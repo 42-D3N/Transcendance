@@ -1,5 +1,3 @@
 const titre = document.getElementById("titre");
-console.log(`Changing "${titre.textContent}" by "Modif"`);
-titre.textContent = "Modif";
+titre.textContent = "Pong";
 titre.style.color = "blue";
-console.log(`New : "${titre.textContent}"`);
