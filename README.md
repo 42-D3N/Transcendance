@@ -27,7 +27,7 @@ The application provides users with :
 - Role(s) : Project Owner, Developer
 - Responsibilities :
 
-## Raphaël Destruhaut (rapo)
+## Raphaël Destruhaut (raporius)
 - Role(s) : Tech lead, Architect, Developer
 - Responsibilities :
 
