@@ -16,7 +16,7 @@
       overflow: hidden;
       background: #111;
     }
-    #square
+    #background
     {
       width: 430px;
       height: 530px;
@@ -25,6 +25,24 @@
       top: 100px;
       left: 100px;
     }
+    #racketUp
+    {
+      width: 80px;
+      height: 10px;
+      background: violet;
+      position: absolute;
+      top: 150px;
+      left: 200px;
+    }
+    #racketDown
+    {
+      width: 80px;
+      height: 10px;
+      background: violet;
+      position: absolute;
+      top: 580px;
+      left: 200px;
+    }
     #circle
     {
       width: 30px;
@@ -32,14 +50,16 @@
       background: red;
       border-radius: 50%;
       position: absolute;
-      top: 300px;
+      top: 350px;
       left: 300px;
     }
   </style>
 </head>
 <body>
 
-<div id="square"></div>
+<div id="background"></div>
+<div id="racketUp"></div>
+<div id="racketDown"></div>
 <div id="circle"></div>
 
 <script src="ball.js"></script>
