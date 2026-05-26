@@ -20,13 +20,13 @@ const createScene = async () => {
     camera.attachControl(canvas, true);
 
     // Lights
-    const light1 = new BABYLON.HemisphericLight(
+    new BABYLON.HemisphericLight(
         "light1",
         new BABYLON.Vector3(1, 1, 0),
         scene
     );
 
-    const light2 = new BABYLON.PointLight(
+    new BABYLON.PointLight(
         "light2",
         new BABYLON.Vector3(0, 10, -10),
         scene
@@ -37,7 +37,7 @@ const createScene = async () => {
         "https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/fonts/gentilis_bold.typeface.json"
     ).then(res => res.json());
 
-    // Create text mesh
+    // Create text
     const middletext = BABYLON.MeshBuilder.CreateText(
         "text",
         "LE PONG DE MERDE",
@@ -51,17 +51,52 @@ const createScene = async () => {
         earcut
     );
 
-    // Center text
-    middletext.position.x = 0;
-
     // Material
     const material = new BABYLON.StandardMaterial("mat", scene);
 
     material.diffuseColor = new BABYLON.Color3(1, 0.2, 0.7);
     material.emissiveColor = new BABYLON.Color3(0.5, 0.1, 0.3);
-    material.specularColor = new BABYLON.Color3(1, 1, 1);
 
     middletext.material = material;
+
+    // CENTER TEXT
+    middletext.position.x = 0;
+
+    // RESPONSIVE FUNCTION
+    const updateResponsive = () => {
+
+        const width = window.innerWidth;
+
+        if (width < 600) {
+
+            // Mobile
+            middletext.scaling.setAll(0.4);
+            camera.radius = 40;
+
+        } else if (width < 1024) {
+
+            // Tablet
+            middletext.scaling.setAll(0.7);
+            camera.radius = 32;
+
+        } else {
+
+            // Desktop
+            middletext.scaling.setAll(1);
+            camera.radius = 25;
+        }
+
+        engine.resize();
+    };
+
+    // Initial call
+    updateResponsive();
+
+    // On resize
+    window.addEventListener("resize", updateResponsive);
+
+    // Rotation animation
+    
     middletext.rotation.y = 0.01
     // Rotation animation
     scene.registerBeforeRender(() => {
