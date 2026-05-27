@@ -1,8 +1,8 @@
-const canvas = document.getElementById("renderCanvas");
-const engine = new BABYLON.Engine(canvas, true);
+import * as BABYLON from "@babylonjs/core";
+import earcut from 'earcut';
 
-const createScene = async () => {
-
+export const createScene = async (canvas:HTMLCanvasElement) => {
+    const engine = new BABYLON.Engine(canvas, true);
     const scene = new BABYLON.Scene(engine);
 
     scene.clearColor = new BABYLON.Color4(0, 0, 0, 1);
@@ -108,17 +108,13 @@ const createScene = async () => {
         console.log("middle text ", middletext.rotation.y);
     });
 
-    return scene;
-};
-
-createScene().then(scene => {
-
     engine.runRenderLoop(() => {
         scene.render();
     });
 
-});
+    window.addEventListener("resize", () => {
+        engine.resize();
+    });
 
-window.addEventListener("resize", () => {
-    engine.resize();
-});
+    return scene;
+};
