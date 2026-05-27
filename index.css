@@ -1,0 +1,53 @@
+
+body
+{
+  margin: 0;
+  overflow: hidden;
+  background: #111;
+}
+#realbackground
+{
+  width: 1920px;
+  height: 1080px;
+  background: rgb(39, 5, 102);
+  position: absolute;
+  top: 0px;
+  left: 0px;
+}
+#background
+{
+  width: 525px;
+  height: 625px;
+  background: rgb(192, 0, 192);
+  position: absolute;
+  top: 25px;
+  left: 100px;
+}
+#racketUp
+{
+  width: 60px;
+  height: 5px;
+  background: rgb(255, 255, 0);
+  position: absolute;
+  top: 35px;
+  left: 342px;
+}
+#racketDown
+{
+  width: 60px;
+  height: 5px;
+  background: rgb(255, 255, 0);
+  position: absolute;
+  top: 630px;
+  left: 342px;
+}
+#circle
+{
+  width: 15px;
+  height: 15px;
+  background: rgb(72, 255, 0);
+  border-radius: 50%;
+  position: absolute;
+  top: 350px;
+  left: 300px;
+}
