@@ -11,14 +11,14 @@ const createScene = async () => {
     const camera = new BABYLON.ArcRotateCamera(
         "camera",
         Math.PI / 2,
-        Math.PI / 2.5,
+        // Math.PI / 2.5,
+        1.5,
         25,
         BABYLON.Vector3.Zero(),
         scene
     );
 
-    camera.attachControl(canvas, true);
-
+    camera.attachControl(canvas, false);
     // Lights
     new BABYLON.HemisphericLight(
         "light1",
@@ -40,11 +40,11 @@ const createScene = async () => {
     // Create text
     const middletext = BABYLON.MeshBuilder.CreateText(
         "text",
-        "LE PONG DE MERDE",
+        "LOADING\n   ZONE",
         fontData,
         {
-            size: 3,
-            depth: 1,
+            size: 4,
+            depth: 3,
             resolution: 64
         },
         scene,
@@ -61,6 +61,7 @@ const createScene = async () => {
 
     // CENTER TEXT
     middletext.position.x = 0;
+    middletext.position.y = -5.2;
 
     // RESPONSIVE FUNCTION
     const updateResponsive = () => {
