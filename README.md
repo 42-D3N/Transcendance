@@ -9,4 +9,4 @@ TODO list :
 
 Power ups :
 - Agrandir (smirk) la raquette
-- Changement de direction au milieu du terrain (avec délais )
+- Changement de direction au milieu du terrain (avec délais et prédiction ?)
