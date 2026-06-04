@@ -1,5 +1,8 @@
 {
 	"/": [],
 	"/game": [],
-	"/loading_screen": []
+	"/loading_screen": [],
+	"/profile": [
+		"src/routes/profile/+page.ts"
+	]
 }

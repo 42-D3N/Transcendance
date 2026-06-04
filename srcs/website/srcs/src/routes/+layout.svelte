@@ -1,5 +1,6 @@
 <script lang="ts">
 	import favicon from '$lib/assets/favicon.svg';
+	import { page } from '$app/state';
 
 	let { children } = $props();
 	import "../app.css";
@@ -7,7 +8,7 @@
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
-	<title>PONG</title>
+	<title>{page.url.pathname.substring(1)}</title>
 </svelte:head>
 
 <div class="w-42.5 h-full fixed overflow-auto m-0 p-0 bg-cyan-600">
