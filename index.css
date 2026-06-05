@@ -17,7 +17,7 @@ body
 {
   width: 525px;
   height: 625px;
-  background: rgb(192, 0, 192);
+  background: rgb(0, 83, 192);
   position: absolute;
   top: 25px;
   left: 100px;
@@ -29,7 +29,7 @@ body
   background: rgb(255, 255, 0);
   position: absolute;
   top: 35px;
-  left: 342px;
+  left: 322.5px;
 }
 #racketDown
 {
@@ -38,7 +38,7 @@ body
   background: rgb(255, 255, 0);
   position: absolute;
   top: 630px;
-  left: 342px;
+  left: 322.5px;
 }
 #circle
 {
@@ -47,6 +47,18 @@ body
   background: rgb(72, 255, 0);
   border-radius: 50%;
   position: absolute;
-  top: 350px;
-  left: 300px;
+  top: 330px;
+  left: 350px;
+}
+#where
+{
+  display: none;
+  width: 150px;
+  height: 5px;
+  background: rgb(0, 17, 255);
+  position: absolute;
+  border-radius: 50%;
+  transform-origin: left center;
+  top: 100000px;
+  left: 100000px;
 }

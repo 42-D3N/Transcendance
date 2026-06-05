@@ -1,104 +1,27 @@
-const terrain_elem = document.getElementById("background");
-const racketDown_elem = document.getElementById("racketDown");
-const racketUp_elem = document.getElementById("racketUp");
-const circle_elem = document.getElementById("circle");
-const baseCircleX = circle.getBoundingClientRect().left;
-const baseCircleY = circle.getBoundingClientRect().top;
-const max_speed = 12;
-const acceleration = 0.1;
-const racket_speed = 10;
-const score_to_win = 15
-
-let last_win = 1;
-let up = false;
-let length;
-let score = { p1: 0, p2: 0 }
-let end_game = false;
-let time = 0;
-
-let easyLevelAI =
-{
-  id: 3,
-  reactionTime: 5,
-  errorMarging: 150
-}
-
-let normalLevelAI =
-{
-  id: 4,
-  reactionTime: 5,
-  errorMarging: 150
-}
-
-let hardLevelAI =
-{
-  id: 5,
-  reactionTime: 5,
-  errorMarging: 150
-}
-
-let impossibleLevelAI =
-{
-  id: 6,
-  reactionTime: 1,
-  errorMarging: 0.0001
-}
-
-let ball = 
-{
-  id: 0,
-  name: 'ball',
-  speed: 6,
-
-  pos: { x: circle_elem.getBoundingClientRect().left, y: circle_elem.getBoundingClientRect().top },
-  size: { w: circle_elem.getBoundingClientRect().width, h: circle_elem.getBoundingClientRect().height },
-  vel: { x: 0, y: 0 }
-}
-
-let racketUp =
-{
-  id: 1,
-  name: 'racketUp',
-  pos: { x: racketUp_elem.getBoundingClientRect().left, y: racketUp_elem.getBoundingClientRect().top },
-  size: { w: racketUp_elem.getBoundingClientRect().width, h: racketUp_elem.getBoundingClientRect().height },
-  keys: { left: false, right: false },
-  movement: 0
-}
-
-let racketDown =
-{
-  id: 2,
-  name: 'racketDown',
-  pos: { x: racketDown_elem.getBoundingClientRect().left, y: racketDown_elem.getBoundingClientRect().top },
-  size: { w: racketDown_elem.getBoundingClientRect().width, h: racketDown_elem.getBoundingClientRect().height },
-  keys: { left: false, right: false },
-  movement: 0
-}
-
-let terrain =
-{
-  pos: { x: terrain_elem.getBoundingClientRect().left, y: terrain_elem.getBoundingClientRect().top },
-  width: terrain_elem.getBoundingClientRect().width,
-  height: terrain_elem.getBoundingClientRect().height
-}
-
 document.addEventListener("keydown", (e) =>
 {
-  if (end_game == true)
+  if (e.key === "Backspace" && running === false && end_game === false && end_round === false)
+    {
+      end_round = true;
+      running = true;
+    }
+  if (end_game === true)
     return ;
-  if (e.key === "Enter")
+  if (e.key === "Enter") // Debug to freeze
     up = !up;
-  else if (e.key === "ArrowRight")
+  if (e.key === "ArrowRight")
   {
     racketDown.keys.left = false;
     racketDown.keys.right = true;
   }
-  else if (e.key === "ArrowLeft")
+  if (e.key === "ArrowLeft")
   {
     racketDown.keys.left = true;
     racketDown.keys.right = false;
   }
-  else if (e.key === "d")
+  if (e.key === "Shift" && (ball.pos.y > (terrain.height / 2) || ball.vel.y > 0))
+    use_powerup = !use_powerup;
+  if (e.key === "d")
   {
     racketUp.keys.left = false;
     racketUp.keys.right = true;
@@ -112,13 +35,8 @@ document.addEventListener("keydown", (e) =>
     ball.speed++;
   else if (e.key === "-") // Debug to decrease ball speed
     ball.speed--;
-  else if (e.key === "Backspace")
-  {
-    new_game();
-    up = !up;
-  }
-  circle_elem.style.left = ball.pos.x + "px";
-  circle_elem.style.top = ball.pos.y + "px";
+  ball_elem.style.left = ball.pos.x + "px";
+  ball_elem.style.top = ball.pos.y + "px";
 });
 
 document.addEventListener("keyup", (e) =>
@@ -134,5 +52,4 @@ document.addEventListener("keyup", (e) =>
 });
 
 new_game();
-update_ball();
-update_rackets();
+game_loop();
