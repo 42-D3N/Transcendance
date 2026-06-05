@@ -5,7 +5,7 @@ node_modules
 .vercel
 .netlify
 .wrangler
-/.svelte-kit
+srcs/website/srcs/.svelte-kit
 /build
 
 # OS
