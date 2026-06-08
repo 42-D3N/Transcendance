@@ -1,13 +1,18 @@
 services:
-  database:
-    image: postgres:18-trixie
-    restart: always
+  # database:
+  #   image: postgres:18-trixie
+  #   restart: always
+  #   ports:
+  #     - 5432:5432
+  #   env_file:
+  #     - ./srcs/database/.env
+  #   volumes:
+  #     - pgdata:/var/lib/postgresql
+  website:
+    build: ./srcs/website
     ports:
-      - 5432:5432
-    env_file:
-      - ./srcs/database/.env
-    volumes:
-      - pgdata:/var/lib/postgresql
+      - "5173:5173"
+    restart: always
   # adminer:
   #   image: adminer
   #   restart: always
