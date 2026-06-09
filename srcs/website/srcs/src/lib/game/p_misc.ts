@@ -2,6 +2,11 @@ import * as game from "./p_var";
 import { up_movement } from "./p_mov";
 import { up_ball } from "./p_ball"
 
+/**
+ * `new_game` is used to initialize all variables for a new round.
+ * 
+ * `game_vars` contain all variables like rackets and ball.
+ */
 export function new_game(game_vars: any)
 {
   game_vars.ball.elem.style.display = "flex";
@@ -16,6 +21,13 @@ export function new_game(game_vars: any)
   game_vars.use_powerup = false;
 }
 
+/**
+ * `freeze_and_prediction` is a function that freeze the ball and display the direction of the ball.
+ * 
+ * `game_vars` contain all variables like rackets and ball.
+ * 
+ * `freeze_time` define how many time the ball will freeze (in ms).
+ */
 export function freeze_and_prediction(game_vars: any, freeze_time: number)
 {
   let tmp_vel_x = game_vars.ball.vel.x;
@@ -37,6 +49,11 @@ export function freeze_and_prediction(game_vars: any, freeze_time: number)
   }, freeze_time);
 }
 
+/**
+ * `game_loop` is the main loop of the game.
+ * 
+ * `game_vars` contain all variables like rackets and ball.
+ */
 export function game_loop(game_vars: any)
 {
   if (game.state.end_game === true)
