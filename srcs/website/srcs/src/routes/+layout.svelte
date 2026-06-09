@@ -1,6 +1,10 @@
 <script lang="ts">
 	let displayNav = $state(false);
 	import favicon from '$lib/assets/favicon.svg';
+	import homeicon from '$lib/assets/home_icon.svg';
+	import gameicon from '$lib/assets/game_icon.svg';
+	import profileicon from '$lib/assets/profile_icon.svg';
+	import setticon from '$lib/assets/settings_icon.svg';
 
 	let { children } = $props();
 	import "../app.css";
@@ -22,7 +26,7 @@
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
-	<title>PONG</title>
+	<title>ft_old_internet</title>
 </svelte:head>
 
 <div id="sidebar" class="lg:left-0 lg:fixed lg:z-100">
@@ -34,19 +38,19 @@
 		<div id="sidebar-menus-buttons" class="min-h-0 overflow-hidden shrink">
 			<div class="items-stretch flex flex-col h-full">
 				<a class="relative text-left grid items-center gap-[1.2rem] w-full hover:text-white hover:bg-neutral-600 text-[1.4rem]/[1.1428] justify-unset overflow-visible whitespace-nowrap break-unset border-0 grid-flow-col max-w-full min-h-16 p-[0.8rem] grid-buttons" href="/">
-					<img class="block h-[2.4rem] w-[2.4rem]"/>
+					<img class="block h-[2.4rem] w-[2.4rem]" src={homeicon} alt="icon"/>
 					<span class="lg:max-xl:hidden overflow-hidden text-2xl/tight text-ellipsis">Home</span>
 				</a>
 				<a class="relative text-left grid items-center gap-[1.2rem] w-full hover:text-white hover:bg-neutral-600 text-[1.4rem]/[1.1428] justify-unset overflow-visible whitespace-nowrap break-unset border-0 grid-flow-col max-w-full min-h-16 p-[0.8rem] grid-buttons" href="/game">
-					<img class="block h-[2.4rem] w-[2.4rem]"/>
+					<img class="block h-[2.4rem] w-[2.4rem]" src={gameicon} alt="icon"/>
 					<span class="lg:max-xl:hidden overflow-hidden text-2xl/tight text-ellipsis">Game</span>
 				</a>
 				<a class="relative text-left grid items-center gap-[1.2rem] w-full hover:text-white hover:bg-neutral-600 text-[1.4rem]/[1.1428] justify-unset overflow-visible whitespace-nowrap break-unset border-0 grid-flow-col max-w-full min-h-16 p-[0.8rem] grid-buttons" href="/profile">
-					<img class="block h-[2.4rem] w-[2.4rem]"/>
+					<img class="block h-[2.4rem] w-[2.4rem]" src={profileicon} alt="icon"/>
 					<span class="lg:max-xl:hidden overflow-hidden text-2xl/tight text-ellipsis">Profile</span>
 				</a>
 				<a class="relative text-left grid items-center gap-[1.2rem] w-full hover:text-white hover:bg-neutral-600 text-[1.4rem]/[1.1428] justify-unset overflow-visible whitespace-nowrap break-unset border-0 grid-flow-col max-w-full min-h-16 p-[0.8rem] grid-buttons" href="/settings">
-					<img class="block h-[2.4rem] w-[2.4rem]"/>
+					<img class="block h-[2.4rem] w-[2.4rem]" src={setticon} alt="icon"/>
 					<span class="lg:max-xl:hidden overflow-hidden text-2xl/tight text-ellipsis">Settings</span>
 				</a>
 			</div>
