@@ -5,7 +5,7 @@ export const users = pgTable('users', {
 	id: serial().primaryKey(),
 	username: varchar({ length:128 }).notNull().unique(),
 	email: varchar({ length:128 }).notNull().unique(),
-	password: text().notNull(),
+	password: varchar({ length:64 }).notNull(),
 	friends: text().default(""),
 	wins: integer().default(0),
 	losses: integer().default(0),
