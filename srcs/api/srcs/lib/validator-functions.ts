@@ -15,4 +15,14 @@ export function validateIdParam() {
   return param("id").toInt().isInt();
 }
 
+export function validateUsername() {
+  return body("username").notEmpty().isString().trim().escape();
+}
 
+export function validateEmail() {
+  return body("email").notEmpty().isString().trim().escape().isEmail();
+}
+
+export function validatePassword() {
+  return body("password").notEmpty().isString().trim().escape();
+}
