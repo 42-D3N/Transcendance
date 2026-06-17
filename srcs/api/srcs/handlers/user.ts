@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { db } from "../db/db.ts";
-import { users, friends, matches } from "../db/schema.js";
+import { users } from "../db/schema.ts";
 import type { Response, Request, NextFunction } from "express";
 import { CustomError } from "../lib/custom-error.ts";
 import { HandleParsingError, handleErrorCode } from "./error.ts";
@@ -18,11 +18,13 @@ export async function adduser(req: Request, res: Response, next: NextFunction) {
       email,
       password
     }).returning();
+    console.log(Data);
     res.status(201).json({ Data });
   } catch (error) {
-    handleErrorCode(error, next);
+    if (handleErrorCode(error, next))
+      return;
     console.log("Failed to add user ", error.cause.code);
-    next(new CustomError("Failed to add Data", 500));
+    next(new CustomError("Failed to add user", 500));
   }
 }
 
@@ -104,7 +106,8 @@ export async function updateuser(req: Request, res: Response,next: NextFunction)
     console.log(Data);
     res.status(200).json({ Data });
   } catch (error) {
-    handleErrorCode(error, next);
+    if (handleErrorCode(error, next))
+      return;
     console.log("Failed to update user ", error.cause.code);
     next(new CustomError("Failed to update user", 500));
   }
@@ -129,7 +132,8 @@ export async function P_updateuser(req: Request, res: Response,next: NextFunctio
     console.log(Data);
     res.status(201).json({ Data });
   } catch (error) {
-    handleErrorCode(error, next);
+    if (handleErrorCode(error, next))
+      return;
     console.log("Failed to update user ", error.cause.code);
     next(new CustomError("Failed to update Data", 500));
   }

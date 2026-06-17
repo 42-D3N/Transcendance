@@ -22,8 +22,32 @@ function validateUpdatePassword() {
   return body("password").optional().notEmpty().isString().trim().escape();
 }
 
+function validateUser1() {
+  return body("user1").notEmpty().isNumeric().trim().escape();
+}
+
+function validateUser2() {
+  return body("user2").notEmpty().isNumeric().trim().escape();
+}
+
+function validateAccepted() {
+  return body("isaccepted").notEmpty().trim().escape().toBoolean().isBoolean();
+}
+
+export function validateIdFriends() {
+  return [
+    validateUser1(),
+    validateUser2(),
+    validateAccepted()
+  ];
+}
+
 export function validateUpdateUser() {
-  return (validateUpdateUsername() || validateUpdateEmail() && validateUpdatePassword());
+  return [
+    validateUpdateUsername(),
+    validateUpdateEmail(),
+    validateUpdatePassword()
+  ];
 }
 
 //Validating id from route parameter
