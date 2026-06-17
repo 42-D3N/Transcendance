@@ -10,6 +10,22 @@ export function validateDataBody() {
   return body("body").notEmpty().isString().trim().escape();
 }
 
+function validateUpdateEmail() {
+  return body("email").optional().notEmpty().isString().trim().escape().isEmail();
+}
+
+function validateUpdateUsername() {
+  return body("username").optional().notEmpty().isString().trim().escape();
+}
+
+function validateUpdatePassword() {
+  return body("password").optional().notEmpty().isString().trim().escape();
+}
+
+export function validateUpdateUser() {
+  return (validateUpdateUsername() || validateUpdateEmail() && validateUpdatePassword());
+}
+
 //Validating id from route parameter
 export function validateIdParam() {
   return param("id").toInt().isInt();

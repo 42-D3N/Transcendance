@@ -1,7 +1,7 @@
 import { CustomError } from "../lib/custom-error.ts";
 import type { NextFunction } from "express";
 
-export function HandleError(result, next: NextFunction)
+export function HandleParsingError(result, next: NextFunction)
 {
   const errors = result.array();
   if (errors.length > 1){
@@ -32,4 +32,18 @@ export function HandleError(result, next: NextFunction)
   }
   console.log("Error while parsing request");
   return next (new CustomError(JSON.stringify(result.array()), 400));
+}
+
+export function handleErrorCode(error, next: NextFunction)
+{
+  if (error.cause.code == "42601") {
+    console.log("No valid field in request");
+    return next(new CustomError("No valid field in request", 400));
+  }
+  if (error.cause.code == "23505") {
+    console.log("Username or email already exist");
+    return next(new CustomError("Username or email already exist", 400));
+  }
+  console.log("Failed to update user ", error.cause.code);
+  next(new CustomError("Failed to update user", 500));
 }

@@ -1,12 +1,11 @@
 import { sql } from "drizzle-orm";
-import { pgTable, serial, varchar, text, integer, timestamp, check, primaryKey } from 'drizzle-orm/pg-core';
+import { pgTable, serial, varchar, text, integer, timestamp, check, primaryKey, boolean } from 'drizzle-orm/pg-core';
 
 export const users = pgTable('users', {
 	id: serial().primaryKey(),
 	username: varchar({ length:128 }).notNull().unique(),
 	email: varchar({ length:128 }).notNull().unique(),
 	password: text().notNull(),
-	friends: text().default(""),
 	wins: integer().default(0),
 	losses: integer().default(0),
 	matches: integer().default(0),
@@ -15,7 +14,8 @@ export const users = pgTable('users', {
 
 export const friends = pgTable('friends', {
 	user1: integer().notNull().references(() => users.id),
-	user2: integer().notNull().references(() => users.id)
+	user2: integer().notNull().references(() => users.id),
+	isaccepted: boolean().default(false)
 	}, (table) => [
  	primaryKey({ columns: [table.user1, table.user2] })
 ]);
