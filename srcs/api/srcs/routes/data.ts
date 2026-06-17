@@ -1,7 +1,7 @@
 import { Router } from "express";
 // import { addData, deleteData, getAllData, getData, updateData} from "../handlers/data.ts";
 import { validateIdParam, validateDataBody, validateDataTitle} from "../lib/validator-functions.ts";
-import { adduser, getalluser, getuserid, deleteuser, updateuser } from "../handlers/data.ts";
+import { adduser, getalluser, getuserid, deleteuser, updateuser, P_updateuser } from "../handlers/data.ts";
 import * as v from "../lib/validator-functions.ts";
 import { GelDateDurationBuilder } from "drizzle-orm/gel-core";
 
@@ -17,6 +17,7 @@ DataRouter.get("/get-all-users", getalluser);
 DataRouter.get("/user/:id", validateIdParam(), getuserid);
 DataRouter.post("/user", v.validateUsername(), v.validateEmail(), v.validatePassword(), adduser);
 DataRouter.patch("/user/:id", v.validateUpdateUser(), updateuser);
+DataRouter.put("/user/:id", v.validateUsername(), v.validateEmail(), v.validatePassword(), P_updateuser);
 DataRouter.delete("/user/:id", v.validateIdParam(), deleteuser);
 
 export default DataRouter;
