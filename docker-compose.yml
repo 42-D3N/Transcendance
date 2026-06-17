@@ -5,9 +5,14 @@ services:
     ports:
       - 5432:5432
     env_file:
-      - ./srcs/database/.env
+      - ./srcs/api/.env
     volumes:
       - pgdata:/var/lib/postgresql
+  # website:
+  #   build: ./srcs/website
+  #   ports:
+  #     - "5173:5173"
+  #   restart: always
   adminer:
     image: adminer
     restart: always
