@@ -7,8 +7,7 @@ import * as db from "$lib/server/db"
 // };
 
 export const actions = {
-	login: async (event) => {
-		console.log("logged in as");
-		// TODO log the user in
+	login: async (event) => {s
+		console.log(event);
 	}
 } satisfies Actions;

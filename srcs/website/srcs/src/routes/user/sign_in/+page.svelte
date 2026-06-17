@@ -65,19 +65,19 @@
         
         <label>
             Email
-            <input name="email" type="email" class="bg-white focus:bg-black/20" bind:value={email} onchange={checkEmail}>
+            <input name="email" type="email" class="bg-white focus:bg-black/20" bind:value={email}>
         </label><br>
         <div id="emailValidity" class="hidden" >please enter a valid email adress</div>
         <label>
             Username
-            <input minlength="4" maxlength="128" name="username" type="username" value={username} onchange={checkUsername}>
+            <input minlength="4" maxlength="128" name="username" type="username" value={username}>
         </label><br>
         <div id="usernameValidity" class="hidden">Username must be between 4 - 128 caracters</div>
         <label>
             Password
-            <input minlength="8" name="password" type="password" bind:value={password} onchange={checkPassword}>
+            <input minlength="8" name="password" type="password" bind:value={password}>
         </label><br>
         <div id="passwordValidity" class="hidden" >Password not secure enough</div>
-	    <input type="submit" value="Create account" onclick={}>
+	    <input type="submit" value="Create account">
     </form>
 </div>
