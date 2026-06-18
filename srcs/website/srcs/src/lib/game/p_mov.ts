@@ -1,12 +1,10 @@
-import * as game from "./p_var"
-
 export function ia_movement_calcul(game_vars: any)
 {
   if (game_vars.ball.vel.y < 0 && game_vars.ball.pos.y >= game_vars.racketUp.pos.y)
   {
     let timeToReach = (game_vars.racketUp.pos.y - game_vars.ball.pos.y) / game_vars.ball.vel.y;
     let targetX = game_vars.ball.pos.x + game_vars.ball.vel.x * timeToReach;
-    targetX += ((Math.random() - 0.2) * game.aiLevels.easy.errorMarging) / 2;
+    targetX += ((Math.random() - 0.2) * game_vars.aiLevels.easy.errorMarging) / 2;
     game_vars.racketUp.movement = targetX - game_vars.racketUp.pos.x - (game_vars.racketUp.size.w / 2);
     while (targetX < 0 || targetX > game_vars.terrain.width)
     {
@@ -23,9 +21,9 @@ export function ia_movement_calcul(game_vars: any)
 export function user_movement_calcul(game_vars: any)
 {
   if (game_vars.racketDown.keys.left === true)
-    game_vars.racketDown.pos.x -= game.racket_speed;
+    game_vars.racketDown.pos.x -= game_vars.racket_speed;
   else if (game_vars.racketDown.keys.right === true)
-    game_vars.racketDown.pos.x += game.racket_speed;
+    game_vars.racketDown.pos.x += game_vars.racket_speed;
 }
 
 export function ia_movement(game_vars: any)
@@ -35,10 +33,10 @@ export function ia_movement(game_vars: any)
     if ((game_vars.racketUp.movement < 0 && game_vars.racketUp.pos.x === game_vars.terrain.pos.x) ||
         (game_vars.racketUp.movement > 0 && game_vars.racketUp.pos.x === game_vars.terrain.pos.x + game_vars.terrain.width - game_vars.racketUp.size.w))
       game_vars.racketUp.movement = 0;
-    if (Math.abs(game_vars.racketUp.movement) >= game.racket_speed)
+    if (Math.abs(game_vars.racketUp.movement) >= game_vars.racket_speed)
     {
-      game_vars.racketUp.pos.x += game.racket_speed * Math.sign(game_vars.racketUp.movement);
-      game_vars.racketUp.movement += game.racket_speed * -Math.sign(game_vars.racketUp.movement);
+      game_vars.racketUp.pos.x += game_vars.racket_speed * Math.sign(game_vars.racketUp.movement);
+      game_vars.racketUp.movement += game_vars.racket_speed * -Math.sign(game_vars.racketUp.movement);
     }
     else
     {
@@ -62,11 +60,11 @@ export function user_movement(game_vars: any)
 
 export function up_movement(game_vars: any)
 {
-  if (game_vars.racketUp.movement === 0 && game.state.time % game.aiLevels.easy.reactionTime === 0)
+  if (game_vars.racketUp.movement === 0 && game_vars.state.time % game_vars.aiLevels.easy.reactionTime === 0)
     ia_movement_calcul(game_vars);
   user_movement_calcul(game_vars);
   ia_movement(game_vars);
   user_movement(game_vars);
-  game_vars.racketDown.elem.style.left = game_vars.racketDown.pos.x + "px";
-  game_vars.racketUp.elem.style.left = game_vars.racketUp.pos.x + "px";
+  game_vars.racketDown.elem.style.left = `${game_vars.racketDown.pos.x * game_vars.scale.x}px`;
+  game_vars.racketUp.elem.style.left = `${game_vars.racketUp.pos.x * game_vars.scale.x}px`;
 }

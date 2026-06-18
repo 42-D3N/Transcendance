@@ -1,4 +1,3 @@
-import * as game from "./p_var"
 import { freeze_and_prediction } from "./p_misc"
 
 export function bounceball(ball: any, racket: any)
@@ -39,7 +38,7 @@ export function up_ball(game_vars: any)
   game_vars.ball.pos.x += game_vars.ball.vel.x * game_vars.ball.speed;
   game_vars.ball.pos.y += game_vars.ball.vel.y * game_vars.ball.speed;
 
-  if (game.state.use_powerup === true && game_vars.ball.vel.y < 0 && game_vars.ball.pos.y <= (game_vars.terrain.height / 2))
+  if (game_vars.state.use_powerup === true && game_vars.ball.vel.y < 0 && game_vars.ball.pos.y <= (game_vars.terrain.height / 2))
   {
     let tmp_vel_mod;
     tmp_vel_mod = Math.random() * (0.8 - (-0.8)) + (-0.8);
@@ -49,7 +48,7 @@ export function up_ball(game_vars: any)
     game_vars.ball.tmp_speed = game_vars.ball.speed;
     game_vars.ball.speed = game_vars.ball.tmp_speed * 2;
     freeze_and_prediction(game_vars, 150);
-    game.state.use_powerup = false;
+    game_vars.state.use_powerup = false;
   }
 
   // Wall hit left & right
@@ -60,25 +59,25 @@ export function up_ball(game_vars: any)
     else if (game_vars.ball.pos.x < game_vars.terrain.pos.x)
       game_vars.ball.pos.x = game_vars.terrain.pos.x;
     game_vars.ball.vel.x = -game_vars.ball.vel.x;
-    if (game_vars.ball.speed < game.maxSpeed - game.acceleration)
-      game_vars.ball.speed += game.acceleration;
+    if (game_vars.ball.speed < game_vars.maxSpeed - game_vars.acceleration)
+      game_vars.ball.speed += game_vars.acceleration;
   }
 
   // Hit with game_vars.racketDown
   if (collide(game_vars.racketDown, game_vars.ball) && game_vars.ball.vel.y > 0)
   {
     bounceball(game_vars.ball, game_vars.racketDown);
-    if (game_vars.ball.speed < game.maxSpeed - game.acceleration)
-        game_vars.ball.speed += game.acceleration;
+    if (game_vars.ball.speed < game_vars.maxSpeed - game_vars.acceleration)
+        game_vars.ball.speed += game_vars.acceleration;
     game_vars.ball.pos.y = game_vars.racketDown.pos.y - game_vars.ball.size.h;
   }
 
-  // Hit with game.racketUp
+  // Hit with game_vars.racketUp
   else if (collide(game_vars.racketUp, game_vars.ball) && game_vars.ball.vel.y < 0)
   {
     bounceball(game_vars.ball, game_vars.racketUp);
-    if (game_vars.ball.speed < game.maxSpeed - game.acceleration)
-        game_vars.ball.speed += game.acceleration;
+    if (game_vars.ball.speed < game_vars.maxSpeed - game_vars.acceleration)
+        game_vars.ball.speed += game_vars.acceleration;
     game_vars.ball.pos.y = game_vars.racketUp.pos.y + game_vars.racketUp.size.h;
   }
 
@@ -87,19 +86,25 @@ export function up_ball(game_vars: any)
   {
     if (game_vars.ball.pos.y > game_vars.terrain.pos.y + game_vars.terrain.height - game_vars.ball.size.h)
     {
-      game.state.score.p1++;
-      game.state.last_win = 1;
+      game_vars.state.score.p1++;
+      game_vars.state.last_win = 1;
     }
     else
     {
-      game.state.score.p2++;
-      game.state.last_win = -1;
+      game_vars.state.score.p2++;
+      game_vars.state.last_win = -1;
     }
-    console.log(`p1 : ${game.state.score.p1} / p2 : ${game.state.score.p2}`);
+    console.log(`p1 : ${game_vars.state.score.p1} / p2 : ${game_vars.state.score.p2}`);
     game_vars.ball.elem.style.display = "none";
-    game.state.up = false;
-    game.state.end_round = true;
+    game_vars.state.up = false;
+    game_vars.state.end_round = true;
   }
-  game_vars.ball.elem.style.left = game_vars.ball.pos.x + "px";
-  game_vars.ball.elem.style.top = game_vars.ball.pos.y + "px";
+  game_vars.ball.elem.style.width = `${game_vars.ball.size.w * game_vars.scale.x}px`;
+  game_vars.ball.elem.style.height = `${game_vars.ball.size.h * game_vars.scale.y}px`;
+  game_vars.racketUp.elem.style.width = `${game_vars.racketUp.size.w * game_vars.scale.x}px`;
+  game_vars.racketUp.elem.style.height = `${game_vars.racketUp.size.h * game_vars.scale.y}px`;
+  game_vars.racketDown.elem.style.width = `${game_vars.racketDown.size.w * game_vars.scale.x}px`;
+  game_vars.racketDown.elem.style.height = `${game_vars.racketDown.size.h * game_vars.scale.y}px`;
+  game_vars.ball.elem.style.left = `${game_vars.ball.pos.x * game_vars.scale.x}px`;
+  game_vars.ball.elem.style.top = `${game_vars.ball.pos.y * game_vars.scale.y}px`;
 }

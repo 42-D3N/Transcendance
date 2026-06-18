@@ -12,6 +12,9 @@ services:
     build: ./srcs/website
     ports:
       - "5173:5173"
+    volumes:
+      - ./srcs/website/srcs:/svelte
+      - /svelte/node_modules
     restart: always
   # adminer:
   #   image: adminer

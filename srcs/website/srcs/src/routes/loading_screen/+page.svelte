@@ -1,11 +1,18 @@
 <script lang="ts">
-    import { onMount } from 'svelte';
+    import { goto } from '$app/navigation';
     import { createScene } from '$lib/scene';
+    import * as BABYLON from "@babylonjs/core";
+    import earcut from 'earcut';
+    import { onMount, onDestroy } from 'svelte';
 
     let  renderCanvas:HTMLCanvasElement;
 
-    onMount(() => {
+    onMount(() =>
+    {
         createScene(renderCanvas);
+        setTimeout(() => {
+            goto('/game');
+        }, 5000);
     });
 </script>
 
