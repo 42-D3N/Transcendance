@@ -34,6 +34,13 @@ function validateAccepted() {
   return body("isaccepted").notEmpty().trim().escape().toBoolean().isBoolean();
 }
 
+export function validateDeleteFriends() {
+  return [
+    validateUser1(),
+    validateUser2(),
+  ];
+}
+
 export function validateIdFriends() {
   return [
     validateUser1(),

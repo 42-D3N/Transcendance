@@ -18,7 +18,7 @@ export async function adduser(req: Request, res: Response, next: NextFunction) {
       email,
       password
     }).returning();
-    console.log(Data);
+    console.log("User added",Data);
     res.status(201).json({ Data });
   } catch (error) {
     if (handleErrorCode(error, next))
@@ -31,7 +31,7 @@ export async function adduser(req: Request, res: Response, next: NextFunction) {
 export async function getalluser(req: Request, res: Response, next: NextFunction) {
   try {
     const Data = await db.select().from(users);
-    console.log(Data);
+    console.log("All users",Data);
     res.status(200).json({ Data });
   } catch (error) {
     console.log("Failed to fetch all users ", error.cause.code);
@@ -54,7 +54,7 @@ export async function getuserid(req: Request, res: Response, next: NextFunction)
       console.log("User not found");
       return next (new CustomError("User not found", 404));
     }
-    console.log(Data);
+    console.log("user",Data);
     res.status(200).json({ Data });
   } catch (error) {
     console.log("Failed to fetch user ", error.cause.error);
@@ -79,7 +79,7 @@ export async function deleteuser(req: Request, res: Response, next: NextFunction
       console.log("User not found");
       return next (new CustomError("User not found", 404));
     }
-    console.log(Data);
+    console.log("deleted user",Data);
     res.status(200).json({ Data });
   } catch (error) {
     console.log("Failed to delete user ", error.cause.error);
@@ -103,7 +103,7 @@ export async function updateuser(req: Request, res: Response,next: NextFunction)
       console.log("User not found");
       return next (new CustomError("User not found", 404));
     }
-    console.log(Data);
+    console.log("user updated",Data);
     res.status(200).json({ Data });
   } catch (error) {
     if (handleErrorCode(error, next))
@@ -129,7 +129,7 @@ export async function P_updateuser(req: Request, res: Response,next: NextFunctio
       console.log("User not found");
       return next (new CustomError("User not found", 404));
     }
-    console.log(Data);
+    console.log("user updated",Data);
     res.status(201).json({ Data });
   } catch (error) {
     if (handleErrorCode(error, next))
