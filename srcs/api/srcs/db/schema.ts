@@ -31,3 +31,11 @@ export const matches = pgTable('matches', {
 	}, (table) => [
     check("winner_check", sql`${table.winner} = ${table.user1} or ${table.winner} = ${table.user2}`)
 ]);
+
+export const api_users = pgTable('api_users', {
+	id: serial().primaryKey(),
+	username: varchar({ length:128 }).notNull().unique(),
+	email: varchar({ length:128 }).notNull().unique(),
+	password: text().notNull(),
+	role: varchar({ length:128 }).notNull().default("user")
+});

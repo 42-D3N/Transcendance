@@ -12,10 +12,14 @@
   "license": "ISC",
   "dependencies": {
     "@libsql/client": "^0.17.3",
+    "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
     "dotenv": "^17.4.2",
     "drizzle-orm": "^0.45.2",
     "express": "^5.2.1",
     "express-validator": "^7.3.2",
+    "jsonwebtoken": "^9.0.3",
+    "nodemon": "^3.1.14",
     "postgres": "^3.4.9"
   },
   "keywords": [],
