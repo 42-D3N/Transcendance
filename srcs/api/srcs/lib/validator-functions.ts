@@ -11,20 +11,52 @@ export function validateDataBody() {
 }
 
 function validateUpdateEmail() {
-  return body("email").optional().notEmpty().isString().trim().escape().isEmail();
+  return body("email").optional({ checkFalsy: true }).isString().trim().isEmail().normalizeEmail();
 }
 
 function validateUpdateUsername() {
-  return body("username").optional().notEmpty().isString().trim().escape();
+  return body("username").optional({ checkFalsy: true }).isString().trim().escape();
 }
 
 function validateUpdatePassword() {
-  return body("password").optional().notEmpty().isString().trim().escape();
+  return body("password").optional({ checkFalsy: true }).isString().trim();
 }
 
 export function validateUpdateUser() {
-  return (validateUpdateUsername() || validateUpdateEmail() && validateUpdatePassword());
+  return [
+    validateUpdateUsername(),
+    validateUpdateEmail(),
+    validateUpdatePassword()
+  ];
 }
+
+function validateUser1() {
+  return body("user1").notEmpty().isNumeric().trim().escape();
+}
+
+function validateUser2() {
+  return body("user2").notEmpty().isNumeric().trim().escape();
+}
+
+function validateAccepted() {
+  return body("isaccepted").notEmpty().trim().escape().toBoolean().isBoolean();
+}
+
+export function validateDeleteFriends() {
+  return [
+    validateUser1(),
+    validateUser2(),
+  ];
+}
+
+export function validateIdFriends() {
+  return [
+    validateUser1(),
+    validateUser2(),
+    validateAccepted()
+  ];
+}
+
 
 //Validating id from route parameter
 export function validateIdParam() {
@@ -32,13 +64,13 @@ export function validateIdParam() {
 }
 
 export function validateUsername() {
-  return body("username").notEmpty().isString().trim().escape();
+  return body("username").notEmpty().isString().trim();
 }
 
 export function validateEmail() {
-  return body("email").notEmpty().isString().trim().escape().isEmail();
+  return body("email").notEmpty().isString().trim().escape().isEmail().normalizeEmail();
 }
 
 export function validatePassword() {
-  return body("password").notEmpty().isString().trim().escape();
+  return body("password").notEmpty().isString().trim();
 }
