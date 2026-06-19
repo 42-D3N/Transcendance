@@ -42,13 +42,14 @@ export function handleErrorCode(error, next: NextFunction, used)
     return 1;
   }
   if (error.cause.code == "23505") {
-    if (used.isEmpty()) {
+    console.log(used);
+    if (!used[0]) {
       console.log("email already exist");
       next(new CustomError("email already exist", 400));
     }
     else {
-      console.log("Username or email already exist");
-      next(new CustomError("Username or email already exist", 400));
+      console.log("Username already exist");
+      next(new CustomError("Username already exist", 400));
     }
     return 1;
   }

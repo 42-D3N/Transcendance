@@ -6,7 +6,7 @@ import { db } from "../db/db.ts";
 import { api_users, users } from "../db/schema.ts";
 import { handleErrorCode, HandleParsingError } from "./error.ts";
 import { eq } from "drizzle-orm";
-import * as jwt from 'jsonwebtoken';
+import jwt from "jsonwebtoken";
 var expire_time = '1h';
 
 export async function register(req: Request, res: Response, next: NextFunction) {
@@ -47,21 +47,17 @@ export async function login(req: Request, res: Response, next: NextFunction) {
     try {
         const { email, password } = req.body;
         const user = await db.select({email: users.email, password: users.password, id: users.id}).from(users).where(eq(email, users.email));
-        console.log("user", user);
         if (!user) {
             console.log("Api register no game user found");
             return new CustomError("Api register wrong credentials", 400);
         }
         const isMatch = await bcrypt.compare(password, user[0].password);
-        console.log(isMatch);
         if (!isMatch) {
             console.log("Api register wrong credentials");
             return next( new CustomError("Api register wrong credentials", 400));
         }
-        const role = await db.select({role: api_users.role}).from(api_users).where(eq(api_users.user, users.id));
-        console.log("role", role);
+        const role = await db.select({role: api_users.role}).from(api_users).where(eq(api_users.user, user[0].id));
         const token = jwt.sign({ id: user[0].id, role: role[0].role }, 'your_secret_key', { expiresIn: expire_time });
-        console.log(token);
         console.log(`user: ${user[0].id} token: ${token} valid for ${expire_time}`);
         res.status(201).json({ token, message: 'Logged in successfuly'});
     } catch (error) {
