@@ -54,10 +54,10 @@ export const actions = {
             {
                 const test = await response.json();
                 console.log(test);
-                if (test.msg == "Username or email already exist")
+                if (test.msg == "Username already exist")
                     return (fail(400, {username, username_exists: true}));
 
-                if (test.msg == "Username or email already exist")
+                if (test.msg == "Email already exist")
                     return (fail(400, {email, email_exists: true}));
             }
             
@@ -68,13 +68,12 @@ export const actions = {
                 username:data.username,
                 password:data.password
             };
-            
-            return (userData);
+
+            // cookies.set('User', userData);
         }
         catch (error)
         {
             console.error("Erreur lors de la requête :", error);
         }
-        return (null);
     }
 } satisfies Actions;
