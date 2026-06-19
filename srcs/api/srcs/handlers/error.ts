@@ -34,7 +34,7 @@ export function HandleParsingError(result, next: NextFunction)
   return next (new CustomError(JSON.stringify(result.array()), 400));
 }
 
-export function handleErrorCode(error, next: NextFunction)
+export function handleErrorCode(error, next: NextFunction, used)
 {
   if (error.cause.code == "42601") {
     console.log("No valid field in request");
@@ -42,8 +42,14 @@ export function handleErrorCode(error, next: NextFunction)
     return 1;
   }
   if (error.cause.code == "23505") {
-    console.log("Username or email already exist");
-    next(new CustomError("Username or email already exist", 400));
+    if (used.isEmpty()) {
+      console.log("email already exist");
+      next(new CustomError("email already exist", 400));
+    }
+    else {
+      console.log("Username or email already exist");
+      next(new CustomError("Username or email already exist", 400));
+    }
     return 1;
   }
   if (error.cause.code == "23503") {
