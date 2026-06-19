@@ -52,12 +52,12 @@ export function up_ball(game_vars: any)
   }
 
   // Wall hit left & right
-  if (game_vars.ball.pos.x > game_vars.terrain.pos.x + game_vars.terrain.width - game_vars.ball.size.w || game_vars.ball.pos.x < game_vars.terrain.pos.x)
+  if (game_vars.ball.pos.x > game_vars.terrain.width - game_vars.ball.size.w || game_vars.ball.pos.x < 0)
   {
-    if (game_vars.ball.pos.x > game_vars.terrain.pos.x + game_vars.terrain.width - game_vars.ball.size.w)
-      game_vars.ball.pos.x = game_vars.terrain.pos.x + game_vars.terrain.width - game_vars.ball.size.w;
-    else if (game_vars.ball.pos.x < game_vars.terrain.pos.x)
-      game_vars.ball.pos.x = game_vars.terrain.pos.x;
+    if (game_vars.ball.pos.x > game_vars.terrain.width - game_vars.ball.size.w)
+      game_vars.ball.pos.x = game_vars.terrain.width - game_vars.ball.size.w;
+    else if (game_vars.ball.pos.x < 0)
+      game_vars.ball.pos.x = 0;
     game_vars.ball.vel.x = -game_vars.ball.vel.x;
     if (game_vars.ball.speed < game_vars.maxSpeed - game_vars.acceleration)
       game_vars.ball.speed += game_vars.acceleration;
@@ -82,9 +82,9 @@ export function up_ball(game_vars: any)
   }
 
   // Hit up or down for loose
-  else if (game_vars.ball.pos.y > game_vars.terrain.pos.y + game_vars.terrain.height - game_vars.ball.size.h || game_vars.ball.pos.y < game_vars.terrain.pos.y)
+  else if (game_vars.ball.pos.y > game_vars.terrain.height - game_vars.ball.size.h || game_vars.ball.pos.y < 0)
   {
-    if (game_vars.ball.pos.y > game_vars.terrain.pos.y + game_vars.terrain.height - game_vars.ball.size.h)
+    if (game_vars.ball.pos.y > game_vars.terrain.height - game_vars.ball.size.h)
     {
       game_vars.state.score.p1++;
       game_vars.state.last_win = 1;

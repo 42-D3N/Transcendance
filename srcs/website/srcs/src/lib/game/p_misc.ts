@@ -33,8 +33,10 @@ export function freeze_and_prediction(game_vars: any, freeze_time: number)
   let tmp_vel_y = game_vars.ball.vel.y;
   game_vars.ball.vel.x = 0;
   game_vars.ball.vel.y = 0;
-  game_vars.where_elem.style.left = game_vars.ball.pos.x + (game_vars.ball.size.w / 2) + "px";
-  game_vars.where_elem.style.top = game_vars.ball.pos.y + (game_vars.ball.size.h / 2) + "px";
+  game_vars.where_elem.style.left = `${(game_vars.ball.pos.x + game_vars.ball.size.w / 2) * game_vars.scale.x}px`
+  game_vars.where_elem.style.top = `${(game_vars.ball.pos.y + game_vars.ball.size.h / 2) * game_vars.scale.y}px`
+  game_vars.where_elem.style.width = `${game_vars.where.size.w * game_vars.scale.x}px`;
+  game_vars.where_elem.style.height = `${game_vars.where.size.h * game_vars.scale.y}px`;
   game_vars.where_elem.style.transform = `rotate(${Math.atan2(tmp_vel_y, tmp_vel_x)}rad)`;
   game_vars.where_elem.style.display = "flex";
   length = Math.hypot(tmp_vel_x, tmp_vel_y);

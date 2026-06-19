@@ -13,13 +13,6 @@ export function initGame()
   if (!terrain_elem || !racketDown_elem || !racketUp_elem || !ball_elem || !where_elem)
     throw new Error("Pong element init not found. Please check HTML or ID");
 
-  const terrainRect = terrain_elem.getBoundingClientRect();
-
-  const racketUpRect = racketUp_elem.getBoundingClientRect();
-  const racketDownRect = racketDown_elem.getBoundingClientRect();
-  const ballRect = ball_elem.getBoundingClientRect();
-  const whereRect = where_elem.getBoundingClientRect();
-
   const GAME_WIDTH	= 650;
   const GAME_HEIGHT	= 730;
 /*
@@ -51,6 +44,25 @@ export function initGame()
     elem: HTMLElement;
   }
 /*
+┌────────────────────┐
+│Terrain Declarations│
+└────────────────────┘
+*/
+  interface Terrain extends GameObject
+  {
+    width:	number;
+    height:	number;
+  }
+
+  let terrain: Terrain =
+  {
+    id:		3,
+    elem:	terrain_elem,
+
+    width:	GAME_WIDTH,
+    height:	GAME_HEIGHT
+  }
+/*
 ┌─────────────────┐
 │Ball Declarations│
 └─────────────────┘
@@ -75,8 +87,8 @@ export function initGame()
     tmp_speed:	0,
     elem:		ball_elem,
 
-    base_pos:	{ x: ballRect.left - (terrainRect.left / 2), y:  ballRect.top - (terrainRect.top / 2) },
-    pos:		{ x: ballRect.left - (terrainRect.left / 2), y:  ballRect.top - (terrainRect.top / 2) },
+    base_pos:	{ x: (terrain.width / 2), y:  (terrain.height / 2) },
+    pos:		{ x: (terrain.width / 2), y:  (terrain.height / 2) },
     size:		{ w: 15, h: 15 },
     vel:		{ x: 0,  y: 0 }
   }
@@ -106,7 +118,7 @@ export function initGame()
     elem:		racketUp_elem,
     movement:	0,
 
-    pos:		{ x: racketUpRect.left - (terrainRect.left / 2),  y: racketUpRect.top - (terrainRect.top / 2) },
+    pos:		{ x: (terrain.width / 2),  y: 12.5 },
     size:		{ w: 80, h: 10 },
     keys:		{ left: false, right: false }
   }
@@ -118,30 +130,9 @@ export function initGame()
     elem:		racketDown_elem,
     movement:	0,
 
-    pos:		{ x: racketDownRect.left - (terrainRect.left / 2),  y: racketDownRect.top - (terrainRect.top / 2) },
+    pos:		{ x: (terrain.width / 2),  y: 722.5 - 12.5 },
     size:		{ w: 80, h: 10 },
     keys:		{ left: false, right: false }
-  }
-/*
-┌────────────────────┐
-│Terrain Declarations│
-└────────────────────┘
-*/
-  interface Terrain extends GameObject
-  {
-    pos:	Position;
-    width:	number;
-    height:	number;
-  }
-
-  let terrain: Terrain =
-  {
-    id:		3,
-    elem:	terrain_elem,
-
-    pos:	{ x: (terrainRect.left / 2), y: (terrainRect.top / 2) },
-    width:	GAME_WIDTH,
-    height:	GAME_HEIGHT
   }
 /*
 ┌───────────────────┐
@@ -154,7 +145,8 @@ export function initGame()
     name:	'ball_dir',
     elem:	where_elem,
 
-    pos:	{ x: whereRect.left - (terrainRect.left / 2), y: whereRect.top - (terrainRect.top / 2) },
+    pos:	{ x: 0, y: 0 },
+    size:	{ w: 200, h: 5 },
   }
 
   const scale = { x: 1, y: 1 };

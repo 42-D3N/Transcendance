@@ -30,8 +30,8 @@ export function ia_movement(game_vars: any)
 {
   if (game_vars.racketUp.movement != 0)
   {
-    if ((game_vars.racketUp.movement < 0 && game_vars.racketUp.pos.x === game_vars.terrain.pos.x) ||
-        (game_vars.racketUp.movement > 0 && game_vars.racketUp.pos.x === game_vars.terrain.pos.x + game_vars.terrain.width - game_vars.racketUp.size.w))
+    if ((game_vars.racketUp.movement < 0 && game_vars.racketUp.pos.x === 0) ||
+        (game_vars.racketUp.movement > 0 && game_vars.racketUp.pos.x === 0 + game_vars.terrain.width - game_vars.racketUp.size.w))
       game_vars.racketUp.movement = 0;
     if (Math.abs(game_vars.racketUp.movement) >= game_vars.racket_speed)
     {
@@ -48,14 +48,14 @@ export function ia_movement(game_vars: any)
 
 export function user_movement(game_vars: any)
 {
-  if (game_vars.racketDown.pos.x > game_vars.terrain.pos.x + game_vars.terrain.width - game_vars.racketDown.size.w)
-    game_vars.racketDown.pos.x = game_vars.terrain.pos.x + game_vars.terrain.width - game_vars.racketDown.size.w;
-  else if (game_vars.racketDown.pos.x < game_vars.terrain.pos.x)
-    game_vars.racketDown.pos.x = game_vars.terrain.pos.x;
-  if (game_vars.racketUp.pos.x > game_vars.terrain.pos.x + game_vars.terrain.width - game_vars.racketUp.size.w)
-    game_vars.racketUp.pos.x = game_vars.terrain.pos.x + game_vars.terrain.width - game_vars.racketUp.size.w
-  else if (game_vars.racketUp.pos.x < game_vars.terrain.pos.x)
-    game_vars.racketUp.pos.x = game_vars.terrain.pos.x;
+  if (game_vars.racketDown.pos.x > game_vars.terrain.width - game_vars.racketDown.size.w)
+    game_vars.racketDown.pos.x = game_vars.terrain.width - game_vars.racketDown.size.w;
+  else if (game_vars.racketDown.pos.x < 0)
+    game_vars.racketDown.pos.x = 0;
+  if (game_vars.racketUp.pos.x > game_vars.terrain.width - game_vars.racketUp.size.w)
+    game_vars.racketUp.pos.x = game_vars.terrain.width - game_vars.racketUp.size.w
+  else if (game_vars.racketUp.pos.x < 0)
+    game_vars.racketUp.pos.x = 0;
 }
 
 export function up_movement(game_vars: any)
@@ -67,4 +67,6 @@ export function up_movement(game_vars: any)
   user_movement(game_vars);
   game_vars.racketDown.elem.style.left = `${game_vars.racketDown.pos.x * game_vars.scale.x}px`;
   game_vars.racketUp.elem.style.left = `${game_vars.racketUp.pos.x * game_vars.scale.x}px`;
+  game_vars.racketDown.elem.style.bottom = `${game_vars.racketUp.pos.y * game_vars.scale.y}px`;
+  game_vars.racketUp.elem.style.top = `${game_vars.racketUp.pos.y * game_vars.scale.y}px`;
 }

@@ -40,22 +40,22 @@
         >
             <div
                 id="racketUp"
-                class="w-33 h-4 bg-yellow-300 top-5 absolute"
+                class="bg-yellow-300 absolute"
             ></div>
 
             <div
                 id="racketDown"
-                class="w-33 h-4 bg-yellow-300 bottom-5 absolute"
+                class="bg-yellow-300 absolute"
             ></div>
 
             <div
                 id="circle"
-                class="bg-green-500 rounded-[50%] w-15 h-15 absolute"
+                class="bg-green-500 rounded-[50%] absolute"
             ></div>
 
             <div
                 id="where"
-                class="hidden bg-fuchsia-400 rounded-[50%] w-80 h-2 absolute origin-[left center]"
+                class="hidden bg-fuchsia-400 rounded-[50%] absolute origin-left"
             ></div>
         </div>
     </div>
