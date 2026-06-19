@@ -1,83 +1,36 @@
 <script lang="ts">
     import type { PageProps } from './$types';
+    import { page } from '$app/state'
+    import type { ActionData } from './$types';
 
 	let { data, form }: PageProps = $props();
-
-    let email = $state('');
-    let username = $state('');
-    let password = $state('');
-
-    function isSpace(cara: string)
-    {
-        return cara === ' ';
-    }
-
-    function checkEmail()
-    {
-        let validEmailEnd = [
-            "fr",
-            "com"
-        ]
-        let validEmailMessaging = [
-            "gmail",
-            "outlook"
-        ]
-        let splittedEmail = email.split('@');
-
-        document.getElementById('emailValidity').classList.remove("hidden");
-        document.getElementById('emailValidity').classList.add("flex");
-
-        if (email.includes(' '))
-            return ;
-        if (splittedEmail.length != 2)
-            return ;
-
-        let emailSuffix = splittedEmail[1].split('.');
-        if (emailSuffix.length != 2)
-            return ;
-
-        if (!validEmailEnd.includes(emailSuffix[1]))
-            return ;
-        if (!validEmailMessaging.includes(emailSuffix[0]))
-            return ;
-        document.getElementById('emailValidity').classList.add("hidden");
-        document.getElementById('emailValidity').classList.remove("flex");
-        console.log("isoke");
-    }
-
-    function checkUsername()
-    {
-
-        console.log("isoke");
-    }
-
-    function checkPassword()
-    {
-        console.log("isoke");
-    }
 
 </script>
 
 <div class="ml-42.5 px-4 py-px">
     <h1>Database in progress</h1>
     <p>Visit <a href="https://youtu.be/dQw4w9WgXcQ">database.progressStatus.fr</a> to see the database creation advancement</p><br>
-    <form method="post" action="?/register">
-        
+    <form method="POST" action="?/register">
         <label>
             Email
-            <input name="email" type="email" class="bg-white focus:bg-black/20" bind:value={email}>
+            <input name="email" class="bg-white focus:bg-black/20" value={form?.email}>
         </label><br>
-        <div id="emailValidity" class="hidden" >please enter a valid email adress</div>
+        {#if form?.empty}<p class="error">The email field is required</p>{/if}
+        {#if form?.wrong}<p class="error">Invalid Email!</p>{/if}
+        {#if form?.email_exists}<p class="error">Email already used</p>{/if}
         <label>
             Username
-            <input minlength="4" maxlength="128" name="username" type="username" value={username}>
+            <input minlength="4" maxlength="128" name="username" type="username" value={form?.username}>
         </label><br>
-        <div id="usernameValidity" class="hidden">Username must be between 4 - 128 caracters</div>
+        {#if form?.length_issue}<p class="error">Username must be between 4 - 128 caracters</p>{/if}
+        {#if form?.username_exists}<p class="error">Username already used</p>{/if}
         <label>
             Password
-            <input minlength="8" name="password" type="password" bind:value={password}>
+            <input minlength="8" name="password" type="password" value={form?.password}>
         </label><br>
-        <div id="passwordValidity" class="hidden" >Password not secure enough</div>
+        {#if form?.skill_issue}<p class="error">Password must contain at least 12 caracters, a upper case and a lower case letter, a number and a special caracter</p>{/if}
 	    <input type="submit" value="Create account">
     </form>
 </div>
+
+
