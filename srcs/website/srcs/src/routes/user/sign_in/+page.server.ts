@@ -1,11 +1,5 @@
-import type { PageServerLoad, Actions } from './$types';
+import type { Actions } from './$types';
 import { fail } from '@sveltejs/kit';
-import * as db from "$lib/server/db"
-
-// export const load: PageServerLoad = async ({ cookies }) => {
-// 	const user = await db.getUserFromSession(cookies.get('sessionid'));
-// 	return { user };
-// // };
 
 export const actions = {
     register: async (event) => {
@@ -24,14 +18,14 @@ export const actions = {
 
             if (!email || email == "")
                 return (fail(400, {email, empty: true }));
-            // if (!isEmail.test(email as string))
-            //     return (fail(400, {email, wrong: true }));
+            if (!isEmail.test(email as string))
+                return (fail(400, {email, wrong: true }));
 
-            // if (!isPass.test(password as string))
-            //     return (fail(400, {password, skill_issue: true }));
+            if (!isPass.test(password as string))
+                return (fail(400, {password, skill_issue: true }));
 
-            // if (!isUsername.test(username as string))
-            //     return (fail(400, {username, length_issue: true}));
+            if (!isUsername.test(username as string))
+                return (fail(400, {username, length_issue: true}));
 
             const response = await fetch("http://localhost:4242/api/user/", {
                 method: 'POST',
@@ -45,17 +39,21 @@ export const actions = {
             if (!response.ok)
             {
                 const test = await response.json();
-                console.log(test);
+
                 if (test.msg == "Username already exist")
                     return (fail(400, {username, username_exists: true}));
 
                 if (test.msg == "Email already exist")
                     return (fail(400, {email, email_exists: true}));
+                return (null);
             }
             
             const data = await response.json();
 
-            event.cookies.set('User', data.user, {path: '/'});
+            event.cookies.set('id', data.Data[0].id, {path: '/'});
+            event.cookies.set('username', data.Data[0].username, {path: '/'});
+            event.cookies.set('email', data.Data[0].email, {path: '/'});
+            // event.cookies.set('icon', data.icon, {path: '/user'});
         }
         catch (error)
         {
