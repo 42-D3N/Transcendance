@@ -24,6 +24,7 @@ export async function adduser(req: Request, res: Response, next: NextFunction) {
     console.log("User added",Data);
     res.status(201).json({ Data });
   } catch (error) {
+    console.log("rest");
     const { username } = req.body;
     const used = await db.select({username: users.username}).from(users).where(eq(username, users.username));
     if (handleErrorCode(error, next, used))
