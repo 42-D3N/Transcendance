@@ -15,7 +15,7 @@ export const actions = {
 			const form = await event.request.formData();
 			const object = Object.fromEntries(form.entries())
 			var json = JSON.stringify(object);
-			const response = await fetch("http://localhost:4242/api/user/", {      
+			const response = await fetch("http://localhost:4242/api/user:", {      
 				method: 'GET',
 				headers: {
 					"Content-Type": "application/json"

@@ -7,14 +7,6 @@ import * as db from "$lib/server/db"
 // 	return { user };
 // // };
 
-export interface User 
-{
-    id: number,
-    email: string,
-    username: string,
-    password: string
-}
-
 export const actions = {
     register: async (event) => {
         try
@@ -32,14 +24,14 @@ export const actions = {
 
             if (!email || email == "")
                 return (fail(400, {email, empty: true }));
-            if (!isEmail.test(email as string))
-                return (fail(400, {email, wrong: true }));
+            // if (!isEmail.test(email as string))
+            //     return (fail(400, {email, wrong: true }));
 
-            if (!isPass.test(password as string))
-                return (fail(400, {password, skill_issue: true }));
+            // if (!isPass.test(password as string))
+            //     return (fail(400, {password, skill_issue: true }));
 
-            if (!isUsername.test(username as string))
-                return (fail(400, {username, length_issue: true}));
+            // if (!isUsername.test(username as string))
+            //     return (fail(400, {username, length_issue: true}));
 
             const response = await fetch("http://localhost:4242/api/user/", {
                 method: 'POST',
@@ -62,14 +54,8 @@ export const actions = {
             }
             
             const data = await response.json();
-            const userData:User = {
-                id:data.id,
-                email:data.email,
-                username:data.username,
-                password:data.password
-            };
 
-            // cookies.set('User', userData);
+            event.cookies.set('User', data.user, {path: '/'});
         }
         catch (error)
         {
