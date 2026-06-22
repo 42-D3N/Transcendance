@@ -24,7 +24,6 @@ export async function adduser(req: Request, res: Response, next: NextFunction) {
     console.log("User added",Data);
     res.status(201).json({ Data });
   } catch (error) {
-    console.log("rest");
     const { username } = req.body;
     const used = await db.select({username: users.username}).from(users).where(eq(username, users.username));
     if (handleErrorCode(error, next, used))
@@ -37,6 +36,10 @@ export async function adduser(req: Request, res: Response, next: NextFunction) {
 export async function getalluser(req: Request, res: Response, next: NextFunction) {
   try {
     const Data = await db.select().from(users);
+    for (let i = 0; Data[i]; i++) {
+      delete Data[i].password;
+      delete Data[i].email;
+    }
     console.log("All users",Data);
     res.status(200).json({ Data });
   } catch (error) {
@@ -60,6 +63,32 @@ export async function getuserid(req: Request, res: Response, next: NextFunction)
       console.log("User not found");
       return next (new CustomError("User not found", 404));
     }
+    delete Data[0].password;
+    delete Data[0].email;
+    console.log("user",Data);
+    res.status(200).json({ Data });
+  } catch (error) {
+    console.log("Failed to fetch user ", error.cause.error);
+    next (new CustomError("Failed to fetch user", 500));
+  }
+}
+
+export async function admingetuserid(req: Request, res: Response, next: NextFunction) {
+  const result = validationResult(req);
+  if (!result.isEmpty()) {
+    console.log("Error while parsing request");
+    return next(new CustomError(JSON.stringify(result.array()), 400));
+  }
+  try {
+    const Data = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, + req.params.id));
+    if (Data.length == 0) {
+      console.log("User not found");
+      return next (new CustomError("User not found", 404));
+    }
+    delete Data[0].password;
     console.log("user",Data);
     res.status(200).json({ Data });
   } catch (error) {

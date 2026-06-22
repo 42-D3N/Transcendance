@@ -58,8 +58,8 @@ export async function login(req: Request, res: Response, next: NextFunction) {
         }
         const role = await db.select({role: api_users.role}).from(api_users).where(eq(api_users.user, user[0].id));
         const token = jwt.sign({ id: user[0].id, role: role[0].role }, 'your_secret_key', { expiresIn: expire_time });
-        console.log(`user: ${user[0].id} token: ${token} valid for ${expire_time}`);
-        res.status(201).json({ token, message: 'Logged in successfuly'});
+        console.log(`user: ${user[0].id}\nrole: ${role}\n token: ${token} valid for ${expire_time}`);
+        res.status(201).json({ token, message: 'Logged in successfuly', role });
     } catch (error) {
         if (handleErrorCode(error, next, null))
             return;

@@ -29,7 +29,7 @@ export async function deletefriends(req: Request, res: Response, next: NextFunct
         res.status(200).json({ Data });
     } catch (error) {
         console.log("Failed to delete Friend link ", error.cause.error);
-        return next (new CustomError("Failde to delete Friend link", 500));
+        return next (new CustomError("Failed to delete Friend link", 500));
     }
 }
 
@@ -49,7 +49,7 @@ export async function addfriends(req: Request, res: Response, next: NextFunction
         console.log("Added friends", Data);
         res.status(201).json({ Data });
     } catch (error) {
-        if (handleErrorCode(error, next))
+        if (handleErrorCode(error, next, null))
             return;
         console.log("Failed to add user ", error.cause.code);
         next (new CustomError("Failed to add friends", 500));
