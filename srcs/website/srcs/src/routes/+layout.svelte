@@ -27,7 +27,7 @@
 	}
 
 	import { redirect } from '@sveltejs/kit';
-	// here add the redirection to a logout page (will just be here to delete cookies and redirect the user)
+	// here add the redirection to a logout page (will just be here to delete cookies and redirect the user) pls remember
 </script>
 
 <svelte:head>
