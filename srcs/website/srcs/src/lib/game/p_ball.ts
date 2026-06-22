@@ -47,7 +47,7 @@ export function up_ball(game_vars: any)
     game_vars.ball.vel.x += tmp_vel_mod;
     game_vars.ball.tmp_speed = game_vars.ball.speed;
     game_vars.ball.speed = game_vars.ball.tmp_speed * 2;
-    freeze_and_prediction(game_vars, 150);
+    freeze_and_prediction(game_vars, 250);
     game_vars.state.use_powerup = false;
   }
 

@@ -26,10 +26,7 @@ export function handleKeyDown(game_vars: any, e: KeyboardEvent)
     game_vars.racketDown.keys.right = false;
   }
   if (e.key === "Shift" && (game_vars.ball.pos.y > (game_vars.terrain.height / 2) || game_vars.ball.vel.y > 0))
-  {
-    console.log(`idkshfyusdghuo`);
-    game_vars.use_powerup = !game_vars.use_powerup;
-  }
+    game_vars.state.use_powerup = !game_vars.state.use_powerup;
   if (e.key === "d")
   {
     game_vars.racketUp.keys.left = false;

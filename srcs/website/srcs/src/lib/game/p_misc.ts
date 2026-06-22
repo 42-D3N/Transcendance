@@ -17,7 +17,7 @@ export function new_game(game_vars: any)
   length = Math.hypot(game_vars.ball.vel.x, game_vars.ball.vel.y);
   game_vars.ball.vel.x /= length;
   game_vars.ball.vel.y /= length;
-  game_vars.use_powerup = false;
+  game_vars.state.use_powerup = false;
 }
 
 /**
