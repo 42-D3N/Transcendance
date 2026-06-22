@@ -32,6 +32,7 @@ export async function register(req: Request, res: Response, next: NextFunction) 
         console.log("Api user added",Data);
         res.status(201).json({ Data });
     } catch (error) {
+		console.log(error)
         if (handleErrorCode(error, next, null))
             return;
         console.log("Failed to add api user ", error.cause.code);
