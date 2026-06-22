@@ -12,6 +12,7 @@ services:
     command: npm run dev -- --host
     image: transcendance-front-end
     build: ./srcs/website
+    pull_policy: never
     ports:
       - "5173:5173"
     restart: always
@@ -20,7 +21,6 @@ services:
         - path: ./srcs/website/srcs/src
           action: sync
           target: /app/src
-          initial_sync: true
           ignore:
             - node_modules/
         - action: rebuild

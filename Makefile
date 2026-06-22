@@ -1,13 +1,13 @@
 devup:
-	docker compose up -f compose.dev.yml -d --watch
+	docker compose -f compose.dev.yml up --watch
 
 devdown:
-	docker compose down -f compose.dev.yml --volumes
+	docker compose -f compose.dev.yml down --volumes
 
 clean: devdown
 
 fclean: clean
-	docker compose down --volumes --remove-orphans --rmi all
+	docker compose -f compose.dev.yml down --volumes --remove-orphans --rmi all
 
 devre: fclean devup
 
