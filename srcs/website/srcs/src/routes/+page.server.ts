@@ -30,3 +30,15 @@ export function load ({ cookies })  {
 		wallet: wallet
 	});
 };
+
+export const actions = {
+    logout: async ({ cookies }) => {
+        cookies.set('id', '-1', { path: '/'});
+        cookies.delete('username', { path: '/' });
+        cookies.delete('email', { path: '/' });
+        cookies.delete('wins', { path: '/' });
+        cookies.delete('losses', { path: '/' });
+        cookies.delete('matches', { path: '/' });
+        cookies.delete('wallet', { path: '/' });
+    }
+};

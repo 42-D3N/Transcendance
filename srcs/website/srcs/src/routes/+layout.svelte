@@ -1,5 +1,6 @@
 <script lang="ts">
 	let displayNav = $state(false);
+	import usericon from '$lib/assets/user/default.svg';
 	import favicon from '$lib/assets/favicon.svg';
 	import homeicon from '$lib/assets/home_icon.svg';
 	import gameicon from '$lib/assets/game_icon.svg';
@@ -9,7 +10,7 @@
 	let { data, children } = $props();
 
 	import "../app.css";
-    import { esbuildVersion } from 'vite';
+    import { GridBlock } from '@babylonjs/core';
 	function enableSidebar() {
 		displayNav = !displayNav;
 		document.querySelector('body')?.classList.add('overflow-hidden');
@@ -24,10 +25,9 @@
 		document.querySelector('html')?.classList.remove('overflow-hidden');
 		document.querySelector('html')?.classList.remove('h-full');
 	}
-	function logoutUser() {
-		
-	}
 
+	import { redirect } from '@sveltejs/kit';
+	// here add the redirection to a logout page (will just be here to delete cookies and redirect the user)
 </script>
 
 <svelte:head>
@@ -78,12 +78,13 @@
 			</a>
 		</div>
 		{:else}
-			<a id="logout-button" class="flex justify-around gap-[0.4rem] text-left items-center overflow-visible relative whitespace-nowrap w-full break-unset border-0 text-[1.4rem]/1.1428 p-[0.8rem] rounded-lg bg-gray-500" href="/user/login">
-				<span class="content-center h-8 w-8 xl:hidden max-lg:hidden">
-					<svg width="20" height="20" viewBox="0 0 24 24" data-glyph="arrow-triangle-enter-right" class="rtl-support" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M13.33 7.67L17.2 11.54C17.53 11.87 17.53 12.14 17.2 12.47L13.33 16.34C12.63 17.04 12.33 16.94 12.33 15.91V8.11C12.33 7.08 12.6 6.94 13.33 7.68V7.67ZM0.83 10.5L13.96 10.53V13.5H0.83C0.23 13.5 0 13.2 0 12.43V11.56C0 10.79 0.23 10.49 0.83 10.49V10.5ZM6 2H18C20.47 2 22 3.53 22 6V18C22 20.47 20.47 22 18 22H6C3.53 22 2 20.47 2 18V16.9C2 16.3 2.33 15.97 2.93 15.97H3.06C3.66 15.97 3.99 16.3 3.99 16.9V17.6C3.99 19.6 4.39 20 6.39 20H17.59C19.59 20 19.99 19.6 19.99 17.6V6.4C19.99 4.4 19.59 4 17.59 4H6.39C4.39 4 3.99 4.4 3.99 6.4V7.03C3.99 7.63 3.66 7.96 3.06 7.96H2.93C2.33 7.96 2 7.63 2 7.03V6C2 3.53 3.53 2 6 2Z"></path></svg>
-				</span>
-				<span class="lg:max-xl:hidden">Log out</span>
-			</a>
+			<div id="user-infos" class="flex justify-around gap-[0.4rem] text-left items-center overflow-visible relative whitespace-nowrap w-full break-unset border-0 text-[1.4rem]/1.1428 p-[0.8rem] rounded-lg bg-gray-500">
+				<img class="block h-[2.4rem] w-[2.4rem]" src={usericon} alt="icon"/>
+				<div id="user-info-container">	
+					<span class="lg:max-xl:hidden">{data.username}</span><br>
+					<span class="content-center w-5 text-lg max-lg:hidden">wallet: {data.wallet}</span>
+				</div>
+			</div>
 		{/if}
 	</nav>
 </div>

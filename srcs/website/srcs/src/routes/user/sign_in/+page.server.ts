@@ -1,5 +1,6 @@
 import type { Actions } from './$types';
 import { fail } from '@sveltejs/kit';
+import { redirect } from '@sveltejs/kit';
 
 export const actions = {
     register: async (event) => {
@@ -53,11 +54,17 @@ export const actions = {
             event.cookies.set('id', data.Data[0].id, {path: '/'});
             event.cookies.set('username', data.Data[0].username, {path: '/'});
             event.cookies.set('email', data.Data[0].email, {path: '/'});
+            event.cookies.set('wins', data.Data[0].wins, {path: '/'});
+            event.cookies.set('losses', data.Data[0].losses, {path: '/'});
+            event.cookies.set('matches', data.Data[0].matches, {path: '/'});
+            event.cookies.set('wallet', data.Data[0].wallet, {path: '/'});
             // event.cookies.set('icon', data.icon, {path: '/user'});
+
         }
         catch (error)
         {
             console.error("Erreur lors de la requête :", error);
         }
+        throw redirect(303, '/');
     }
 } satisfies Actions;
