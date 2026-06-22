@@ -1,22 +1,28 @@
 import { eq } from "drizzle-orm";
 import app from "./server.ts";
 import { db } from "./db/db.ts";
-import { users } from "./db/schema.ts";
+import { api_users, users } from "./db/schema.ts";
 import bcrypt, { hashSync } from "bcryptjs";
 const port = process.env.PORT || 9090;
 
 async function addadmin():Promise<number> {
-  const hashedPassword = await bcrypt.hash(process.env.ADMIN_PASSWORD, 10);
-  const is_first = await db.select().from(users).where(eq(process.env.ADMIN_USERNAME, users.username));
-  if (is_first[0])
-	return (0);
   try {
+    const hashedPassword = await bcrypt.hash(process.env.ADMIN_PASSWORD, 10);
+    const is_first = await db.select().from(users).where(eq(process.env.ADMIN_USERNAME, users.username));
+    if (is_first[0])
+      return (0);
     const admin = await db.insert(users).values({
       username: process.env.ADMIN_USERNAME,
       email: process.env.ADMIN_EMAIL,
       password: hashedPassword
-	}).returning();
-	console.log("Successfully added admin user.");
+    }).returning();
+    console.log("Successfully added admin user.");
+    const id = await db.select({id: users.id}).from(users).where(eq(process.env.ADMIN_EMAIL, users.email));
+    const admin_api = await db.insert(api_users).values({
+      user: id[0].id,
+      role: "admin"
+    }).returning();
+    console.log("Successfully added admin user to api.");
 	} catch (error) {
 	console.log("Failed to add user ", error.cause.code);
 	return (1);

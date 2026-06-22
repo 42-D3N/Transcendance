@@ -24,14 +24,14 @@ DataRouter.get("/get-all-users", authMiddleware, u.getalluser);
 DataRouter.get("/user/:id", v.validateIdParam(), authMiddleware, u.getuserid);
 DataRouter.get("/admin/user/:id", v.validateIdParam(), authMiddleware, roleMiddleware("admin"), u.admingetuserid);
 DataRouter.post("/admin/user", v.validateUsername(), v.validateEmail(), v.validatePassword(), authMiddleware, roleMiddleware("admin"), u.adduser);
-DataRouter.patch("/admin/user/:id", ...v.validateUpdateUser(), u.updateuser);
+DataRouter.patch("/admin/user/:id", ...v.validateUpdateUser(), authMiddleware, roleMiddleware("admin"), u.updateuser);
 DataRouter.put("/admin/user/:id", v.validateUsername(), v.validateEmail(), v.validatePassword(), authMiddleware, roleMiddleware("admin"), u.P_updateuser);
 DataRouter.delete("/admin/user/:id", v.validateIdParam(), authMiddleware, roleMiddleware("admin"), u.deleteuser);
 
 //fiends
 
-DataRouter.get("/friends/:id", v.validateIdParam(), getfriends);
-DataRouter.post("/friends/", ...v.validateIdFriends(), addfriends);
-DataRouter.delete("/friends/", ...v.validateDeleteFriends(), deletefriends);
+DataRouter.get("/friends/:id", v.validateIdParam(), authMiddleware, roleMiddleware("admin"), getfriends);
+DataRouter.post("/friends/", ...v.validateIdFriends(), authMiddleware, roleMiddleware("admin"), addfriends);
+DataRouter.delete("/friends/", ...v.validateDeleteFriends(), authMiddleware, roleMiddleware("admin"), deletefriends);
 
 export default DataRouter;
