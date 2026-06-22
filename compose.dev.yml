@@ -1,0 +1,50 @@
+services:
+  database:
+    image: transcendance-database
+    build: ./srcs/database
+    pull_policy: never
+    restart: always
+    ports:
+      - 5432:5432
+    env_file:
+      - ./srcs/database/.env
+    volumes:
+      - pgdata:/var/lib/postgresql
+  api:
+    command: npm run dev
+    image: transcendance-front-end
+    build: ./srcs/api
+    pull_policy: never
+    env_file:
+      - ./srcs/api/srcs/.env
+    ports:
+      - "4567:4567"
+    restart: always
+    depends_on:
+      - database
+    develop:
+      watch:
+        - path: ./srcs/api/srcs/src
+          action: sync
+          target: /app/src
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: ./srcs/api/srcs/package.json
+  # website:
+  #   build: ./srcs/website
+  #   ports:
+  #     - "5173:5173"
+  #   restart: always
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+volumes:
+  pgdata:
+
+# networks:
+#   transcendance:
+#     name: transcendance
