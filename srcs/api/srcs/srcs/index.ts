@@ -3,6 +3,7 @@ import app from "./server.ts";
 import { db } from "./db/db.ts";
 import { api_users, users } from "./db/schema.ts";
 import bcrypt, { hashSync } from "bcryptjs";
+import { generateHexString } from "./lib/custom-key.ts";
 const port = process.env.PORT || 9090;
 
 async function addadmin():Promise<number> {
@@ -18,9 +19,11 @@ async function addadmin():Promise<number> {
     }).returning();
     console.log("Successfully added admin user.");
     const id = await db.select({id: users.id}).from(users).where(eq(process.env.ADMIN_EMAIL, users.email));
+	const secret_key = generateHexString();
     const admin_api = await db.insert(api_users).values({
       user: id[0].id,
-      role: "admin"
+      role: "admin",
+	  secret_key: secret_key
     }).returning();
     console.log("Successfully added admin user to api.");
 	} catch (error) {

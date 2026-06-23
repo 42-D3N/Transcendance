@@ -37,24 +37,24 @@ export function HandleParsingError(result, next: NextFunction)
 export function handleErrorCode(error, next: NextFunction, used)
 {
   if (error.cause.code == "42601") {
-    console.log("No valid field in request");
+    console.log("No valid field in request ", error.cause.code);
     next(new CustomError("No valid field in request", 400));
     return 1;
   }
   if (error.cause.code == "23505") {
     console.log(used);
     if (!used[0]) {
-      console.log("email already exist");
+      console.log("email already exist ", error.cause.code);
       next(new CustomError("email already exist", 400));
     }
     else {
-      console.log("Username already exist");
+      console.log("Username already exist ", error.cause.code);
       next(new CustomError("Username already exist", 400));
     }
     return 1;
   }
   if (error.cause.code == "23503") {
-    console.log("User not found in the data base");
+    console.log("User not found in the data base ", error.cause.code);
     next(new CustomError("User not found in the data base", 404));
     return 1;
   }

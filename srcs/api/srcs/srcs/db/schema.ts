@@ -34,5 +34,6 @@ export const matches = pgTable('matches', {
 
 export const api_users = pgTable('api_users', {
 	user: integer().notNull().unique().references(() => users.id),
-	role: varchar({ length:128 }).notNull().default("user")
+	role: varchar({ length:128 }).notNull().default("user"),
+	secret_key: varchar({ length:64 }).notNull()
 });

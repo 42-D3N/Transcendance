@@ -14,6 +14,12 @@ export async function adduser(req: Request, res: Response, next: NextFunction) {
   }
   try {
     const { username, email, password } = req.body;
+    const already = await db.select({username: users.username, password: users.password}).from(users).where(eq(email, users.email)).where(eq(username, users.username));
+    console.log(already.length);
+    if (already.length !== 0) {
+      console.log("user already in database")
+      return next(new CustomError("user already in database", 400));
+    }
     const hashedPassword = await bcrypt.hash(password, 10);
     const Data = await db.insert(users).values({
       username,
@@ -55,11 +61,13 @@ export async function getuserid(req: Request, res: Response, next: NextFunction)
     return next(new CustomError(JSON.stringify(result.array()), 400));
   }
   try {
+    const { username } = req.body;
     const Data = await db
       .select()
       .from(users)
-      .where(eq(users.id, + req.params.id));
-    if (Data.length == 0) {
+      .where(eq(username, users.username));
+    console.log(req.body.username);
+    if (Data.length === 0) {
       console.log("User not found");
       return next (new CustomError("User not found", 404));
     }
@@ -83,8 +91,8 @@ export async function admingetuserid(req: Request, res: Response, next: NextFunc
     const Data = await db
       .select()
       .from(users)
-      .where(eq(users.id, + req.params.id));
-    if (Data.length == 0) {
+      .where(eq(users.username, req.body.username));
+    if (Data.length === 0) {
       console.log("User not found");
       return next (new CustomError("User not found", 404));
     }
@@ -117,22 +125,19 @@ export async function deleteuser(req: Request, res: Response, next: NextFunction
     console.log("deleted user",Data);
     res.status(200).json({ Data });
   } catch (error) {
-    console.log("Failed to delete user ", error.cause.error);
+    console.log("Failed to delete user ", error.cause.code);
     next(new CustomError("Failed to delete user", 500));
   }
 }
 
 export async function updateuser(req: Request, res: Response, next: NextFunction) {
-  console.log("BODY RECEIVED:", req.body);
   const result = validationResult(req);
-  console.log("VALIDATION RESULT:", result.array());
   if (!result.isEmpty()) {
     console.log("Error while parsing request");
     return (HandleParsingError(result, next));
   }
   try {
     const update_data = { ...req.body };
-    console.log(update_data);
     if (update_data.password) {
       update_data.password = await bcrypt.hash(update_data.password, 10);
     }

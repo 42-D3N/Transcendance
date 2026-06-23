@@ -2,7 +2,7 @@ import { Router } from "express";
 // import { addData, deleteData, getAllData, getData, updateData} from "../handlers/data.ts";
 import * as u from "../handlers/user.ts"
 import { addfriends, getfriends, deletefriends } from "../handlers/friends.ts";
-import { register, login } from "../handlers/auth.ts";
+import { register, login, deleteapiuser } from "../handlers/auth.ts";
 import { authMiddleware, roleMiddleware } from "../middleware/auth.ts";
 import * as v from "../lib/validator-functions.ts";
 const DataRouter = Router();
@@ -17,16 +17,17 @@ const DataRouter = Router();
 
 DataRouter.post("/register", v.validateEmail(), v.validatePassword(), register);
 DataRouter.post("/login", v.validateEmail(), v.validatePassword(), login);
+DataRouter.delete("/quit", v.validateEmail(), v.validatePassword(), deleteapiuser);
 
 //users
 
 DataRouter.get("/get-all-users", authMiddleware, u.getalluser);
-DataRouter.get("/user/:id", v.validateIdParam(), authMiddleware, u.getuserid);
-DataRouter.get("/admin/user/:id", v.validateIdParam(), authMiddleware, roleMiddleware("admin"), u.admingetuserid);
-DataRouter.post("/admin/user", v.validateUsername(), v.validateEmail(), v.validatePassword(), authMiddleware, roleMiddleware("admin"), u.adduser);
-DataRouter.patch("/admin/user/:id", ...v.validateUpdateUser(), authMiddleware, roleMiddleware("admin"), u.updateuser);
-DataRouter.put("/admin/user/:id", v.validateUsername(), v.validateEmail(), v.validatePassword(), authMiddleware, roleMiddleware("admin"), u.P_updateuser);
-DataRouter.delete("/admin/user/:id", v.validateIdParam(), authMiddleware, roleMiddleware("admin"), u.deleteuser);
+DataRouter.get("/user", v.validateUsername(), authMiddleware, u.getuserid);
+DataRouter.get("/admin/user", v.validateUsername(), authMiddleware, roleMiddleware("admin"), u.admingetuserid);
+DataRouter.post("/user", v.validateUsername(), v.validateEmail(), v.validatePassword(), authMiddleware, roleMiddleware("admin"), u.adduser);
+DataRouter.patch("/user/:id", ...v.validateUpdateUser(), authMiddleware, roleMiddleware("admin"), u.updateuser);
+DataRouter.put("/user/:id", v.validateUsername(), v.validateEmail(), v.validatePassword(), authMiddleware, roleMiddleware("admin"), u.P_updateuser);
+DataRouter.delete("/user/:id", v.validateIdParam(), authMiddleware, roleMiddleware("admin"), u.deleteuser);
 
 //fiends
 
