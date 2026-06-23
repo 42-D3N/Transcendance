@@ -150,6 +150,10 @@ export function initGame()
   }
 
   const scale = { x: 1, y: 1 };
+
+  let onKeyDown;
+  let onKeyUp;
+  let onResize;
 /*
 ┌──────────────────────┐
 │Gamerules Declarations│
@@ -253,9 +257,12 @@ export function initGame()
     score_to_win,
     maxSpeed,
     baseSpeed,
+    onKeyDown,
+    onKeyUp,
+    onResize,
     aiLevels,
     timeoutID: undefined,
     animationFrameID: 0,
-    close_game: false
+    close_game: false,
 };
 }

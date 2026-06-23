@@ -2,30 +2,23 @@
     import { onMount } from 'svelte';
     import { initGame } from '$lib/game/p_var';
     import { handleKeyDown, handleKeyUp, updateScale } from '$lib/game/p_game';
-    import { new_game, game_loop } from '$lib/game/p_misc'
+    import { new_game, game_loop, stop_game } from '$lib/game/p_misc'
 
     onMount(() =>
     {
         const game_vars = initGame();
-        const onKeyDown = (event: KeyboardEvent) => { handleKeyDown(game_vars, event); }
-        const onKeyUp = (event: KeyboardEvent) => { handleKeyUp(game_vars, event); }
-        const onResize = () => { updateScale(game_vars) };
-        window.addEventListener('keydown', onKeyDown);
-        window.addEventListener('keyup', onKeyUp);
-        window.addEventListener('resize', onResize);
+        game_vars.onKeyDown = (event: KeyboardEvent) => { handleKeyDown(game_vars, event); }
+        game_vars.onKeyUp = (event: KeyboardEvent) => { handleKeyUp(game_vars, event); }
+        game_vars.onResize = () => { updateScale(game_vars) };
+        window.addEventListener('keydown', game_vars.onKeyDown);
+        window.addEventListener('keyup', game_vars.onKeyUp);
+        window.addEventListener('resize', game_vars.onResize);
 
         updateScale(game_vars);
         new_game(game_vars);
         game_loop(game_vars);
 
-        return () =>
-        {
-            game_vars.close_game = true;
-            window.removeEventListener('keydown', onKeyDown);
-            window.removeEventListener('keyup', onKeyUp);
-            window.removeEventListener('resize', onResize);
-            cancelAnimationFrame(game_vars.animationFrameID);
-        }
+        return () => { stop_game(game_vars); }
     });
 </script>
 

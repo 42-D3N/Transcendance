@@ -38,7 +38,8 @@
 			{ label: 'Hard', action: placeholder },
 			{ label: 'Impossible?', action: placeholder },
 			{ label: 'Retour', action: () => currentMenu = 'play' }
-		]};
+		]
+	};
 </script>
 
 <div class="menu-container">

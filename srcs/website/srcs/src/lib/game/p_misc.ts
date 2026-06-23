@@ -47,8 +47,28 @@ export function freeze_and_prediction(game_vars: any, freeze_time: number)
     game_vars.ball.vel.x = tmp_vel_x;
     game_vars.ball.vel.y = tmp_vel_y;
     game_vars.where_elem.style.display = "none";
-	game_vars.timeoutID = undefined;
+    game_vars.timeoutID = undefined;
   }, freeze_time);
+}
+
+/**
+ * `stop_game` destroy all event and stop loops.
+ * 
+ * `game_vars` contain all variables like rackets and ball.
+ */
+export function stop_game(game_vars: any)
+{
+  game_vars.close_game = true;
+  window.removeEventListener('keydown', game_vars.onKeyDown);
+  window.removeEventListener('keyup', game_vars.onKeyUp);
+  window.removeEventListener('resize', game_vars.onResize);
+  cancelAnimationFrame(game_vars.animationFrameID);
+}
+
+
+export function scoreboard(game_vars: any)
+{
+  console.log(`GG PLAYER ${game_vars.state.score.p1 >= game_vars.score_to_win ? 1 : 2}`);
 }
 
 /**
@@ -67,9 +87,10 @@ export function game_loop(game_vars: any)
 
   if (game_vars.state.score.p1 >= game_vars.score_to_win || game_vars.state.score.p2 >= game_vars.score_to_win)
   {
-    console.log(`GG PLAYER ${game_vars.state.score.p1 >= game_vars.score_to_win ? 1 : 2}`);
+    scoreboard(game_vars);
     game_vars.state.end_game = true;
     game_vars.state.running = false;
+    stop_game(game_vars);
   }
   else
     game_vars.state.restart = true;
