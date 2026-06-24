@@ -13,6 +13,61 @@
     word-break: unset;
 }
 
-.grid-buttons {
-    grid-template-columns: 2.4rem minmax(0, 1fr);
+.user-grid-buttons {
+	grid-template-columns: repeat(4, 3.2rem);
+}
+
+#sidebar-main-menu {
+	@variant lg:max-xl {
+		--navWidth: 5.6rem;
+		--text-column-width: 0fr;
+	}
+}
+
+.sidebar-link {
+	--button-padding: 0.8rem;
+	@apply grid items-center gap-[1.2rem] text-left overflow-visible relative w-full whitespace-nowrap;
+	grid-template-columns: 2.4rem minmax(0, var(--text-column-width, 1fr));
+	justify-content: unset;
+	word-break: unset;
+}
+
+.ft-button-medium {
+	--button-height: 4rem;
+	--column-gap: 0.8rem;
+	--font-size: 1.4rem;
+}
+
+.ft-button-small {
+	--border-radius: 0.3rem;
+	--button-height: 3.2rem;
+	--column-gap: 0.8rem;
+}
+
+.ft-icon-size-24 {
+	--icon-size: 2.4rem;
+}
+
+.ft-icon-size-20 {
+	--icon-size: 2rem;
+}
+
+.ft-icon-glyph {
+	@apply content-center inline-grid h-(--icon-size) w-(--icon-size) justify-center;
+}
+
+.ft-button {
+	@apply border-0 cursor-pointer text-(--font-size) leading-[1.1428] min-h-(--button-height) p-(--button-padding) grid-flow-col max-w-full;
+}
+
+.ft-icon-img {
+	@apply block h-(--icon-size) w-(--icon-size) select-none;
+}
+
+.ft-sidebar-link-text {
+	@apply overflow-hidden text-ellipsis;
+}
+
+.ft-sidebar-footing-icon {
+	@apply block size-full relative;
 }
