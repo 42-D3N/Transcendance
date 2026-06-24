@@ -1,5 +1,5 @@
 import type { PageServerLoad, Actions } from './$types';
-import * as db from "$lib/server/db"
+import * as db from "$lib/server/db";
 import type { logOperation } from '@babylonjs/core';
 import { stringify } from 'querystring';
 

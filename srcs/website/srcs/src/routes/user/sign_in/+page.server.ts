@@ -1,6 +1,10 @@
 import type { Actions } from './$types';
 import { fail } from '@sveltejs/kit';
 import { redirect } from '@sveltejs/kit';
+import { db } from "$lib/server/db/index";
+import { eq, lt, gte, ne } from 'drizzle-orm';
+import { users } from "$lib/server/db/schema";
+import bcrypt from "bcryptjs";
 
 export const actions = {
     register: async (event) => {
@@ -14,11 +18,11 @@ export const actions = {
             const email = form.get('email');
             const username = form.get('username');
             const password = form.get('password');
-            const object = Object.fromEntries(form.entries())
-            var json = JSON.stringify(object);
+            
 
             if (!email || email == "")
                 return (fail(400, {email, empty: true }));
+
             if (!isEmail.test(email as string))
                 return (fail(400, {email, wrong: true }));
 
@@ -28,43 +32,22 @@ export const actions = {
             if (!isUsername.test(username as string))
                 return (fail(400, {username, length_issue: true}));
 
-            const response = await fetch("http://localhost:4242/api/user/", {
-                method: 'POST',
-                headers: {
-                    "Accept": "*/*",
-                    "Content-Type": "application/json"
-                },
-                body: json
-            })
+            if ((await db.select().from(users).where(eq(users.username, username as string))).length != 0)
+                return (fail(400, {username, username_exists: true }));
 
-            if (!response.ok)
-            {
-                const test = await response.json();
+            if ((await db.select().from(users).where(eq(users.email, email as string))).length != 0)
+                return (fail(400, {username, email_exists: true }));
 
-                if (test.msg == "Username already exist")
-                    return (fail(400, {username, username_exists: true}));
-
-                if (test.msg == "Email already exist")
-                    return (fail(400, {email, email_exists: true}));
-                return (null);
-            }
+            const hashedPassword = await bcrypt.hash(password as string, 10);
             
-            const data = await response.json();
-
-            event.cookies.set('id', data.Data[0].id, {path: '/'});
-            event.cookies.set('username', data.Data[0].username, {path: '/'});
-            event.cookies.set('email', data.Data[0].email, {path: '/'});
-            event.cookies.set('wins', data.Data[0].wins, {path: '/'});
-            event.cookies.set('losses', data.Data[0].losses, {path: '/'});
-            event.cookies.set('matches', data.Data[0].matches, {path: '/'});
-            event.cookies.set('wallet', data.Data[0].wallet, {path: '/'});
-            // event.cookies.set('icon', data.icon, {path: '/user'});
-
+            db.insert(users).values({ username: username as string, email: email as string, password: hashedPassword });
+            
         }
         catch (error)
         {
             console.error("Erreur lors de la requête :", error);
+            return ;
         }
-        throw redirect(303, '/');
+        throw redirect(303, '/user/login');
     }
 } satisfies Actions;
