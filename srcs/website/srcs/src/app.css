@@ -5,6 +5,10 @@
     --breakpoint-lg: 960px;
 }
 
+.border-none {
+	border: none;
+}
+
 .justify-unset {
     justify-content: unset;
 }
@@ -30,6 +34,10 @@
 	grid-template-columns: 2.4rem minmax(0, var(--text-column-width, 1fr));
 	justify-content: unset;
 	word-break: unset;
+}
+
+.ft-heading-xxx-small {
+	@apply text-[1.4rem] leading-[1.1428571429];
 }
 
 .ft-button-medium {
