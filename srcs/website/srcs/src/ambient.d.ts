@@ -8,6 +8,21 @@ export function generateHmacSha256(key: string, message: string): string {
         .digest('hex');
 }
 
+export function createJWT( payload ){
+
+    if (!env.SECRET_KEY_JWT) throw new Error("JWT encryption key not set (SECRET_KEY_JWT undefined)");
+
+    let header = {
+        "alg": "HS256",
+        "typ": "JWT"
+    }
+    const encodedHeader = btoa(JSON.stringify(header));
+    const encodedPayload = btoa(JSON.stringify(payload));
+    const signature = btoa(env.SECRET_KEY_JWT);
+
+    return (encodedHeader+"."+encodedPayload+"."+btoa(generateHmacSha256(signature, encodedHeader+"."+encodedPayload)));
+}
+
 export function validateJWT( Token:string ){
     let splittedInfos = Token.split('.');
     let encodedHeader =splittedInfos[0];
@@ -33,7 +48,6 @@ export function validateJWT( Token:string ){
 
 
         let userInfos = JSON.parse(atob(encodedPayload));
-        console.log('User infos:\n'+JSON.stringify(userInfos));
         return (userInfos);
     }
     catch (error)

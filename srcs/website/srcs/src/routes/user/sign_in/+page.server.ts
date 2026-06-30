@@ -4,9 +4,16 @@ import { redirect } from '@sveltejs/kit';
 import { db } from '$lib/server/db/index';
 import { eq, lt, gte, ne } from 'drizzle-orm';
 import { users } from '$lib/server/db/schema';
-import { generateHmacSha256 } from '../../../ambient.d.ts';
-import { env } from '$env/dynamic/private';
+import { createJWT } from '../../../ambient.d.ts';
 import bcrypt from 'bcryptjs';
+
+export const load = async ({ cookies }) => {
+	const JWT = cookies.get('JWTtoken');
+
+	if (!JWT || JWT != '-1')
+		redirect(308, '/');
+
+};
 
 export const actions = {
     register: async (event) => {
@@ -52,19 +59,7 @@ export const actions = {
             const userInfos = await db.select({ id:users.id, username:users.username, email:users.email, wins:users.wins, losses:users.losses, matches:users.matches, wallets:users.wallet}).from(users).where(eq(users.username, username as string));
             if (userInfos.length > 0)
             {
-                if (!env.SECRET_KEY_JWT) throw new Error("JWT encryption key not set (SECRET_KEY_JWT undefined)");
-
-                let header = {
-                    "alg": "HS256",
-                    "typ": "JWT"
-                }
-                let payload = userInfos[0];
-                const encodedHeader = btoa(JSON.stringify(header));
-                const encodedPayload = btoa(JSON.stringify(payload));
-                const signature = btoa(env.SECRET_KEY_JWT);
-
-                const JWT = encodedHeader+"."+encodedPayload+"."+btoa(generateHmacSha256(signature, encodedHeader+"."+encodedPayload));
-                console.log(JWT);
+                const JWT = createJWT(userInfos[0]);
 
                 event.cookies.set('JWTtoken', JWT, { path: '/' });
             }
@@ -74,6 +69,6 @@ export const actions = {
             console.error("Erreur lors de la requête :", error);
             return ;
         }
-        throw redirect(307, '/');
+        throw redirect(303, '/');
     }
 } satisfies Actions;

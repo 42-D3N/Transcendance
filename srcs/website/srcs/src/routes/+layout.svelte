@@ -59,7 +59,7 @@
 			</div>
 		</div>
 		<hr class="mt-auto border-none">
-		{#if data.id === '-1' }
+		{#if data.Token === '-1' }
 		<div id="sidebar-login-buttons" class="items-stretch flex flex-col gap-[1.2rem] mt-[1.2rem]">
 			<a id="signup-button" class="flex justify-around gap-[0.4rem] text-left items-center overflow-visible relative whitespace-nowrap w-full break-unset border-0 text-[1.4rem]/1.1428 p-[0.8rem] rounded-lg bg-green-500" href="/user/sign_in">
 				<span class="content-center h-8 w-8 xl:hidden max-lg:hidden">
