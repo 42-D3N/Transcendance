@@ -12,29 +12,7 @@ export const actions = {
 	login: async (event) => {
 		try
 		{
-			const form = await event.request.formData();
-			const object = Object.fromEntries(form.entries())
-			var json = JSON.stringify(object);
-			const response = await fetch("http://localhost:4242/api/user:", {      
-				method: 'GET',
-				headers: {
-					"Content-Type": "application/json"
-				},
-				body: json
-			})
-			console.log(response);
-			if (!response.ok)
-				throw new Error(`HTTP error: ${response.status}`);
 			
-			const data = await response.json();
-			const userData:User = {
-				id:data.id,
-				email:data.email,
-				username:data.username,
-				password:data.password
-			};
-			
-			return (userData);
 		}
 		catch (error)
 		{
