@@ -1,23 +1,37 @@
+import { validateJWT } from '../ambient.d.ts';
+import { redirect } from '@sveltejs/kit';
+
 export function load ({ cookies })  {
-	let id = cookies.get('id');
-	let username = cookies.get('username');
-	let email = cookies.get('email');
-	let wins = cookies.get('wins');
-	let losses = cookies.get('losses');
-	let matches = cookies.get('matches');
-	let wallet = cookies.get('wallet');
+	let JWTtoken = cookies.get('JWTtoken');
+	let id = '-1';
+	let username = '';
+	let email = '';
+	let wins = '0';
+	let losses = '0';
+	let matches = '0';
+	let wallet = '0';
 
-	if (!id || id === '-1')
+	if (!JWTtoken || JWTtoken === '-1')
 	{
-		cookies.set('id', '-1', { path: '/' });
+		cookies.set('JWTtoken', '-1', { path: '/' });
+	}
+	else
+	{
+		let userInfos = validateJWT(JWTtoken);
 
-		id = '-1';
-		username = '';
-		email = '';
-		wins = '0';
-		losses = '0';
-		matches = '0';
-		wallet = '0';
+		if (!userInfos)
+			throw redirect(308, '/user/login');
+
+		if (userInfos.length == 0)
+			console.error("couldn't retrieve userData");
+
+		id = userInfos.id;
+		username = userInfos.username;
+		email = userInfos.email;
+		wins = userInfos.wins;
+		losses = userInfos.losses;
+		matches = userInfos.matches;
+		wallet = userInfos.wallets;
 	}
 
 	return ({
