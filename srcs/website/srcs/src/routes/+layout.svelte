@@ -7,6 +7,8 @@
 	import profileicon from '$lib/assets/profile_icon.svg';
 	import setticon from '$lib/assets/settings_icon.svg';
 
+	let sidebar:any;
+	let header:any;
 	let { children } = $props();
 	import "../app.css";
 	import Tab from './Tab.svelte';
@@ -24,6 +26,10 @@
 		document.querySelector('html')?.classList.remove('overflow-hidden');
 		document.querySelector('html')?.classList.remove('h-full');
 	}
+	function onSidebarClick(e:any) {
+		if (sidebar.contains(e.target) == false && header.contains(e.target) == false)
+			displayNav = false;
+	}
 </script>
 
 <svelte:head>
@@ -31,10 +37,12 @@
 	<title>ft_old_internet</title>
 </svelte:head>
 
+<svelte:window onclick={onSidebarClick} />
+
 <div id="sidebar" class="lg:left-0 lg:fixed lg:z-100">
 	<div id="opened-chats-container"></div>
 	<div id="mobile-shroud" class="lg:hidden {(!displayNav)?"hidden":""} inset-0 fixed z-2 bg-black/30"></div>
-	<nav id="sidebar-main-menu" class="flex max-lg:fixed flex-col h-svh max-lg:h-[unset] max-lg:top-19 px-[0.8rem] pt-[0.8rem] pb-[1.2rem] max-lg:bottom-0 w-68 lg:max-xl:w-[5.6rem] bg-cyan-600 max-lg:z-100 max-lg:{(!displayNav)?"hidden":""}">
+	<nav id="sidebar-main-menu" class="flex max-lg:fixed flex-col h-svh max-lg:h-[unset] max-lg:top-19 px-[0.8rem] pt-[0.8rem] pb-[1.2rem] max-lg:bottom-0 w-68 lg:max-xl:w-[5.6rem] bg-cyan-600 max-lg:z-100 max-lg:{(!displayNav)?"hidden":""}" bind:this={sidebar}>
 		<a href="/" class="items-center grid gap-[1.2rem] relative max-lg:hidden w-full">
 			<img alt="logo" class="col-span-full" src={favicon} height="120px" width="120px"/>
 		</a>
@@ -75,12 +83,12 @@
 			</a>
 		</div>
 		{:else}
-		<div class="grid justify-between mt-[0.8rem] px-[0.4rem] place-items-center user-grid-buttons grid-rows-[3.2rem]">
+		<div class="sidebar-footer-icons mobile-hidden">
 			<Tab name="friends"/>
 			<Tab name="chats"/>
 			<Tab name="settings"/>
 			<div class="ft-sidebar-footing-icon">
-				<button class="sidebar-link ft-button ft-button-small" onclick={() => (islogin = !islogin)}>
+				<button class="sidebar-link ft-button ft-button-small hover:bg-white/30" onclick={() => (islogin = !islogin)}>
 					<span class="ft-icon-size-20 ft-icon-glyph">
 						<!-- This here will change -->
 						<svg width="20" height="20" viewBox="0 0 24 24" data-glyph="local-door-left-exit" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M4.93,16.37 l-4.47,-3.93 c-0.33,-0.3,-0.33,-0.57,0,-0.87 l4.47,-3.93 c0.77,-0.7,1.07,-0.57,1.07,0.47 l0,7.8 c0,1.03,-0.3,1.17,-1.07,0.47 Z M15.13,13.5 l-10.77,-0.03 l0,-2.97 l10.77,0 c0.6,0,0.83,0.3,0.83,1.07 l0,0.87 c0,0.77,-0.23,1.07,-0.83,1.07 Z M10.0,15.43 l0.0,3.9 c0.0,0.67,0.0,0.67,0.67,0.67 l5.3,0.0 l0,2.0 l-5.3,0 c-2.0,0.0,-2.67,-0.67,-2.67,-2.67 l0,-3.9 Z M19.23,20.0 l2.07,-0.03 c0.7,-0.01,0.7,-0.01,0.7,-0.7 l0,-14.6 c-0.0,-0.67,-0.0,-0.67,-0.67,-0.67 l-10.67,-0.0 c-0.67,0.0,-0.67,0.0,-0.67,0.67 l-0.0,3.9 l-2.0,0 l0,-3.9 c0,-2.0,0.67,-2.67,2.67,-2.67 l10.67,0 c2.0,0,2.67,0.67,2.67,2.67 l0,14.6 c0,2.0,-0.67,2.67,-2.67,2.7 l-2.07,0.03 Z M22.67,22.53 l-3.33,1.27 c-0.97,0.4,-1.33,0.13,-1.33,-0.9 l0,-15.47 c0,-1.03,0.37,-1.57,1.33,-1.97 l2.17,-0.83 c1.87,-0.73,2.5,-0.3,2.5,1.7 l0,14.23 c0,1.03,-0.37,1.57,-1.33,1.97 Z M22.67,22.53"></path></svg>
@@ -92,7 +100,7 @@
 	</nav>
 </div>
 <div class="flex flex-col min-h-dvh">
-	<header id="mobile-header" class="bg-cyan-600 lg:hidden left-0 right-0 top-0 sticky z-100">
+	<header id="mobile-header" class="bg-cyan-600 lg:hidden left-0 right-0 top-0 sticky z-100" bind:this={header}>
 		<div class="flex flex-row items-center justify-between py-[.8rem] px-[.4rem]">
 			<div id="header-left" class="flex flex-row items-center gap-[.8rem]">
 				<button aria-label="Menu button" type="button" onclick={enableSidebar} class="grid h-[3.2rem] w-[3.2rem] p-[unset] place-items-center cursor-pointer {displayNav?"hidden":""}">

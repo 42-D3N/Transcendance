@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+.root {
+	--radius-5: 0.5rem;
+}
+
 @theme {
     --breakpoint-xl: 1250px;
     --breakpoint-lg: 960px;
@@ -64,8 +68,13 @@
 	@apply content-center inline-grid h-(--icon-size) w-(--icon-size) justify-center;
 }
 
+.ft-icon-glyph > svg {
+	@apply h-(--icon-size) w-(--icon-size);
+}
+
 .ft-button {
-	@apply border-0 cursor-pointer text-(--font-size) leading-[1.1428] min-h-(--button-height) p-(--button-padding) grid-flow-col max-w-full;
+	--ft-button: var(--border-radius, var(--radius-5)) ;
+	@apply border-0 cursor-pointer text-(--font-size) leading-[1.1428] min-h-(--button-height) p-(--button-padding) grid-flow-col max-w-full rounded-(--ft-button);
 }
 
 .ft-icon-img {
@@ -76,6 +85,25 @@
 	@apply overflow-hidden text-ellipsis;
 }
 
+.ft-sidebar-footing-icon .sidebar-link {
+	--button-padding: 0.6rem;
+}
+
 .ft-sidebar-footing-icon {
-	@apply block size-full relative;
+	@apply size-full relative;
+}
+
+.sidebar-footer-icons {
+	@apply grid place-items-center px-[0.4rem] grid-cols-[repeat(4,3.2rem)] grid-rows-[3.2rem] justify-between mt-[0.8rem];
+	@variant lg:max-xl {
+		@apply grid-cols-[3.2rem] grid-rows-[repeat(4,3.2rem)] justify-around gap-[0.4rem];
+		margin: unset;
+		padding: unset;
+	}
+}
+
+.mobile-hidden {
+	@variant max-lg {
+		@apply hidden;
+	}
 }
