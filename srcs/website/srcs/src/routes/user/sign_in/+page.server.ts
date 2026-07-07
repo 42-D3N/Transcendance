@@ -4,7 +4,7 @@ import { redirect } from '@sveltejs/kit';
 import { db } from '$lib/server/db/index';
 import { eq, lt, gte, ne } from 'drizzle-orm';
 import { users } from '$lib/server/db/schema';
-import { createJWT } from '../../../ambient.d.ts';
+import { createJWT } from '$lib/server/user_management/jwt.js';
 import bcrypt from 'bcryptjs';
 
 export const load = async ({ cookies }) => {

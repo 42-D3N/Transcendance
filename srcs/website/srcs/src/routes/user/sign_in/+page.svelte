@@ -11,7 +11,7 @@
     <form method="POST" action="?/register">
         <label>
             Username
-            <input minlength="4" maxlength="128" name="username" type="username" value={form?.username}>
+        <input minlength="4" maxlength="128" name="username" type="username" value={form?.username}>
         </label><br>
         {#if form?.length_issue}<p class="error">Username must be between 4 - 128 caracters</p>{/if}
         {#if form?.username_exists}<p class="error">Username already used</p>{/if}
@@ -27,8 +27,6 @@
             <input minlength="8" name="password" type="password" value={form?.password}>
         </label><br>
         {#if form?.skill_issue}<p class="error">Password must contain at least 12 caracters, a upper case and a lower case letter, a number and a special caracter</p>{/if}
-	    <input type="submit" value="Create account">
+        <input type="submit" value="Create account">
     </form>
 </div>
-
-

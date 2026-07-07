@@ -1,4 +1,4 @@
-import { validateJWT } from '../ambient.d.ts';
+import { validateJWT } from '$lib/server/user_management/jwt.js';
 import { redirect } from '@sveltejs/kit';
 
 export function load ({ cookies })  {

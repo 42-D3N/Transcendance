@@ -8,7 +8,7 @@ export function generateHmacSha256(key: string, message: string): string {
         .digest('hex');
 }
 
-export function createJWT( payload ){
+export function createJWT( payload: any ){
 
     if (!env.SECRET_KEY_JWT) throw new Error("JWT encryption key not set (SECRET_KEY_JWT undefined)");
 
@@ -48,7 +48,8 @@ export function validateJWT( Token:string ){
 
 
         let userInfos = JSON.parse(atob(encodedPayload));
-        return (userInfos);
+        if (userInfos)
+            return (userInfos);
     }
     catch (error)
     {
