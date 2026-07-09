@@ -9,7 +9,7 @@
 
 <div>
     <div class="px-4 py-px border-2 border-white border-solid rounded-xl bg-red-200">
-        <form method="POST" action="?/register">
+        <form method="POST" action="?/register" class="flex">
             <label>
                 Username
                 <input minlength="4" maxlength="128" name="username" type="username" value={form?.username}>
