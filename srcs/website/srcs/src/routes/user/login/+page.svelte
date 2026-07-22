@@ -7,8 +7,28 @@
 </script>
 
 <div class="absolute size-full z-0 bg-linear-to-b from-olive-500 to-80% to-white md:items-center"></div>
-<div class="flex size-auto">
-    <div class="bg-zinc-100 px-4 py-px border-zinc-400 border border-solid rounded-xl z-10 mt-2">
+<div class="flex h-80/100">
+    <div class="hidden lg:block ml-2 mt-2 relative w-lg h-128 rounded-xl overflow-hidden bg-linear-to-b from-sky-200 via-sky-400 to-blue-500 p-6 pt-8 text-center">
+        <button class="bg-green-500 hover:bg-green-600 text-white font-bold px-8 py-2 rounded-md shadow-lg">
+            Sign up!
+        </button>
+        <h2 class="text-white font-extrabold text-xl mt-4">Blog, Profile, Chat ...</h2>
+        <p class="text-white text-sm mt-1">Make tons of friends!</p>
+    <div class="absolute bottom-0 left-0 w-full flex justify-center items-end pointer-events-none">
+        <svg width="180" height="140" viewBox="0 0 180 140" class="opacity-90">
+            <!-- person 1 -->
+            <circle cx="60" cy="30" r="18" fill="white" fill-opacity="0.85"/>
+            <rect x="35" y="48" width="50" height="90" rx="20" fill="white" fill-opacity="0.85"/>
+            <!-- person 2 -->
+            <circle cx="120" cy="30" r="18" fill="white" fill-opacity="0.6"/>
+            <rect x="95" y="48" width="50" height="90" rx="20" fill="white" fill-opacity="0.6"/>
+        </svg>
+    </div>
+    </div>
+
+    <!---->
+    
+    <div class="h-fit bg-zinc-100 px-4 py-px border-zinc-400 border border-solid rounded-xl z-10 mt-2">
         <form method="POST" action="?/login">
             <p class="relative text-blue-600 font-bold z-10">Already registered?</p>
             <div class="relative bg-blue-200 min-height-1/50 min-lenght-10 h-4 bottom-4"></div>
@@ -39,14 +59,17 @@
             <p class="p-1 justify-center text-center text-lg">Any login is a permanent login unless a logout button is clicked (available on the nav bar, options, ...)</p>
         </div>
     </div>
-    <div class="bg-zinc-100 px-4 py-px border-zinc-400 border border-solid rounded-xl z-10 mt-2 h-auto">
+
+    <!---->
+
+    <div class="h-fit bg-zinc-100 px-4 py-px border-zinc-400 border border-solid rounded-xl z-10 mt-2">
         <div class="flex">
             <svg class="mt-1 mr-1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="17" height="17" viewBox="0 0 48 48">
                 <path fill="#2196f3" d="M44,24c0,11.045-8.955,20-20,20S4,35.045,4,24S12.955,4,24,4S44,12.955,44,24z"></path><path fill="#fff" d="M22 22h4v11h-4V22zM26.5 16.5c0 1.379-1.121 2.5-2.5 2.5s-2.5-1.121-2.5-2.5S22.621 14 24 14 26.5 15.121 26.5 16.5z"></path>
             </svg>
             <span class="text-blue-600 overflow-hidden text-xl2 font-bold">Sign up in 2 minutes and:</span>
         </div>
-        <ul class="ml-10 list-disc">
+        <ul class="w-fit ml-10 list-disc">
             <li>Edit your profile and make some friends</li>
             <li>Play a magnificent pong game</li>
             <li>Chat with your firends</li>
