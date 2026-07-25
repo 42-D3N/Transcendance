@@ -28,6 +28,8 @@ export const actions = {
             const username = form.get('username');
             const password = form.get('password');
             
+            if (!isUsername.test(username as string))
+                return (fail(400, {username, length_issue: true}));
 
             if (!email || email == "")
                 return (fail(400, {email, empty: true }));
@@ -37,9 +39,6 @@ export const actions = {
 
             if (!isPass.test(password as string))
                 return (fail(400, {password, skill_issue: true }));
-
-            if (!isUsername.test(username as string))
-                return (fail(400, {username, length_issue: true}));
 
             if ((await db.select().from(users).where(eq(users.username, username as string))).length != 0)
                 return (fail(400, {username, username_exists: true }));
