@@ -9,11 +9,11 @@
 
 <div class="absolute size-full z-0 bg-[#00000099] md:items-center"></div>
 
-<div class="mt-[10%] ml-[40%] scale-150 w-[20%] h-[80%] h-fit bg-[#FFFFFFAA] px-4 py-px border-zinc-400 border border-solid rounded-xl z-10 mt-2">
+<div class="mt-[10%] ml-[40%] scale-150 w-[20%] h-[80%] h-fit bg-linear-to-b  to-200% from-[#FFFFFFBB ] to-[#00000099] px-4 py-px rounded-xl z-10 mt-2">
 
     <form method="POST" action="?/register">
-        <p class="relative text-blue-600 font-bold z-10">Already registered?</p>
-        <div class="relative bg-blue-200 min-height-1/50 min-lenght-10 h-4 bottom-4"></div>
+        <p class="relative text-blue-200 font-bold z-10">Already registered?</p>
+        <div class="relative bg-blue-700 min-height-1/50 min-lenght-10 h-4 bottom-4"></div>
         <label>
             Username:<br>
             <input minlength="4" maxlength="128" name="username" type="username" value={form?.username} class="border border-solid border-zinc-400 bg-white focus:bg-black/20 max-w-1/1">
