@@ -7,7 +7,7 @@
 
 </script>
 
-<div class="absolute size-full z-0 bg-[#00000099] md:items-center"></div>
+<div class="absolute inset-0 z-0 bg-[#00000099]"></div>
 
 <div class="mt-[10%] ml-[40%] scale-150 w-[20%] h-[80%] h-fit bg-linear-to-b  to-200% from-[#FFFFFFBB ] to-[#00000099] px-4 py-px rounded-xl z-10 mt-2">
 
@@ -16,20 +16,20 @@
         <div class="relative bg-blue-700 min-height-1/50 min-lenght-10 h-4 bottom-4"></div>
         <label>
             Username:<br>
-            <input minlength="4" maxlength="128" name="username" type="username" value={form?.username} class="border border-solid border-zinc-400 bg-white focus:bg-black/20 max-w-1/1">
+            <input minlength="4" maxlength="128" name="username" type="username" value={form?.username} class="border border-solid border-zinc-400 bg-white focus:bg-black/20 max-w-full">
         </label><br>
         {#if form?.length_issue}<p class="error">Username must be between 4 - 128 caracters</p>{/if}
         {#if form?.username_exists}<p class="error">Username already used</p>{/if}
         <label>
             Email:<br>
-            <input name="email" value={form?.email} class="border border-solid border-zinc-400 bg-white focus:bg-black/20 max-w-1/1">
+            <input name="email" value={form?.email} class="border border-solid border-zinc-400 bg-white focus:bg-black/20 max-w-full">
         </label><br>
         {#if form?.empty}<p class="error">The email field is required</p>{/if}
         {#if form?.wrong}<p class="error">Invalid Email!</p>{/if}
         {#if form?.email_exists}<p class="error">Email already used</p>{/if}
         <label>
             Password:<br>
-            <input minlength="8" name="password" type="password" value={form?.password} class="border border-solid border-zinc-400 bg-white focus:bg-black/20 max-w-1/1">
+            <input minlength="8" name="password" type="password" value={form?.password} class="border border-solid border-zinc-400 bg-white focus:bg-black/20 max-w-full">
         </label><br>
         {#if form?.skill_issue}<p class="error">Password must contain at least 12 caracters, a upper case and a lower case letter, a number and a special caracter</p>{/if}
         <a class="" href="./sign_in">

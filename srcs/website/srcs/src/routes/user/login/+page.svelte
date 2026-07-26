@@ -6,7 +6,7 @@
 
 </script>
 
-<div class="absolute size-full z-0 bg-linear-to-b from-olive-500 to-80% to-white md:items-center"></div>
+<div class="absolute inset-0 z-0 bg-linear-to-b from-olive-500 to-120% to-white"></div>
 
 <div class="scale-120 pb-8 mt-[5%] ml-[15%] p-16 w-[70%] h-[80%] bg-gray-200 px-4 py-px border-zinc-400 border border-solid rounded-xl z-10 mt-2">
     
@@ -40,14 +40,14 @@
                 <div class="relative bg-blue-200 min-height-1/50 min-lenght-10 h-4 bottom-4"></div>
                 <label>
                     Username or Email:
-                    <br><input name="username" type="username" class="border border-solid border-zinc-400 bg-white focus:bg-black/20 max-w-1/1">
+                    <br><input name="username" type="username" class="border border-solid border-zinc-400 bg-white focus:bg-black/20 max-w-full">
                 </label><br>
                 {#if form?.accNotFound}<p class="error">Account not found</p>{/if}
                 {#if form?.emptyName}<p class="error">Usename or email cannot be empty</p>{/if}
                 {#if form?.wrong}<p class="error">You must enter your email or username</p>{/if}
                 <label>
                     Password:
-                    <br><input name="password" type="password" class="border border-solid border-zinc-400 bg-white focus:bg-black/20 max-w-1/1">
+                    <br><input name="password" type="password" class="border border-solid border-zinc-400 bg-white focus:bg-black/20 max-w-full">
                 </label><br>
                 {#if form?.emptyPass}<p class="error">Password cannot be empty</p>{/if}
                 {#if form?.invalidPass}<p class="error">Incorrect password</p>{/if}
