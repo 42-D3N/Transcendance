@@ -8,14 +8,14 @@
 
 <div class="absolute inset-0 z-0 bg-linear-to-b from-olive-500 to-120% to-white"></div>
 
-<div class="scale-120 pb-8 mt-[5%] ml-[15%] p-16 w-[70%] h-[80%] bg-gray-200 px-4 py-px border-zinc-400 border border-solid rounded-xl z-10 mt-2">
+<div class="lg:scale-120 pb-8 mt-[5%] ml-[5%] lg:ml-[15%] p-16 w-[90%] lg:w-[70%] lg:h-[80%] bg-gray-200 px-4 py-px border-zinc-400 border border-solid rounded-xl z-10 mt-2">
     
-    <p class="text-3xl ml-24 m-4">Log in</p>
+    <p class="text-3xl lg:ml-24 m-4">Log in</p>
 
-    <div class="flex content-center space-x-4">
+    <div class="lg:flex content-center space-x-4">
 
         <div class="hidden lg:block ml-2 mt-2 relative w-lg h-160 rounded-xl overflow-hidden bg-linear-to-b from-sky-200 via-sky-400 to-blue-500 p-6 pt-8 text-center">
-            <button class="bg-green-500 hover:bg-green-600 text-white font-bold mt-4 px-16 py-4 rounded-md shadow-lg">
+            <button class="bg-green-500 hover:bg-green-600 text-white font-bold mt-4 px-16 py-4 rounded-md shadow-[inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.35),0_1px_2px_rgba(0,0,0,0.4)]">
                 Sign up!
             </button>
             <h2 class="text-white font-extrabold text-5xl mt-8">Blog, Profile, Chat ...</h2>
@@ -32,9 +32,9 @@
             </div>
         </div>
 
-        <!---->
+        <!--  -->
         
-        <div class="h-fit bg-zinc-100 px-4 py-px border-zinc-400 border border-solid rounded-xl z-10 mt-2">
+        <div class="h-fit w-full lg:w-fit bg-zinc-100 px-4 py-px border-zinc-400 border border-solid rounded-xl z-10 mt-2">
             <form method="POST" action="?/login">
                 <p class="relative text-blue-600 font-bold z-10">Already registered?</p>
                 <div class="relative bg-blue-200 min-height-1/50 min-lenght-10 h-4 bottom-4"></div>
@@ -66,9 +66,9 @@
             </div>
         </div>
 
-        <!---->
+        <!--  -->
 
-        <div class="h-fit bg-zinc-100 px-4 py-px border-zinc-400 border border-solid rounded-xl z-10 mt-2">
+        <div class="h-fit w-full lg:w-fit bg-zinc-100 px-4 py-px border-zinc-400 border border-solid rounded-xl z-10 mt-2">
             <div class="flex">
                 <svg class="mt-1 mr-1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="17" height="17" viewBox="0 0 48 48">
                     <path fill="#2196f3" d="M44,24c0,11.045-8.955,20-20,20S4,35.045,4,24S12.955,4,24,4S44,12.955,44,24z"></path><path fill="#fff" d="M22 22h4v11h-4V22zM26.5 16.5c0 1.379-1.121 2.5-2.5 2.5s-2.5-1.121-2.5-2.5S22.621 14 24 14 26.5 15.121 26.5 16.5z"></path>
