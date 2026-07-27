@@ -14,20 +14,20 @@
         <p class="relative text-zinc-400 font-bold text-3xl z-10 m-2">Create an account</p>
         <label class="text-white">
             Username:<br>
-            <input minlength="4" maxlength="128" name="username" type="username" value={form?.username} class="border border-solid border-zinc-400 bg-white focus:bg-black/20 max-w-full">
+            <input minlength="4" maxlength="128" name="username" type="username" value={form?.username} class="border border-solid border-zinc-400 bg-[#333131FF] focus:bg-black/20 max-w-full">
         </label><br>
         {#if form?.length_issue}<p class="error">Username must be between 4 - 128 caracters</p>{/if}
         {#if form?.username_exists}<p class="error">Username already used</p>{/if}
         <label class="text-white">
             Email:<br>
-            <input name="email" value={form?.email} class="border border-solid border-zinc-400 bg-white focus:bg-black/20 max-w-full">
+            <input name="email" value={form?.email} class="border border-solid border-zinc-400 bg-[#333131FF] focus:bg-black/20 max-w-full">
         </label><br>
         {#if form?.empty}<p class="error">The email field is required</p>{/if}
         {#if form?.wrong}<p class="error">Invalid Email!</p>{/if}
         {#if form?.email_exists}<p class="error">Email already used</p>{/if}
         <label class="text-white">
             Password:<br>
-            <input minlength="8" name="password" type="password" value={form?.password} class="border border-solid border-zinc-400 bg-white focus:bg-black/20 max-w-full">
+            <input minlength="8" name="password" type="password" value={form?.password} class="border border-solid border-zinc-400 bg-[#333131FF] focus:bg-black/20 max-w-full">
         </label><br>
         {#if form?.skill_issue}<p class="error">Password must contain at least 12 caracters, a upper case and a lower case letter, a number and a special caracter</p>{/if}
         <a class="" href="./sign_in">
