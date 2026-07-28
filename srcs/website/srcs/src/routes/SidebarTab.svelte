@@ -12,7 +12,7 @@
 <svelte:window onclick={onTabClick} />
 
 <div class="ft-sidebar-footing-icon" bind:this={container}>
-	<button id={name+"-widget-button"} class="sidebar-link ft-button ft-button-small hover:bg-white/30 {(show)?"bg-white/30":""}" onclick={() => (show = !show)}>
+	<button id={name+"-widget-button"} class="ft-button ft-button-small sidebar-link hover:bg-white/30 {(show)?"bg-white/30":""}" onclick={() => (show = !show)}>
 		<span class="ft-icon-size-20 ft-icon-glyph">
 			{#if name == "friends"}
 				<svg width="20" height="20" viewBox="0 0 24 24" data-glyph="users" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M8 18V16.13C8 14.3 8.63 13.43 10.4 12.9L11.78 12.42C11.38 13.94 10.57 14.16 10.57 15.03C10.57 15.63 10.74 15.93 11.3 16.1L13.6 16.9C14.47 17.16 15.06 17.5 15.44 18H8ZM12.07 5.24C12.35 3.14 13.47 2 15.43 2C17.9 2 19 3.57 19 6.4C19 10 17.57 9.8 17.57 11.03C17.57 11.63 17.77 11.93 18.3 12.1L20.63 12.9C22.36 13.43 23 14.3 23 16.13V18H17.61C17.04 16.56 15.86 15.49 14.22 15L13.15 14.63C13.55 13.85 14.01 12.36 14.01 10.4C14.01 8.01 13.29 6.29 12.08 5.24H12.07ZM1 22V20.13C1 18.3 1.63 17.43 3.4 16.9L5.6 16.13C6.13 15.93 6.37 15.66 6.37 15.03C6.37 13.86 5 13.86 5 10.4C5 7.57 6.1 6 8.43 6C10.9 6 12 7.57 12 10.4C12 13.87 10.57 13.87 10.57 15.03C10.57 15.63 10.74 15.93 11.3 16.1L13.6 16.9C15.37 17.43 16 18.3 16 20.13V22H1Z"></path></svg>

@@ -34,8 +34,8 @@
 
 .sidebar-link {
 	--button-padding: 0.8rem;
-	@apply grid items-center gap-[1.2rem] text-left overflow-visible relative w-full whitespace-nowrap;
-	grid-template-columns: 2.4rem minmax(0, var(--text-column-width, 1fr));
+	@apply items-center grid gap-[1.2rem] text-left overflow-visible relative w-full whitespace-nowrap;
+	grid-template-columns: minmax(0, 2.4rem) minmax(0, var(--text-column-width, 1fr));
 	justify-content: unset;
 	word-break: unset;
 }
