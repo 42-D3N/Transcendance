@@ -20,7 +20,7 @@ export function load ({ cookies })  {
 		let userInfos = validateJWT(JWTtoken);
 
 		if (!userInfos)
-			throw redirect(403, '/user/login');
+			throw redirect(403, '/login');
 
 		if (userInfos.length == 0)
 			console.error("couldn't retrieve userData");

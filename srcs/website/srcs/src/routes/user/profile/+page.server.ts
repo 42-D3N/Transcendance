@@ -14,13 +14,14 @@ export function load ({ cookies })  {
     if (!JWTtoken || JWTtoken === '-1')
     {
         cookies.set('JWTtoken', '-1', { path: '/' });
+        throw redirect(308, '/sign_in');
     }
     else
     {
         let userInfos = validateJWT(JWTtoken);
 
         if (!userInfos)
-            throw redirect(403, '/user/login');
+            throw redirect(308, '/sign_in');
 
         if (userInfos.length == 0)
             console.error("couldn't retrieve userData");

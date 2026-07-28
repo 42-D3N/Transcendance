@@ -34,7 +34,7 @@
             <span class="lg:max-xl:hidden text-amber-600 overflow-hidden text-xl/tight text-ellipsis underline font-bold">Already registered?</span>
         </a>
         <div class="flex justify-end">
-            <div class="bg-gray-200 border border-solid border-zinc-400 rounded-lg px-3 py-1 mt-4 mb-1 w-fit">
+            <div class="bg-[#333131FF] hover:bg-black/20 border border-solid border-zinc-400 rounded-lg px-3 py-1 mt-4 mb-1 w-fit">
                 <img class="inline w-4 h-6 -translate-y-1" src={arrow} alt="icon">
                 <input type="submit" value="Create account">
             </div>
