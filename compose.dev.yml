@@ -1,0 +1,45 @@
+services:
+  # database:
+  #   image: postgres:18-trixie
+  #   restart: always
+  #   ports:
+  #     - 5432:5432
+  #   env_file:
+  #     - ./srcs/database/.env
+  #   volumes:
+  #     - pgdata:/var/lib/postgresql
+  website:
+    command: npm run dev -- --host
+    image: transcendance-front-end
+    build: ./srcs/website
+    pull_policy: never
+    ports:
+      - "5173:5173"
+    restart: always
+    develop:
+      watch:
+        - path: ./srcs/website/srcs/src
+          action: sync
+          target: /app/src
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: ./srcs/website/srcs/package.json
+  # adminer:
+  #   image: adminer
+  #   restart: always
+  #   ports:
+  #     - "5173:5173"
+  #   restart: always
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+volumes:
+  pgdata:
+
+# networks:
+#   transcendance:
+#     name: transcendance
