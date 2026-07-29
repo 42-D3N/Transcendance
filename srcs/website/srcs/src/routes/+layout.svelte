@@ -63,7 +63,7 @@
 			if (mobToolbarEnabled === "none")
 				enableScroll();
 		}
-		if (islogin && friendsContainer.contains(e.target) == false && chatsContainer.contains(e.target) == false && settingsContainer.contains(e.target) == false && mobileSpace.contains(e.target) == false && header.contains(e.target) == false)
+		if (data.Token !== '-1' && friendsContainer.contains(e.target) == false && chatsContainer.contains(e.target) == false && settingsContainer.contains(e.target) == false && mobileSpace.contains(e.target) == false && header.contains(e.target) == false)
 		{	
 			mobToolbarEnabled = "none";
 			enableScroll();
@@ -87,24 +87,21 @@
 		</a>
 		<div id="sidebar-menus-buttons" class="min-h-0 overflow-hidden shrink">
 			<div class="items-stretch flex flex-col h-full">
-				<a class="ft-button ft-button-medium sidebar-link hover:text-white hover:bg-[#333131FF]" href="/">
+				<a class="ft-button ft-button-medium sidebar-link hover:bg-[#333131FF]" href="/">
 					<img class="ft-icon-img ft-icon-size-24" src={homeicon} alt="icon"/>
-					<span class="ft-sidebar-link-text text-2xl/tight">Home</span>
-				<a class="relative text-left grid items-center gap-[1.2rem] w-full text-white hover:bg-[#333131FF] text-[1.4rem]/[1.1428] justify-unset overflow-visible whitespace-nowrap break-unset border-0 grid-flow-col max-w-full min-h-16 p-[0.8rem] grid-buttons" href="/">
-					<img class="block h-[2.4rem] w-[2.4rem]" src={homeicon} alt="icon"/>
-					<span class="lg:max-xl:hidden overflow-hidden text-2xl/tight text-ellipsis">Home</span>
+					<span class="ft-sidebar-link-text text-2xl/tight text-white">Home</span>
 				</a>
-				<a class="ft-button ft-button-medium sidebar-link hover:text-white hover:bg-[#333131FF]" href="/game">
+				<a class="ft-button ft-button-medium sidebar-link hover:bg-[#333131FF]" href="/game">
 					<img class="ft-icon-img ft-icon-size-24" src={gameicon} alt="icon"/>
-					<span class="ft-sidebar-link-text text-2xl/tight">Game</span>
+					<span class="ft-sidebar-link-text text-2xl/tight text-white">Game</span>
 				</a>
-				<a class="ft-button ft-button-medium sidebar-link hover:text-white hover:bg-[#333131FF]" href="/user/profile">
+				<a class="ft-button ft-button-medium sidebar-link hover:bg-[#333131FF]" href="/user/profile">
 					<img class="ft-icon-img ft-icon-size-24" src={profileicon} alt="icon"/>
-					<span class="ft-sidebar-link-text text-2xl/tight">Profile</span>
+					<span class="ft-sidebar-link-text text-2xl/tight text-white">Profile</span>
 				</a>
-				<a class="ft-button ft-button-medium sidebar-link hover:text-white hover:bg-[#333131FF]" href="/settings">
+				<a class="ft-button ft-button-medium sidebar-link hover:bg-[#333131FF]" href="/settings">
 					<img class="ft-icon-img ft-icon-size-24" src={setticon} alt="icon"/>
-					<span class="ft-sidebar-link-text text-2xl/tight">Settings</span>
+					<span class="ft-sidebar-link-text text-2xl/tight text-white">Settings</span>
 				</a>
 			</div>
 		</div>
@@ -148,7 +145,7 @@
 	</nav>
 </div>
 <div class="flex flex-col min-h-dvh">
-	<header id="mobile-header" class="bg-[#333131FF] lg:hidden left-0 right-0 top-0 sticky z-100" bind:this={header}>
+	<header id="mobile-header" class="bg-[#333131FF] lg:hidden left-0 right-0 top-0 sticky z-100" bind:this={header} data-sveltekit-reload>
 		<div class="flex flex-row items-center justify-between py-[0.8rem] px-[0.4rem]">
 			<div id="mobile-header-left" class="flex flex-row items-center gap-[0.8rem]">
 				<button aria-label="Menu button" type="button" onclick={enableSidebar} class="grid h-[3.2rem] w-[3.2rem] p-[unset] place-items-center cursor-pointer {displayNav?"hidden":""}">
@@ -165,10 +162,10 @@
 					<img alt="logo" src={favicon} width="26.75px"/>
 				</a>
 			</div>
-			{#if !islogin}
+			{#if data.Token === '-1'}
 			<div id="mobile-header-auth" class="flex flex-row items-center gap-[0.8rem]">
-				<a class="ft-button ft-button-small bg-green-500"><span>Sign Up</span></a>
-				<a class="ft-button ft-button-small bg-gray-500" onclick={() => (islogin = !islogin)}><span>Log In</span></a>
+				<a class="ft-button ft-button-small bg-green-500" href="/sign_in"><span>Sign Up</span></a>
+				<a class="ft-button ft-button-small bg-gray-500" href="/login"><span>Log In</span></a>
 			</div>
 			{:else}
 			<div id="mobile-header-buttons" class="flex place-items-center">
@@ -194,11 +191,11 @@
 					</button>
 				</div>
 				<div class="mobile-toolbar-action">
-					<button id="logout-widget-button" class="mobile-toolbar-action-button ft-button ft-button-small hover:bg-white/30" onclick={() => (islogin = !islogin)}>
+					<a id="logout-widget-button" class="mobile-toolbar-action-button ft-button ft-button-small hover:bg-white/30" href="/user/logout">
 						<span class="ft-icon-size-20 ft-icon-glyph">
 							<svg width="20" height="20" viewBox="0 0 24 24" data-glyph="local-door-left-exit" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M4.93,16.37 l-4.47,-3.93 c-0.33,-0.3,-0.33,-0.57,0,-0.87 l4.47,-3.93 c0.77,-0.7,1.07,-0.57,1.07,0.47 l0,7.8 c0,1.03,-0.3,1.17,-1.07,0.47 Z M15.13,13.5 l-10.77,-0.03 l0,-2.97 l10.77,0 c0.6,0,0.83,0.3,0.83,1.07 l0,0.87 c0,0.77,-0.23,1.07,-0.83,1.07 Z M10.0,15.43 l0.0,3.9 c0.0,0.67,0.0,0.67,0.67,0.67 l5.3,0.0 l0,2.0 l-5.3,0 c-2.0,0.0,-2.67,-0.67,-2.67,-2.67 l0,-3.9 Z M19.23,20.0 l2.07,-0.03 c0.7,-0.01,0.7,-0.01,0.7,-0.7 l0,-14.6 c-0.0,-0.67,-0.0,-0.67,-0.67,-0.67 l-10.67,-0.0 c-0.67,0.0,-0.67,0.0,-0.67,0.67 l-0.0,3.9 l-2.0,0 l0,-3.9 c0,-2.0,0.67,-2.67,2.67,-2.67 l10.67,0 c2.0,0,2.67,0.67,2.67,2.67 l0,14.6 c0,2.0,-0.67,2.67,-2.67,2.7 l-2.07,0.03 Z M22.67,22.53 l-3.33,1.27 c-0.97,0.4,-1.33,0.13,-1.33,-0.9 l0,-15.47 c0,-1.03,0.37,-1.57,1.33,-1.97 l2.17,-0.83 c1.87,-0.73,2.5,-0.3,2.5,1.7 l0,14.23 c0,1.03,-0.37,1.57,-1.33,1.97 Z M22.67,22.53"></path></svg>
 						</span>
-					</button>
+					</a>
 				</div>
 			</div>
 			{/if}
