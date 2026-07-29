@@ -9,7 +9,7 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql
   api:
-    image: transcendance-front-end
+    image: transcendance-api
     build: ./srcs/api
     pull_policy: never
     env_file:
@@ -36,6 +36,8 @@ services:
     image: transcendance-front-end
     build: ./srcs/website
     pull_policy: never
+    env_file:
+      - ./srcs/website/srcs/.env
     networks:
       - transcendance
     ports:
