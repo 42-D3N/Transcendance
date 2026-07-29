@@ -2,7 +2,7 @@ devup:
 	docker compose -f compose.dev.yml up --watch
 
 devdown:
-	docker compose -f compose.dev.yml down
+	docker compose -f compose.dev.yml down --volumes
 
 clean: devdown
 
@@ -11,9 +11,7 @@ fclean: clean
 
 devre: fclean devup
 
-devreboot: devdown devup
-
 prune: fclean
 	docker system prune -af --volumes
 
-.PHONY: devup devdown clean fclean devre prune devreboot
+.PHONY: devup devdown clean fclean devre prune

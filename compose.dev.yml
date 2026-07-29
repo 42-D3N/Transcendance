@@ -31,11 +31,25 @@ services:
             - node_modules/
         - action: rebuild
           path: ./srcs/api/srcs/package.json
-  # website:
-  #   build: ./srcs/website
-  #   ports:
-  #     - "5173:5173"
-  #   restart: always
+  website:
+    command: npm run dev -- --host
+    image: transcendance-front-end
+    build: ./srcs/website
+    pull_policy: never
+    networks:
+      - transcendance
+    ports:
+      - "5173:5173"
+    restart: always
+    develop:
+      watch:
+        - path: ./srcs/website/srcs/src
+          action: sync
+          target: /app/src
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: ./srcs/website/srcs/package.json
   adminer:
     image: adminer
     restart: always
