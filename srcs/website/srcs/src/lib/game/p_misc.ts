@@ -69,6 +69,8 @@ export function stop_game(game_vars: any)
 export function scoreboard(game_vars: any)
 {
   console.log(`GG PLAYER ${game_vars.state.score.p1 >= game_vars.score_to_win ? 1 : 2}`);
+  ;
+  // afficher la div (inexistante) du score final;
 }
 
 /**

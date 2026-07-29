@@ -25,12 +25,12 @@
 <main class="grid w-full max-w-[108.4rem] content-start grow shrink-0 basis-auto gap-[2.4rem] grid-cols-[100%] p-[1.6rem]">
     <div
         id="realbackground"
-        class="aspect-[65/73] w-full max-w-[65rem] bg-violet-950 flex justify-center items-center"
-    >
+        class="aspect-[65/73] w-full max-w-[65rem] bg-violet-950 flex justify-center items-center">
+
         <div
             id="background"
-            class="relative w-[97%] h-[97%] bg-blue-700"
-        >
+            class="relative w-[97%] h-[97%] bg-blue-700">
+
             <div
                 id="racketUp"
                 class="bg-yellow-300 absolute"
