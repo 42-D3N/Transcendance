@@ -33,6 +33,9 @@
 	},
 	"dependencies": {
 		"@tailwindcss/vite": "^4.3.0",
+		"bcrypt": "^6.0.0",
+		"bcryptjs": "^3.0.3",
+		"cookie": "^1.1.1",
 		"earcut": "^3.0.2",
 		"node": "^26.3.0",
 		"tailwindcss": "^4.3.0"

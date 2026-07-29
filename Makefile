@@ -1,11 +1,17 @@
-all:
-	@echo "Docker compose is working..."
-	@docker compose up
-	@echo "Done."
+devup:
+	docker compose -f compose.dev.yml up --watch
 
-fclean:
-	@echo "Deleting everything..."
-	@docker compose down && docker system prune -af
-	@echo "Done."
+devdown:
+	docker compose -f compose.dev.yml down --volumes
 
-re: fclean all
+clean: devdown
+
+fclean: clean
+	docker compose -f compose.dev.yml down --volumes --remove-orphans --rmi all
+
+devre: fclean devup
+
+prune: fclean
+	docker system prune -af --volumes
+
+.PHONY: devup devdown clean fclean devre prune
