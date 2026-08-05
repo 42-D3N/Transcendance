@@ -3,7 +3,7 @@ import type { logOperation } from '@babylonjs/core';
 import { fail } from '@sveltejs/kit';
 import { redirect } from '@sveltejs/kit';
 import { db } from '$lib/server/db/index';
-import { eq, lt, gte, ne } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { users } from '$lib/server/db/schema';
 import { createJWT } from '$lib/server/user_management/jwt.js';
 import bcrypt from 'bcryptjs';
@@ -53,9 +53,9 @@ export const actions = {
 			{
 				let userInfos;
 				if (isEmail.test(username as string))
-					userInfos = await db.select({ id:users.id, username:users.username, email:users.email, wins:users.wins, losses:users.losses, matches:users.matches, wallets:users.wallet}).from(users).where(eq(users.email, username as string));
+					userInfos = await db.select({ id:users.id, username:users.username, email:users.email, wins:users.wins, losses:users.losses, matches:users.matches, wallets:users.wallet, icon:users.icon}).from(users).where(eq(users.email, username as string));
 				else
-					userInfos = await db.select({ id:users.id, username:users.username, email:users.email, wins:users.wins, losses:users.losses, matches:users.matches, wallets:users.wallet}).from(users).where(eq(users.username, username as string));
+					userInfos = await db.select({ id:users.id, username:users.username, email:users.email, wins:users.wins, losses:users.losses, matches:users.matches, wallets:users.wallet, icon:users.icon}).from(users).where(eq(users.username, username as string));
 				const JWT = createJWT(userInfos[0]);
 
 				event.cookies.set('JWTtoken', JWT, { path: '/' });
