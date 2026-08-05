@@ -59,13 +59,13 @@ services:
             - node_modules/
         - action: rebuild
           path: ./srcs/website/srcs/package.json
-  # adminer:
-  #   image: adminer
-  #   restart: always
-  #   networks:
-  #     - transcendance
-  #   ports:
-  #     - 4040:8080
+  adminer:
+    image: adminer
+    restart: always
+    networks:
+      - transcendance
+    ports:
+      - 4040:8080
 
 volumes:
   pgdata:
