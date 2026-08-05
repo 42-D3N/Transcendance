@@ -14,6 +14,7 @@ export function load ({ cookies })  {
 	if (!JWTtoken || JWTtoken === '-1')
 	{
 		cookies.set('JWTtoken', '-1', { path: '/' });
+		JWTtoken = '-1';
 	}
 	else
 	{
@@ -23,7 +24,20 @@ export function load ({ cookies })  {
 			throw redirect(403, '/login');
 
 		if (userInfos.length == 0)
+		{
 			console.error("couldn't retrieve userData");
+			cookies.set('JWTtoken', '-1', { path: '/' });
+			return ({
+				Token: JWTtoken,
+				id: id,
+				username: username,
+				email: email,
+				wins: wins,
+				losses: losses,
+				matches: matches,
+				wallet: wallet
+			});
+		}
 
 		id = userInfos.id;
 		username = userInfos.username;

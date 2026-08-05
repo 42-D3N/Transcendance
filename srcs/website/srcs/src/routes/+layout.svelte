@@ -126,7 +126,7 @@
 			<img class="block h-[3.6rem] w-[3.6rem] bg-amber-50 border rounded-lg" src={usericon} alt="icon"/>
 			<div id="user-info-container">	
 				<span class="lg:max-xl:hidden text-white">{data.username}</span><br>
-				<span class="content-center w-5 text-lg max-lg:hidden text-white">wallet: {data.wallet}</span>
+				<span class="content-center w-5 text-lg hidden xl:block text-white">wallet: {data.wallet}</span>
 			</div>
 		</a>
 		<div class="sidebar-footer-icons mobile-hidden">
