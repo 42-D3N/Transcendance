@@ -16,11 +16,12 @@ export const nodes = [
 export const server_loads = [0];
 
 export const dictionary = {
-		"/": [~3],
-		"/game": [6],
-		"/loading_screen": [7],
-		"/(login)/login": [~4,[2]],
-		"/(login)/sign_in": [~5,[2]],
+		"/": [~2],
+		"/game": [5],
+		"/game/gameItself": [6],
+		"/game/loadingScreen": [7],
+		"/(login)/login": [~3],
+		"/(login)/sign_in": [~4],
 		"/user/logout": [~8],
 		"/user/profile": [~9]
 	};

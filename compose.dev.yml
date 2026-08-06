@@ -52,6 +52,25 @@ services:
             - node_modules/
         - action: rebuild
           path: ./srcs/website/srcs/package.json
+  game_server:
+    command: npm run dev
+    image: game_serv
+    build: ./srcs/game-server
+    pull_policy: never
+    networks:
+      - transcendance
+    ports:
+      - "3310:3310"
+    restart: always
+    develop:
+      watch:
+        - path: ./srcs/game-server/srcs/src
+          action: sync
+          target: /app/src
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: ./srcs/game-server/srcs/package.json
   adminer:
     image: adminer
     restart: always

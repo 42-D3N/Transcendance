@@ -1,6 +1,10 @@
 {
   "dependencies": {
     "tsc": "^2.0.4",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "ws": "^8.21.2"
+  },
+  "devDependencies": {
+    "@types/ws": "^8.18.1"
   }
 }

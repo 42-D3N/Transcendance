@@ -28,7 +28,7 @@
         class="aspect-[65/73] w-full max-w-[65rem] bg-violet-950 flex justify-center items-center">
 
         <div
-            id="background"
+            id="terrain"
             class="relative w-[97%] h-[97%] bg-blue-700">
 
             <div
@@ -42,7 +42,7 @@
             ></div>
 
             <div
-                id="circle"
+                id="ball"
                 class="bg-green-500 rounded-[50%] absolute"
             ></div>
 

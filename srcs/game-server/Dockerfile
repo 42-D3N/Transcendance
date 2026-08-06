@@ -6,3 +6,5 @@ WORKDIR /app
 COPY --chown=app:app ./srcs/package.json ./srcs/package-lock.json ./
 RUN npm install
 COPY --chown=app:app ./srcs /app
+
+EXPOSE 3310
