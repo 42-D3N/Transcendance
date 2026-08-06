@@ -7,7 +7,7 @@ const start = async () => {
 	try {
 		server.register(fastifyWebsocket);
 		server.register( async function (fastify) {
-			server.get('/', { websocket: true }, (socket, req) => {
+			server.get('/api/chat', { websocket: true }, (socket, req) => {
 				socket.on('message', async (message: string) => {
 					if (message.toString() === 'hi from client')
 						socket.send('hi from server');

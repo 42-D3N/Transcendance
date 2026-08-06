@@ -13,7 +13,19 @@
 	let friendsContainer:any;
 	let chatsContainer:any;
 	let settingsContainer:any;
+
 	import { redirect } from '@sveltejs/kit';
+	import { browser } from "$app/environment";
+	import { chatClient } from '$lib/chat-client'
+
+	$effect(() => {
+        if (!browser) return;
+
+        if (data.Token != -1)
+            chatClient.connect();
+        else
+            chatClient.disconnect();
+    });
 
 	let { data, children } = $props();
 
