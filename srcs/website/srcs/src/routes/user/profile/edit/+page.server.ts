@@ -18,30 +18,30 @@ export const actions = {
         }
         else
         {
-            let randomString = randomBytes(64);
+            let randomString = randomBytes(48);
             let userInfos = validateJWT(cookies.get('JWTtoken'));
 
             if (!userInfos)
                 return console.log("failed to retrieve user information");
             console.log(await db.select().from(users).where(eq(users.id, userInfos.id)));
-            await db.update(users).set({icon: randomString.toString("hex")}).where(eq(users.id, userInfos.id));
             console.log("new icon name: "+randomString.toString("hex"));
-
-            mkdir("/data/userIcon", { recursive: true });
+            
+            // mkdir("/user/profile/userIcons", { recursive: true });
             const buffer = Buffer.from(await icon.arrayBuffer());
-            const uploadDir = path.resolve('/data/userIcon');
+            const uploadDir = path.resolve('/user/profile/userIcons');
             const end = icon.name.split('.');
             const filePath = path.join(uploadDir, randomString.toString('hex')+"."+end[end.length - 1]);
+            await db.update(users).set({icon: './userIcons/'+randomString.toString('hex')+"."+end[end.length - 1]}).where(eq(users.id, userInfos.id));
             console.log("File uploading:");
-            console.log(icon);
             
             console.log("Saving as: "+filePath);
             await writeFile(filePath, buffer);
             console.log("File Uploaded");
             
-            userInfos.icon = "/data/userIcon/"+randomString.toString("hex")+"."+end[end.length - 1];
+            userInfos.icon = randomString.toString("hex")+"."+end[end.length - 1];
+            console.log(userInfos.icon);
             const updatedJWT = createJWT(userInfos);
-            console.log(await readdir("/data/userIcon"));
+            console.log(await readdir("/user/profile/userIcons"));
             cookies.set('JWTtoken', updatedJWT, { path: '/' });
         }
     }

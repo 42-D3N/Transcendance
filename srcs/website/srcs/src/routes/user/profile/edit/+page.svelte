@@ -32,7 +32,7 @@
 </script>
 
 <div class="absolute inset-0 z-0 bg-[#333131FF]"></div>
-
+0                                                 
 <div class="lg:scale-120 pb-8 z-1 lg:mt-[2%] lg:p-16 pl-6 pr-6 lg:ml-[25%] lg:w-[50%]">
     <form method="POST" enctype="multipart/form-data" use:enhance>
         <div class="pb-8 w-full h-[80%] bg-[#292626FF] border-solid rounded-lg z-10">
