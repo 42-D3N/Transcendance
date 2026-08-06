@@ -1,10 +1,10 @@
 class ChatClient {
 	private ws: WebSocket | null = null;
 
-	connect(){
+	connect(token: string){
 		if (this.ws) return;
 
-		this.ws = new WebSocket(`wss://localhost:8081/api/chat`);
+		this.ws = new WebSocket(`wss://localhost:8081/api/chat?token=${token}`);
 
 		this.ws.onopen = () => {
 			console.log("Connected to chat server");

@@ -22,7 +22,7 @@
         if (!browser) return;
 
         if (data.Token != -1)
-            chatClient.connect();
+            chatClient.connect(data.Token);
         else
             chatClient.disconnect();
     });
