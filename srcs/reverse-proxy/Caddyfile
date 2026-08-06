@@ -3,6 +3,9 @@ http://localhost {
 }
 
 localhost {
+	handle /api/chat {
+        reverse_proxy chat-server:5786
+    }
     handle /api* {
         reverse_proxy api:9090
     }

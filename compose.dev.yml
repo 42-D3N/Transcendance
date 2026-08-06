@@ -68,8 +68,6 @@ services:
       - ./srcs/chat-server/srcs/.env
     networks:
       - transcendance
-    ports:
-      - "5786:5786"
     restart: always
     develop:
       watch:
