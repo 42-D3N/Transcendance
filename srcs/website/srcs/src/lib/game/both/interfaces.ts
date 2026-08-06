@@ -105,6 +105,12 @@ export interface ClientPingMessage
   type: "ping";
 }
 
+export interface ConnectedPlayer
+{
+  socket: WebSocket;
+  player: Player;
+}
+
 export type ClientMessage =
   | ClientInputMessage
   | ClientPingMessage;

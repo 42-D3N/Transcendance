@@ -1,18 +1,41 @@
-import Fastify from 'fastify'
+import Fastify from 'fastify';
+import fastifyWebsocket from '@fastify/websocket';
+import { gameLoop, storeInputs, addClient, removeClient } from './game';
+import type { ClientMessage } from '../../../website/srcs/src/lib/game/both/interfaces';
 
-const fastify = Fastify({logger: true});
-
-fastify.get('/', function (request:any, reply:any) {
-	reply.send({ hello: 'world'})
-});
+const server = Fastify({logger: true});
 
 const start = async () => {
-	try { await fastify.listen({ port: 3310, host: '0.0.0.0' }); }
-	catch (err)
-	{
-		fastify.log.error(err);
-		process.exit(1);
-	}
+  server.register(fastifyWebsocket);
+  server.register(async function (fastify: any)
+  {
+    server.get('/', { websocket:true }, (socket: any, req: any) => {
+      console.log("Client connecté");
+      addClient(socket);
+      socket.on("message", async (data: any) =>
+      {
+        const message = JSON.parse(data.toString()) as ClientMessage;
+        switch (message.type)
+        {
+          case "ping":
+            socket.send(JSON.stringify({ type: "pong" }));
+            break;
+          case "input":
+            storeInputs(socket, message);
+            break;
+        }
+        console.log(message);
+      });
+      socket.on("close", () => { console.log("Client déconnecté"); removeClient(socket); });
+    })
+  })
+  try { await server.listen({ port: 3310, host: '0.0.0.0' }); }
+  catch (err)
+  {
+    server.log.error(err);
+    process.exit(1);
+  }
+  gameLoop();
 };
 
 start();

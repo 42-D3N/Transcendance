@@ -3,9 +3,10 @@
 
 	function placeholder()	{ console.log(`Ceci est un placeholder.`) }
 	function play()			{ goto('/game/gameItself'); }
+	function matchmaking()	{ goto('/game/matchmaking'); }
 	function loading()		{ goto('/game/loadingScreen'); }
-	function options()		{ console.log('Options'); /*goto('/profile/gameOption')*/ }
 	function home()			{ goto('/'); }
+	function options()		{/*goto('/profile/gameOption')*/}
 
 	let currentMenu = $state('main');
 	const menus =
@@ -27,7 +28,7 @@
 		],
 		onevone:
 		[
-			{ label: 'Local', action: placeholder },
+			{ label: 'Local', action: matchmaking },
 			{ label: 'Matchmaking', action: placeholder },
 			{ label: 'Retour', action: () => currentMenu = 'play' }
 		],
