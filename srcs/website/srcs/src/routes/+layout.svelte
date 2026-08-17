@@ -6,6 +6,7 @@
 	import gameicon from '$lib/assets/game_icon.svg';
 	import profileicon from '$lib/assets/profile_icon.svg';
 	import setticon from '$lib/assets/settings_icon.svg';
+	import shopicon from '$lib/assets/shop_icon.svg';
 	import { redirect } from '@sveltejs/kit';
 
 	let { data, children } = $props();
@@ -53,6 +54,10 @@
 				<a class="relative text-left grid items-center gap-[1.2rem] w-full text-white hover:bg-[#333131FF] text-[1.4rem]/[1.1428] justify-unset overflow-visible whitespace-nowrap break-unset border-0 grid-flow-col max-w-full min-h-16 p-[0.8rem] grid-buttons" href="/user/profile">
 					<img class="block h-[2.4rem] w-[2.4rem]" src={profileicon} alt="icon"/>
 					<span class="lg:max-xl:hidden overflow-hidden text-2xl/tight text-ellipsis">Profile</span>
+				</a>
+				<a class="relative text-left grid items-center gap-[1.2rem] w-full text-white hover:bg-[#333131FF] text-[1.4rem]/[1.1428] justify-unset overflow-visible whitespace-nowrap break-unset border-0 grid-flow-col max-w-full min-h-16 p-[0.8rem] grid-buttons" href="/shop">
+					<img class="block h-[2.4rem] w-[2.4rem]" src={shopicon} alt="icon"/>
+					<span class="lg:max-xl:hidden overflow-hidden text-2xl/tight text-ellipsis">Shop</span>
 				</a>
 				<a class="relative text-left grid items-center gap-[1.2rem] w-full text-white hover:bg-[#333131FF] text-[1.4rem]/[1.1428] justify-unset overflow-visible whitespace-nowrap break-unset border-0 grid-flow-col max-w-full min-h-16 p-[0.8rem] grid-buttons" href="/settings">
 					<img class="block h-[2.4rem] w-[2.4rem]" src={setticon} alt="icon"/>
