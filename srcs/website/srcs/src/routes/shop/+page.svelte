@@ -3,15 +3,21 @@
     import test from "$lib/assets/test.jpg";
     let { data } = $props();
 
-    let products = [
-        { id: 1, name: "Product 1", price: 10 },
-        { id: 2, name: "Product 2", price: 20 },
-        { id: 3, name: "Product 3", price: 30 },
-        { id: 4, name: "Product 4", price: 40 }
-    ];
+    let shep = $state(1);
+    let products = $state([
+        { id: 1, name: "Product", price: 10, src: noise},
+        { id: 2, name: "Product", price: 20, src: noise},
+        { id: 3, name: "Product", price: 30, src: noise},
+        { id: 4, name: "Product", price: 40, src: noise},
+        { id: 5, name: "Product", price: 50, src: noise},
+        { id: 6, name: "Product", price: 60, src: noise},
+        { id: 7, name: "Product", price: 70, src: noise},
+        { id: 8, name: "Product", price: 80, src: noise},
+    ]);
 
     function buy(product) {
-        if (data.wallet < product.price)
+        console.log(product.price * shep);
+        if (data.wallet < product.price * shep)
             alert('Price to high for your budget');
         else
             alert('Thanks for your buy!');
@@ -20,12 +26,13 @@
 		alert('Thanks for your buy!');
 	}
     let showmodal = $state(false);
-    let code = data.user;
+    let code = $state("");
     function secret() {
         showmodal = true;
     }
     function save_code() {
-        alert(code);
+        if (code === "Citadel")
+            shep = 0.75;
         showmodal = false;
         code = "";
     }
@@ -60,10 +67,10 @@
 <div class="grid lg:scale-90 lg:grid-cols-4 gap-10 mt-[3%] scale-95 lg:h-[80%] h-fit px-4 py-px z-1 size-full text-center grid-cols-2">
     {#each products as product}
         <div>
-            <img src={noise} class="scale-80 mx-auto" alt=""/>
+            <img src={product.src} class="scale-80 mx-auto" alt=""/>
 
             <button onclick={() => buy(product)} class="text-wrap inline-block rounded-xl bg-[#C41E3AFF] z-10 w-[90%] min-h-[15%] max-h-[50%] text-center">
-                <span class="break-words text-l sm:text-xl md:text-3xl lg:text-4xl"> {product.name} </span>
+                <span class="break-words text-l sm:text-xl md:text-3xl lg:text-4xl">{product.name} {product.price * shep}</span>
             </button>
         </div>
     {/each}
