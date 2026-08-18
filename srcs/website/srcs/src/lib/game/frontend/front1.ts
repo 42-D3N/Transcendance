@@ -1,25 +1,40 @@
+import type { PlayerInput } from "../both/interfaces";
+
 export function updateScale(game_vars: any)
 {
   game_vars.scale.x = game_vars.terrain.elem.clientWidth / game_vars.terrain.width;
   game_vars.scale.y = game_vars.terrain.elem.clientHeight / game_vars.terrain.height;
 }
 
-export function handleKeyUp(e: KeyboardEvent)
+export function updateInput(kb: any, inputs: PlayerInput)
 {
-  if (e.key === "ArrowRight" || e.key === "ArrowLeft")
-    console.log("Send to server player.input.move = 0");
-  else if (e.key === "Shift")
-    console.log("Send to server player.input.special = 0");
+  if (kb.left && !kb.right)
+    inputs.move = -1;
+  else if (kb.right && !kb.left)
+    inputs.move = 1;
+  else
+    inputs.move = 0;
+  inputs.special = kb.special;
 }
 
-export function handleKeyDown(e: KeyboardEvent)
+export function handleKeyUp(e: KeyboardEvent, kb: any)
 {
   if (e.key === "ArrowRight")
-    console.log("Send to server player.input.move = 1");
+    kb.right = false;
   if (e.key === "ArrowLeft")
-    console.log("Send to server player.input.move = -1");
+    kb.left = false;
   if (e.key === "Shift")
-    console.log("Send to server player.input.useSpecial()");
+    kb.special = false;
+}
+
+export function handleKeyDown(e: KeyboardEvent, kb: any)
+{
+  if (e.key === "ArrowRight")
+    kb.right = true;
+  if (e.key === "ArrowLeft")
+    kb.left = true;
+  if (e.key === "Shift")
+    kb.special = true;
 }
 export function updateBallPosition(game_vars: any)
 {

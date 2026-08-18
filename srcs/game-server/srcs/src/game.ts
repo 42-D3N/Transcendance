@@ -60,7 +60,7 @@ function gameTick(vars: Game)
   updatePlayers(vars);
   // updateBall(vars);
 
-  broadcast({type: "game_state", state: buildClientGameState(vars) });
+  broadcast({type: "gameState", state: buildClientGameState(vars) });
 }
 
 export function gameLoop()

@@ -118,7 +118,7 @@ export type ClientMessage =
 
 export interface ServerGameStateMessage
 {
-  type: "game_state";
+  type: "gameState";
   state: ClientGameState;
 }
 
