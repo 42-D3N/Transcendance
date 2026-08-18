@@ -3,7 +3,11 @@
     import test from "$lib/assets/test.jpg";
     let { data } = $props();
 
-    let shep = $state(1);
+    let shep:number = $state(0);
+    if (data.code === true)
+        shep = 0.75;
+    else
+        shep = 1;
     let products = $state([
         { id: 1, name: "Product", price: 10, src: noise},
         { id: 2, name: "Product", price: 20, src: noise},
@@ -15,16 +19,20 @@
         { id: 8, name: "Product", price: 80, src: noise},
     ]);
 
-    function buy(product) {
-        console.log(product.price * shep);
-        if (data.wallet < product.price * shep)
-            alert('Price to high for your budget');
-        else
-            alert('Thanks for your buy!');
+    async function sendData(product) {
+        const response = await fetch('/shop', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                product: product,
+                data: data,
+            })
+        });
+            const result = await response.json();
+            console.log(result);
     }
-	function greet() {
-		alert('Thanks for your buy!');
-	}
     let showmodal = $state(false);
     let code = $state("");
     function secret() {
@@ -68,10 +76,27 @@
     {#each products as product}
         <div>
             <img src={product.src} class="scale-80 mx-auto" alt=""/>
+            <form method="POST">
+                <input
+                type="hidden"
+                name="productId"
+                value={product.id}/>
+                 
+                <input
+                type="hidden"
+                name="price"
+                value={product.price}/>
 
-            <button onclick={() => buy(product)} class="text-wrap inline-block rounded-xl bg-[#C41E3AFF] z-10 w-[90%] min-h-[15%] max-h-[50%] text-center">
-                <span class="break-words text-l sm:text-xl md:text-3xl lg:text-4xl">{product.name} {product.price * shep}</span>
-            </button>
+                <input
+                type="hidden"
+                name="shep"
+                value={data.code}/>
+                <button type="submit" class="text-wrap inline-block rounded-xl bg-[#C41E3AFF] z-10 w-[90%] min-h-[15%] max-h-[50%] text-center">
+                    <span class="break-words text-l sm:text-xl md:text-3xl lg:text-4xl">
+                        {product.name} {product.price * shep}
+                    </span>
+                </button>
+            </form>
         </div>
     {/each}
 </div>

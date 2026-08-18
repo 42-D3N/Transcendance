@@ -32,8 +32,13 @@ export const matches = pgTable('matches', {
     check("winner_check", sql`${table.winner} = ${table.user1} or ${table.winner} = ${table.user2}`)
 ]);
 
+export const inventory = pgTable('inventory', {
+	user: integer().primaryKey().notNull().unique().references(() => users.id),
+	code: boolean().default(false),
+})
+
 export const api_users = pgTable('api_users', {
-	user: integer().notNull().unique().references(() => users.id),
+	user: integer().primaryKey().notNull().unique().references(() => users.id),
 	role: varchar({ length:128 }).notNull().default("user"),
-	secret_key: varchar({ length:64 }).notNull()
+	secret_key: varchar({ length:64 })
 });
