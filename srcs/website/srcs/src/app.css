@@ -1,8 +1,16 @@
 @import "tailwindcss";
 
+:root {
+	--radius-5: 0.5rem;
+}
+
 @theme {
     --breakpoint-xl: 1250px;
     --breakpoint-lg: 960px;
+}
+
+.border-none {
+	border: none;
 }
 
 .justify-unset {
@@ -13,6 +21,108 @@
     word-break: unset;
 }
 
-.grid-buttons {
-    grid-template-columns: 2.4rem minmax(0, 1fr);
+.user-grid-buttons {
+	grid-template-columns: repeat(4, 3.2rem);
+}
+
+#sidebar-main-menu {
+	@variant lg:max-xl {
+		--navWidth: 5.6rem;
+		--text-column-width: 0fr;
+	}
+}
+
+.sidebar-link {
+	--button-padding: 0.8rem;
+	@apply items-center grid gap-[1.2rem] text-left overflow-visible relative w-full whitespace-nowrap;
+	grid-template-columns: minmax(0, 2.4rem) minmax(0, var(--text-column-width, 1fr));
+	justify-content: unset;
+	word-break: unset;
+}
+
+.ft-heading-xxx-small {
+	@apply text-[1.4rem] leading-[1.1428571429];
+}
+
+.ft-button-medium {
+	--button-height: 4rem;
+	--column-gap: 0.8rem;
+	--font-size: 1.4rem;
+}
+
+.ft-button-small {
+	--border-radius: 0.3rem;
+	--button-height: 3.2rem;
+	--button-padding: 0.2rem 1.6rem;
+	--column-gap: 0.8rem;
+}
+
+.ft-icon-size-24 {
+	--icon-size: 2.4rem;
+}
+
+.ft-icon-size-20 {
+	--icon-size: 2rem;
+}
+
+.ft-icon-glyph {
+	@apply content-center inline-grid h-(--icon-size) w-(--icon-size) justify-center;
+}
+
+.ft-icon-glyph > svg {
+	@apply h-(--icon-size) w-(--icon-size);
+}
+
+.ft-button {
+	--ft-button: var(--border-radius, var(--radius-5));
+	@apply items-center justify-center overflow-hidden text-center inline-grid border-0 cursor-pointer text-(--font-size) leading-[1.1428] min-h-(--button-height) p-(--button-padding) grid-flow-col max-w-full rounded-(--ft-button) gap-x-(--column-gap);
+	word-break: break-word;
+}
+
+.ft-icon-img {
+	@apply block h-(--icon-size) w-(--icon-size) select-none;
+}
+
+.ft-sidebar-link-text {
+	@apply overflow-hidden text-ellipsis;
+}
+
+.ft-sidebar-footing-icon .sidebar-link {
+	--button-padding: 0.6rem;
+}
+
+.ft-sidebar-footing-icon {
+	@apply size-full relative;
+}
+
+.sidebar-footer-icons {
+	@apply grid place-items-center px-[0.4rem] grid-cols-[repeat(4,3.2rem)] grid-rows-[3.2rem] justify-between mt-[0.8rem];
+	@variant lg:max-xl {
+		@apply grid-cols-[3.2rem] grid-rows-[repeat(4,3.2rem)] justify-around gap-[0.4rem];
+		margin: unset;
+		padding: unset;
+	}
+}
+
+.mobile-toolbar-action button {
+	--buton-padding: 0.6rem;
+	@apply h-full w-full;
+}
+
+.mobile-toolbar-action-button {
+	--buttonPaddings: 0
+}
+
+.sidebar-link.sidebar-collapse-icon {
+	@apply flex justify-around;
+}
+
+.sidebar-login-buttons .sidebar-link {
+	@apply gap-[0.4rem];
+}
+
+.mobile-hidden {
+	@variant max-lg {
+		@apply hidden;
+	}
 }
