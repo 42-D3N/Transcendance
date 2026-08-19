@@ -47,7 +47,29 @@ function updateRackets(player: Player, vars: Game)
     player.racket.pos.x = max;
 }
 
-function updatePlayers(vars: Game)
+export function updateBall(vars: Game)
+{
+//   console.log(vars.ball.vel.x * vars.DT)
+  vars.ball.pos.x += vars.ball.vel.x * vars.DT;
+  vars.ball.pos.y += vars.ball.vel.y * vars.DT;
+
+  if (vars.ball.pos.x <= 0)
+  {
+    vars.ball.pos.x = 0;
+    vars.ball.vel.x *= -1;
+  }
+  if (vars.ball.pos.x + vars.ball.size.w >= vars.GAME_WIDTH)
+  {
+    vars.ball.pos.x = vars.GAME_WIDTH - vars.ball.size.w;
+    vars.ball.vel.x *= -1;
+  }
+  vars.ball.speed = Math.min(
+    vars.ball.speed + vars.rules.acceleration * vars.DT,
+    vars.rules.maxSpeed
+  );
+}
+
+export function updatePlayers(vars: Game)
 {
   updateRackets(vars.player1, vars);
   updateRackets(vars.player2, vars);
@@ -68,18 +90,14 @@ function gameTick(vars: Game)
   vars.state.tick++;
   vars.state.elapsedTime += vars.DT;
   if (vars.state.tick % 60 === 0)
-    console.log("time :", vars.state.tick/60, "sec");
+    console.log("time :", vars.state.tick / 60, "sec | Ball velX :", vars.ball.vel.x, "Ball velY :", vars.ball.vel.y);
 
   updatePlayers(vars);
-  // updateBall(vars);
-
+  updateBall(vars);
   broadcast({type: "gameState", state: buildClientGameState(vars) });
 }
 
 export function gameLoop()
 {
-  setInterval(() =>
-  {
-    gameTick(vars);
-  }, vars.TICK_INTERVAL);
+  setInterval(() => { gameTick(vars); }, vars.TICK_INTERVAL);
 }

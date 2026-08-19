@@ -12,7 +12,8 @@ export function connection(socket: WebSocket)
         socket.send(JSON.stringify({ type: "pang" }));
         break;
       case "gameState":
-        console.log(message);
+        console.log("Racket x:", message.state.player1.racket.x, "Racket y:", message.state.player1.racket.y);
+        console.log("Ball   x:", message.state.ball.x, "Ball   y:", message.state.ball.y);
         break;
     }
   };
