@@ -28,11 +28,11 @@ export function serverVariable()
 
   let rules: GameRules = 
   {
-	acceleration:	0.1,
-	racketSpeed:	10,
+	acceleration:	6,
+	racketSpeed:	600,
 	scoreToWin:		15,
-	maxSpeed:		12,
-	baseSpeed:		6
+	maxSpeed:		720,
+	baseSpeed:		360
   }
 
   const state: GameState =

@@ -1,5 +1,5 @@
 import { serverVariable } from './pongVariables';
-import type { ClientInputMessage, ConnectedPlayer, ClientGameState } from '../../../website/srcs/src/lib/game/both/interfaces';
+import type { ClientInputMessage, ConnectedPlayer, ClientGameState, Player } from '../../../website/srcs/src/lib/game/both/interfaces';
 
 type Game = ReturnType<typeof serverVariable>;
 
@@ -34,10 +34,23 @@ function buildClientGameState(vars: Game): ClientGameState
   };
 }
 
+function updateRackets(player: Player, vars: Game)
+{
+  const min = 0;
+  const max = vars.GAME_WIDTH - player.racket.size.w;
+
+  player.racket.vel.x = player.input.move * vars.rules.racketSpeed;
+  player.racket.pos.x += player.racket.vel.x * vars.DT;
+  if (player.racket.pos.x < min)
+    player.racket.pos.x = min;
+  if (player.racket.pos.x > max)
+    player.racket.pos.x = max;
+}
+
 function updatePlayers(vars: Game)
 {
-    vars.player1.racket.vel.x = vars.player1.input.move * vars.rules.racketSpeed;
-    vars.player1.racket.pos.x += vars.player1.racket.vel.x;
+  updateRackets(vars.player1, vars);
+  updateRackets(vars.player2, vars);
 }
 
 function broadcast(message: unknown)
@@ -55,7 +68,7 @@ function gameTick(vars: Game)
   vars.state.tick++;
   vars.state.elapsedTime += vars.DT;
   if (vars.state.tick % 60 === 0)
-    console.log(vars.state.tick);
+    console.log("time :", vars.state.tick/60, "sec");
 
   updatePlayers(vars);
   // updateBall(vars);
