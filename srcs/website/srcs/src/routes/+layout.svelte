@@ -16,7 +16,7 @@
 
 	import { redirect } from '@sveltejs/kit';
 	import { browser } from "$app/environment";
-	import { chatClient } from '$lib/chat-client'
+	import { chatClient } from '$lib/chat-client';
 
 	$effect(() => {
         if (!browser) return;
@@ -40,7 +40,6 @@
 		document.querySelector('html')?.classList.add('h-full');
 	}
 	function enableScroll() {
-		console.log("scroll enabled");
 		document.querySelector('body')?.classList.remove('overflow-hidden');
 		document.querySelector('body')?.classList.remove('h-full');
 		document.querySelector('html')?.classList.remove('overflow-hidden');
@@ -56,7 +55,6 @@
 		enableScroll();
 	}
 	function buttonClick(button:any) {
-		console.log("buttonClick called");
 		if (mobToolbarEnabled !== button)
 		{
 			disableScroll();
@@ -115,6 +113,16 @@
 					<img class="ft-icon-img ft-icon-size-24" src={setticon} alt="icon"/>
 					<span class="ft-sidebar-link-text text-2xl/tight text-white">Settings</span>
 				</a>
+				{#if data.Token !== '-1'}
+				<button class="ft-button ft-button-medium sidebar-link hover:bg-[#333131FF]" onclick={() => chatClient.sendRequest("rapo")}>
+					<img class="ft-icon-img ft-icon-size-24" src={setticon} alt="icon"/>
+					<span class="ft-sidebar-link-text text-2xl/tight text-white">History</span>
+				</button>
+				<button class="ft-button ft-button-medium sidebar-link hover:bg-[#333131FF]" onclick={() => chatClient.sendMessage("noooooooo", "rapo")}>
+					<img class="ft-icon-img ft-icon-size-24" src={setticon} alt="icon"/>
+					<span class="ft-sidebar-link-text text-2xl/tight text-white">Message</span>
+				</button>
+				{/if}
 			</div>
 		</div>
 		<hr class="mt-auto border-none">
@@ -228,6 +236,8 @@
 								</button>
 							</div>
 						</section>
+						{:else if mobToolbarEnabled === "chat"}
+						{:else if mobToolbarEnabled === "settings"}
 						{/if}
 					</div>
 				</div>

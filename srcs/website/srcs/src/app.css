@@ -7,6 +7,8 @@
 @theme {
     --breakpoint-xl: 1250px;
     --breakpoint-lg: 960px;
+	--text-small: 1.2rem;
+	--text-small--line-height: 1.3333333333;
 }
 
 .border-none {
@@ -102,6 +104,45 @@
 		margin: unset;
 		padding: unset;
 	}
+}
+
+.chat-row-wrapper {
+	@apply items-center grid rounded-lg gap-[0.8rem] p-[0.8rem];
+	grid-template-columns: 3.2rem 1fr;
+}
+
+.ft-avatar-component {
+	@apply rounded-lg h-(--ft-avatar-size) w-(--ft-avatar-size) flex overflow-hidden relative;
+}
+
+.message-row-message {
+	align-items: start;
+	@apply flex flex-col justify-stretch w-full;
+}
+
+.message-row-row {
+	align-items: start;
+	justify-content: end;
+	@apply grid relative w-full;
+	grid-template-columns: minmax(0, 1fr) max-content;
+}
+
+.message-row-row .message-row-text {
+	justify-self: start;
+	@apply overflow-hidden text-ellipsis whitespace-nowrap w-full;
+}
+
+.ft-user-block-component {
+	@apply items-center inline-flex flex-row gap-[0.4rem] max-w-full overflow-hidden wrap-break-word;
+}
+
+.message-row-message-content {
+	@apply max-w-full overflow-hidden text-ellipsis whitespace-nowrap;
+}
+
+.ft-avatar-size-32 {
+	--ft-avatar-size: 3.2rem;
+	--ft-avatar-status-size: 0.8rem;
 }
 
 .mobile-toolbar-action button {

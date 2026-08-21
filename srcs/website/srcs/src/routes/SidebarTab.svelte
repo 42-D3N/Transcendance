@@ -1,11 +1,30 @@
 <script lang="ts">
 	import "../app.css";
+	import { activeChats } from '$lib/chat-client';
 	let { name } = $props();
     let show = $state(false);
 	let container:any;
+
 	function onTabClick(e:any) {
 		if (container.contains(e.target) == false)
 			show = false;
+	}
+
+	function formatTime(e:Date):string {
+		const interval = (Date.now() - e.getTime()) / 1000;
+		if (interval < 5)
+			return ("À l'instant.");
+		if (interval < 60)
+			return "Il y a "+interval+" secondes.";
+		if (interval < 90)
+			return "Il y a 1 minute.";
+		if (interval < 3600)
+			return "Il y a "+Math.round(interval/60)+" minutes.";
+		if (interval < 5400)
+			return "Il y a 1 heure.";
+		if (interval < 86400)
+			return "Il y a "+Math.round(interval/3600)+" heures.";
+		return e.toDateString();
 	}
 </script>
 
@@ -25,7 +44,7 @@
 	</button>
 	{#if show}
 	<div id={name+"-widget-slot"} class="fixed max-xl:left-[52px] left-[8px] pl-[unset] box-content max-h-[calc(100svh - 2 * 0.8rem)] overflow-hidden w-[30rem] z-1 max-xl:bottom-[12px] bottom-[50px]">
-		<div class="oveflow-hidden rounded-lg overscroll-contain box-border h-full cursor-default bg-black/50 text-white">
+		<div class="oveflow-hidden border-white border-[0.1rem] border-solid rounded-lg overscroll-contain box-border h-full cursor-default bg-black/50 text-white">
 			<div class="p-0 h-full">
 				<div class="grid h-[44rem]">
 					{#if name == "friends"}
@@ -39,6 +58,30 @@
 							</button>
 						</div>
 					</section>
+					{:else if name === "chats"}
+					<section class="h-full overflow-x-hidden overflow-y-auto overscroll-contain pt-[0.8rem] pr-[0.8rem] pl-[0.8rem] pb-0">
+						<div class="items-stretch flex flex-col h-full overscroll-contain">
+							{#each activeChats as contact}
+								<div class="chat-row-wrapper">
+									<div class="ft-avatar-component ft-avatar-size-32">
+										<img class="h-full w-full object-cover overscroll-contain" src="https://www.chess.com/bundles/web/images/noavatar_l.84a92436.gif" alt="avatar de {contact.name}">
+									</div>
+									<div class="message-row-message overscroll-contain">
+										<div class="message-row-row overscroll-contain">
+											<div class="ft-user-block-component message-row-text overscroll-contain">
+												<div>{contact.name}</div>
+											</div>
+											<p class="message-row-message-content text-small p-0 m-0 overscroll-contain">{formatTime(contact.time)}</p>
+										</div>
+										<div class="message-row-row overscroll-contain">
+											<p class="message-row-message-content text-small p-0 m-0 overscroll-contain">{contact.message}</p>
+										</div>
+									</div>
+								</div>
+							{/each}
+						</div>
+					</section>
+					{:else if name === "settings"}
 					{/if}
 				</div>
 			</div>
