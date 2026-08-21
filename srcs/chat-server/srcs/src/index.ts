@@ -2,7 +2,7 @@ import fastify from 'fastify'
 import fastifyWebsocket from '@fastify/websocket'
 import { db } from './db/db.ts';
 import { users, chat } from './db/schema.ts';
-import { eq, lt, gte, ne, or } from 'drizzle-orm';
+import { eq, lt, gte, ne, or, and } from 'drizzle-orm';
 import http from "http";
 import { validateJWT } from './jwt';
 
@@ -10,17 +10,19 @@ const server = fastify({ logger: true })
 
 const connections = new Map<WebSocket, number>();
 
-interface ChatUser {
+interface ChatContact {
 	id: number,
-	name: string
+	name: string,
+	message: string,
+	time: Date
 }
 
-function onlyUnique(value:ChatUser, index:number, array:ChatUser[]) {
-	return index === array.findIndex((t) => (t.id === value.id));
+function onlyUnique(value:ChatContact, index:number, array:ChatContact[]) {
+	return index === array.findLastIndex((t) => (t.id === value.id));
 }
 
-function mapUser(value:ChatUser, index:number, array:ChatUser[]) {
-	return value.name;
+function timeSort(a: ChatContact, b: ChatContact): number {
+	return a.time.getTime() - b.time.getTime();
 }
 
 function newConn(sock: WebSocket, token: string) {
@@ -37,10 +39,10 @@ function newConn(sock: WebSocket, token: string) {
 async function sendContacts(sock: WebSocket) {
 	const userId = connections.get(sock);
 	try {
-		const authors:ChatUser[] = await db.selectDistinctOn([chat.author], {id: chat.author, name: users.username}).from(chat).where(eq(userId, chat.dest)).innerJoin(users, eq(chat.author, users.id));
-		const dests:ChatUser[] = await db.selectDistinctOn([chat.dest], {id: chat.dest, name: users.username}).from(chat).where(eq(userId, chat.author)).innerJoin(users, eq(chat.dest, users.id));
-		let res:string[] = authors.concat(dests).filter(onlyUnique).map(mapUser);
-		sock.send(JSON.stringify(res));
+		const authors:ChatContact[] = await db.select({id: chat.author, name: users.username, time: chat.timestamp, message: chat.content}).from(chat).where(eq(userId, chat.dest)).innerJoin(users, eq(chat.author, users.id));
+		const dests:ChatContact[] = await db.select({id: chat.dest, name: users.username, time: chat.timestamp, message: chat.content}).from(chat).where(eq(userId, chat.author)).innerJoin(users, eq(chat.dest, users.id));
+		const res:ChatContact[] = authors.concat(dests).sort(timeSort).filter(onlyUnique);
+		sock.send(JSON.stringify({type: "contacts", res}));
 	} catch (error) {
 		console.log(error);
 	}
