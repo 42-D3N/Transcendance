@@ -89,6 +89,7 @@ export interface ClientGameState
 {
   score:	Score;
   ball:		Position;
+  prediction: { start: Position; end: Position } | null;
   player1:	{ racket: Position; };
   player2:	{ racket: Position; };
   status:	GameStatus

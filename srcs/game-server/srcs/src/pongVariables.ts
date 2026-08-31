@@ -7,13 +7,17 @@ export function serverVariable()
   const TICK_RATE = 60;
   const TICK_INTERVAL = 1000 / TICK_RATE;
   const DT = 1 / TICK_RATE;
-  const BALL_BASE_POSITION = { x: (GAME_WIDTH / 2), y: (GAME_HEIGHT / 2) }
+  const ROUND_PAUSE_TICKS = TICK_RATE * 2;
   const BALL_SIZE = { w: 15, h: 15 } as const;
+  const BALL_BASE_POSITION = {
+    x: (GAME_WIDTH - BALL_SIZE.w) / 2,
+    y: (GAME_HEIGHT - BALL_SIZE.h) / 2
+  };
 
   let ball: Ball =
   {
     speed:	360,
-    pos:	{ x: (GAME_WIDTH / 2), y: (GAME_HEIGHT / 2) },
+    pos:	{ x: BALL_BASE_POSITION.x, y: BALL_BASE_POSITION.y },
     size:	BALL_SIZE,
     vel:	{ x: 50.5,  y: 50.5 }
   }
@@ -92,6 +96,8 @@ export function serverVariable()
     BALL_BASE_POSITION,
     TICK_INTERVAL,
     DT,
+    ROUND_PAUSE_TICKS,
+    roundEndTick: 0,
     ball,
     player1,
     player2,

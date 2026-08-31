@@ -1,6 +1,6 @@
-import type { PlayerInput, ServerMessage } from "../both/interfaces";
+import type { ClientGameState, PlayerInput, ServerMessage } from "../both/interfaces";
 
-export function connection(socket: WebSocket)
+export function connection(socket: WebSocket, onGameState: (state: ClientGameState) => void)
 {
   socket.onopen = () => { console.log("Connected"); };
   socket.onmessage = event =>
@@ -12,8 +12,7 @@ export function connection(socket: WebSocket)
         socket.send(JSON.stringify({ type: "pang" }));
         break;
       case "gameState":
-        console.log("Racket x:", message.state.player1.racket.x, "Racket y:", message.state.player1.racket.y);
-        console.log("Ball   x:", message.state.ball.x, "Ball   y:", message.state.ball.y);
+        onGameState(message.state);
         break;
     }
   };
