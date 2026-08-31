@@ -19,7 +19,7 @@ export const actions = {
         else
         {
             let randomString = randomBytes(48);
-            let userInfos = validateJWT(cookies.get('JWTtoken'));
+            let userInfos = await validateJWT(cookies.get('JWTtoken'));
 
             if (!userInfos)
                 return console.log("failed to retrieve user information");
@@ -40,14 +40,14 @@ export const actions = {
             
             userInfos.icon = randomString.toString("hex")+"."+end[end.length - 1];
             console.log(userInfos.icon);
-            const updatedJWT = createJWT(userInfos);
+            const updatedJWT = await createJWT(userInfos);
             console.log(await readdir("/user/profile/userIcons"));
             cookies.set('JWTtoken', updatedJWT, { path: '/' });
         }
     }
 } satisfies Actions;
 
-export function load ({ cookies })  {
+export async function load ({ cookies }) {
     let JWTtoken = cookies.get('JWTtoken');
     let id = '-1';
     let username = '';
@@ -65,10 +65,18 @@ export function load ({ cookies })  {
     }
     else
     {
-        let userInfos = validateJWT(JWTtoken);
+        let userInfos = await validateJWT(JWTtoken);
 
         if (!userInfos)
-            throw redirect(308, '/sign_in');
+        {
+            cookies.set('JWTtoken', "-1", { path: '/' });
+            throw redirect(303, '/sign_in');
+        }
+        if (userInfos["JWT"] != undefined)
+        {
+            cookies.set('JWTtoken', userInfos["JWT"], { path: '/' });
+            throw redirect(303, "./edit");
+        }
 
         if (userInfos.length == 0)
             console.error("couldn't retrieve userData");

@@ -1,7 +1,7 @@
 import { validateJWT } from '$lib/server/user_management/jwt.js';
 import { redirect } from '@sveltejs/kit';
 
-export function load ({ cookies })  {
+export async function load ({ cookies })  {
 	let JWTtoken = cookies.get('JWTtoken');
 	let id = '-1';
 	let username = '';
@@ -18,10 +18,10 @@ export function load ({ cookies })  {
 	}
 	else
 	{
-		let userInfos = validateJWT(JWTtoken);
+		let userInfos = await validateJWT(JWTtoken);
 
 		if (!userInfos)
-			throw redirect(403, '/login');
+			throw redirect(303, '/login');
 
 		if (userInfos.length == 0)
 		{

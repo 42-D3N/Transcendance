@@ -2,13 +2,19 @@
 import { createHmac } from 'crypto';
 import { env } from '$env/dynamic/private';
 
+import { db } from '$lib/server/db/index';
+import { eq, lt, gte, ne } from 'drizzle-orm';
+import { users } from '$lib/server/db/schema';
+
+
+
 export function generateHmacSha256(key: string, message: string): string {
     return createHmac('sha256', key)
         .update(message)
         .digest('hex');
 }
 
-export function createJWT( payload: any ){
+export async function createJWT( payload: any ){
 
     if (!env.SECRET_KEY_JWT) throw new Error("JWT encryption key not set (SECRET_KEY_JWT undefined)");
 
@@ -16,6 +22,7 @@ export function createJWT( payload: any ){
         "alg": "HS256",
         "typ": "JWT"
     }
+    payload["created"] = Date.now();
     const encodedHeader = btoa(JSON.stringify(header));
     const encodedPayload = btoa(JSON.stringify(payload));
     const signature = btoa(env.SECRET_KEY_JWT);
@@ -23,7 +30,7 @@ export function createJWT( payload: any ){
     return (encodedHeader+"."+encodedPayload+"."+btoa(generateHmacSha256(signature, encodedHeader+"."+encodedPayload)));
 }
 
-export function validateJWT( Token:string ){
+export async function validateJWT( Token:string ){
     let splittedInfos = Token.split('.');
     let encodedHeader =splittedInfos[0];
     let encodedPayload = splittedInfos[1];
@@ -49,7 +56,15 @@ export function validateJWT( Token:string ){
 
         let userInfos = JSON.parse(atob(encodedPayload));
         if (userInfos)
+        {
+            let validToken = (await checkPayload(userInfos));
+            console.log(validToken);
+            if (validToken === 2)
+                return (null);
+            if (validToken == 1)
+                userInfos["JWT"] = await createJWT((await db.select({ id:users.id, username:users.username, email:users.email, wins:users.wins, losses:users.losses, matches:users.matches, wallets:users.wallet, icon:users.icon}).from(users).where(eq(users.id, userInfos["id"])))[0]);
             return (userInfos);
+        }
     }
     catch (error)
     {
@@ -59,4 +74,23 @@ export function validateJWT( Token:string ){
     
     console.log("error retrieving user infos from JWT payload");
     return ({});
+}
+
+// 0 -> not modified; 1 -> modified; 2 -> expired 
+async function checkPayload( payload:any ): Promise<number> {
+    if (Date.now() > payload["created"] + 86_400_000)
+        return (2);
+    
+    let userInfos = (await db.select({ id:users.id, username:users.username, email:users.email, wins:users.wins, losses:users.losses, matches:users.matches, wallets:users.wallet, icon:users.icon}).from(users).where(eq(users.id, payload["id"])))[0];
+    
+    if (userInfos["username"] != payload["username"] ||
+        userInfos["email"] != payload["email"] ||
+        userInfos["wins"] != payload["wins"] ||
+        userInfos["losses"] != payload["losses"] ||
+        userInfos["matches"] != payload["matches"] ||
+        userInfos["wallets"] != payload["wallets"] ||
+        userInfos["icon"] != payload["icon"]
+    )
+        return (1);
+    return (0);
 }

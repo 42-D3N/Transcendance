@@ -56,7 +56,7 @@ export const actions = {
 					userInfos = await db.select({ id:users.id, username:users.username, email:users.email, wins:users.wins, losses:users.losses, matches:users.matches, wallets:users.wallet, icon:users.icon}).from(users).where(eq(users.email, username as string));
 				else
 					userInfos = await db.select({ id:users.id, username:users.username, email:users.email, wins:users.wins, losses:users.losses, matches:users.matches, wallets:users.wallet, icon:users.icon}).from(users).where(eq(users.username, username as string));
-				const JWT = createJWT(userInfos[0]);
+				const JWT = await createJWT(userInfos[0]);
 
 				event.cookies.set('JWTtoken', JWT, { path: '/' });
 			}
