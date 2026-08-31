@@ -23,7 +23,11 @@
     <div class="pb-8 w-full h-[80%] bg-[#292626FF] border-solid rounded-lg z-10">
         
         <div class="flex p-4">
-            <img class="block lg:h-[12rem] lg:w-[12rem] h-[8rem] w-[8rem] border-solid rounded-md bg-amber-50" src={usericon} alt="icon"/>
+            {#if !data.icon}
+                <img class="upload block lg:h-[12rem] lg:w-[12rem] h-[8rem] w-[8rem] border-solid rounded-md bg-amber-50" src={usericon} alt=""/>
+            {:else}
+                <img class="upload block lg:h-[12rem] lg:w-[12rem] h-[8rem] w-[8rem] border-solid rounded-md bg-amber-50" src={data.icon} alt={data.icon}/>
+            {/if}
             <div>
                 <span class="block pl-6 font-black text-white text-4xl">{data.username}</span>
 

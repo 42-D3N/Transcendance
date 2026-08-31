@@ -1,8 +1,7 @@
 import { redirect } from '@sveltejs/kit';
-import { invalidateAll } from '$app/navigation';
 import { validateJWT } from '$lib/server/user_management/jwt.js';
 
-export async function load ({ cookies })  {
+export async function load ({ cookies }) {
     let JWTtoken = cookies.get('JWTtoken');
     let id = '-1';
     let username = '';
@@ -11,6 +10,7 @@ export async function load ({ cookies })  {
     let losses = '0';
     let matches = '0';
     let wallet = '0';
+    let icon = 'default.svg';
 
     if (!JWTtoken || JWTtoken === '-1')
     {
@@ -20,7 +20,6 @@ export async function load ({ cookies })  {
     else
     {
         let userInfos = await validateJWT(JWTtoken);
-        console.log("\n>    final:",userInfos);
 
         if (!userInfos)
         {
@@ -43,6 +42,8 @@ export async function load ({ cookies })  {
         losses = userInfos.losses;
         matches = userInfos.matches;
         wallet = userInfos.wallets;
+        if (userInfos.icon != '')
+            icon = userInfos.icon
     }
 
     return ({
@@ -53,6 +54,7 @@ export async function load ({ cookies })  {
         wins: wins,
         losses: losses,
         matches: matches,
-        wallet: wallet
+        wallet: wallet,
+        icon: icon
     });
 };

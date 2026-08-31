@@ -58,10 +58,9 @@ export async function validateJWT( Token:string ){
         if (userInfos)
         {
             let validToken = (await checkPayload(userInfos));
-            console.log(validToken);
             if (validToken === 2)
                 return (null);
-            if (validToken == 1)
+            if (validToken === 1)
                 userInfos["JWT"] = await createJWT((await db.select({ id:users.id, username:users.username, email:users.email, wins:users.wins, losses:users.losses, matches:users.matches, wallets:users.wallet, icon:users.icon}).from(users).where(eq(users.id, userInfos["id"])))[0]);
             return (userInfos);
         }
@@ -80,7 +79,6 @@ export async function validateJWT( Token:string ){
 async function checkPayload( payload:any ): Promise<number> {
     if (Date.now() > payload["created"] + 86_400_000)
         return (2);
-    
     let userInfos = (await db.select({ id:users.id, username:users.username, email:users.email, wins:users.wins, losses:users.losses, matches:users.matches, wallets:users.wallet, icon:users.icon}).from(users).where(eq(users.id, payload["id"])))[0];
     
     if (userInfos["username"] != payload["username"] ||

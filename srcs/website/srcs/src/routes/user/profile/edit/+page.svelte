@@ -3,10 +3,8 @@
     import { enhance } from '$app/forms';
 
     import usericon from '$lib/assets/user/default.svg';
-    import {imageDimensionsFromStream} from 'image-dimensions';
     let fileinput: HTMLInputElement;
     let avatar: string | undefined = $state();
-
 
     function    Winrate()
     {

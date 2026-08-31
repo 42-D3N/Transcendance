@@ -31,7 +31,7 @@ export const actions = {
             const uploadDir = path.resolve('/user/profile/userIcons');
             const end = icon.name.split('.');
             const filePath = path.join(uploadDir, randomString.toString('hex')+"."+end[end.length - 1]);
-            await db.update(users).set({icon: './userIcons/'+randomString.toString('hex')+"."+end[end.length - 1]}).where(eq(users.id, userInfos.id));
+            await db.update(users).set({icon: '/userIcons/'+randomString.toString('hex')+"."+end[end.length - 1]}).where(eq(users.id, userInfos.id));
             console.log("File uploading:");
             
             console.log("Saving as: "+filePath);
