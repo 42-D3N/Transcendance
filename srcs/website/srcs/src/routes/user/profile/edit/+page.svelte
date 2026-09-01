@@ -46,11 +46,9 @@
                 {/if}
                 <input name="icon" style="display:none" type="file" accept=".jpg, .jpeg, .png" onchange={onFileSelected} bind:this={fileinput} >
                 <div>
-                    <span class="block pl-6 font-black text-white text-4xl">{data.username}</span>
-                    
-                    <span class="pl-12 pt-6 font-semibold text-zinc-400 text-xl">Wallets:</span>
-                    <span class="pt-6 font-semibold text-white text-xl">{data.wallet}</span>
-                    <span class="block"></span>
+                    <span class="inline pl-3 text-white">Username:</span><input name="username" value={data.username} type="username" class="inline pl-3 font-black text-white text-4xl"><br>
+                    <span class="inline pl-3 text-white">Email:</span><input name="email" value={data.email} type="email" class="inline pl-3 font-black text-white text-4xl"><br>
+                    <span class="inline pl-12 pt-6 font-semibold text-zinc-400 text-xl">Wallets:</span><input name="wallet" value={data.wallet} type="wallet" class="inline pl-3 font-black text-white text-xl size-fit"><br>
                     <span class="pl-12 text-zinc-400 text-lg">Winrate:</span>
                     <span class="text-white text-lg">{Winrate()}</span>
                 </div>

@@ -20,7 +20,7 @@ export const actions = {
 	login: async (event) => {
 		try
 		{
-			const isUsername:RegExp = /^.{3,128}$/;
+			const isUsername:RegExp = /^.{4,128}$/;
 			const isEmail:RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 			const form = await event.request.formData();

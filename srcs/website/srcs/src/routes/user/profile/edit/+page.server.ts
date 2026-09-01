@@ -1,5 +1,5 @@
 import { createJWT, validateJWT } from '$lib/server/user_management/jwt.js';
-import { redirect } from '@sveltejs/kit';
+import { redirect, fail } from '@sveltejs/kit';
 import { randomBytes } from 'crypto';
 import { db } from '$lib/server/db/index';
 import { users } from '$lib/server/db/schema';
@@ -11,36 +11,54 @@ import path from 'path';
 export const actions = {
     default: async ({ request, cookies }) => {
         const form = await request.formData();
-        const icon = form.get('icon') as File;
 
-        if (!icon || icon.size === 0) {
-            console.log("No new icon uploaded");
+        const isUsername:RegExp = /^.{4,128}$/;
+        const isEmail:RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        const icon = form.get('icon') as File;
+        const newName = form.get('username') as string;
+        const newMail = form.get('email') as string;
+        let userInfos = await validateJWT(cookies.get('JWTtoken'));
+
+        if (!newName || !isUsername.test(newName))
+            return (fail(400, {newName, invalidName: true }));
+        if (newName != userInfos.username)
+        {
+            console.log("changing {user_id}",userInfos.id,"username: ",userInfos.username,"->",newName);
+            await db.update(users).set({username: newName}).where(eq(users.id, userInfos.id));
         }
-        else
+
+
+        if (!newMail || !isEmail.test(newMail))
+            return (fail(400, {newMail, invalidMail: true }));
+        if (newMail != userInfos.email)
+        {
+            console.log("changing {user_id}",userInfos.id,"email: ",userInfos.email,"->",newMail);
+            await db.update(users).set({email: newMail}).where(eq(users.id, userInfos.id));
+        }
+
+
+        if (icon && icon.size != 0)
         {
             let randomString = randomBytes(48);
-            let userInfos = await validateJWT(cookies.get('JWTtoken'));
 
             if (!userInfos)
                 return console.log("failed to retrieve user information");
-            console.log(await db.select().from(users).where(eq(users.id, userInfos.id)));
-            console.log("new icon name: "+randomString.toString("hex"));
             
             const buffer = Buffer.from(await icon.arrayBuffer());
             const uploadDir = path.resolve('/user/profile/userIcons');
             const end = icon.name.split('.');
             const filePath = path.join(uploadDir, randomString.toString('hex')+"."+end[end.length - 1]);
             await db.update(users).set({icon: '/userIcons/'+randomString.toString('hex')+"."+end[end.length - 1]}).where(eq(users.id, userInfos.id));
-            console.log("File uploading:");
             
-            console.log("Saving as: "+filePath);
+            console.log("Saving new icon as: "+filePath);
             await writeFile(filePath, buffer);
-            console.log("File Uploaded");
-            
+            console.log("changing {user_id}",userInfos.id,"icon: ",userInfos.icon,"->\n",randomString.toString("hex")+"."+end[end.length - 1]);
             userInfos.icon = randomString.toString("hex")+"."+end[end.length - 1];
-            const updatedJWT = await createJWT(userInfos);
-            cookies.set('JWTtoken', updatedJWT, { path: '/' });
         }
+
+        const updatedJWT = await createJWT(userInfos);
+        cookies.set('JWTtoken', updatedJWT, { path: '/' });
         throw redirect(303, "../profile");
     }
 } satisfies Actions;

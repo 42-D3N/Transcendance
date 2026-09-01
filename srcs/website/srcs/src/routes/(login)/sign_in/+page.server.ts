@@ -20,7 +20,7 @@ export const actions = {
         {
             const isEmail:RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             const isPass:RegExp = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])[^\s]{12,67}$/;
-            const isUsername:RegExp = /^.{3,128}$/;
+            const isUsername:RegExp = /^.{4,128}$/;
 
             const form = await event.request.formData();
             const email = form.get('email');
