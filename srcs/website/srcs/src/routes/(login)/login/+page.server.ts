@@ -11,8 +11,8 @@ import bcrypt from 'bcryptjs';
 export const load = async ({ cookies }) => {
 	const JWT = cookies.get('JWTtoken');
 
-	if (!JWT || JWT != '-1')
-		redirect(308, '/');
+	if (JWT && JWT != '-1')
+		redirect(303, '/');
 
 };
 

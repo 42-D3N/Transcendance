@@ -18,7 +18,7 @@
         const image = target.files?.[0];
         
         if (!image) return;
-        if (image.size > 1048576) console.log("caca");
+        if (image.size > 1048576) return;
 
         const reader = new FileReader();
         reader.readAsDataURL(image);

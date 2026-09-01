@@ -26,7 +26,6 @@ export const actions = {
             console.log(await db.select().from(users).where(eq(users.id, userInfos.id)));
             console.log("new icon name: "+randomString.toString("hex"));
             
-            // mkdir("/user/profile/userIcons", { recursive: true });
             const buffer = Buffer.from(await icon.arrayBuffer());
             const uploadDir = path.resolve('/user/profile/userIcons');
             const end = icon.name.split('.');
@@ -39,11 +38,10 @@ export const actions = {
             console.log("File Uploaded");
             
             userInfos.icon = randomString.toString("hex")+"."+end[end.length - 1];
-            console.log(userInfos.icon);
             const updatedJWT = await createJWT(userInfos);
-            console.log(await readdir("/user/profile/userIcons"));
             cookies.set('JWTtoken', updatedJWT, { path: '/' });
         }
+        throw redirect(303, "../profile");
     }
 } satisfies Actions;
 
