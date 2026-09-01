@@ -14,8 +14,8 @@
   }
 
   onMount(() =>
-  {
-    socket = new WebSocket("ws://localhost:3310");
+  {// c2r7p6
+    socket = new WebSocket("wss://localhost:8081/api/game_server");// ws://localhost:3310
     const game = initGameClient();
     let keyboardState = { left: false, right: false, special: false };
 

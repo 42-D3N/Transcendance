@@ -9,7 +9,7 @@ const start = async () => {
   server.register(fastifyWebsocket);
   server.register(async function (fastify: any)
   {
-    server.get('/', { websocket:true }, (socket: any, req: any) => {
+    server.get('/api/game_server', { websocket:true }, (socket: any, req: any) => {
       console.log("Client connecté");
       addClient(socket);
       socket.on("message", async (data: any) =>
