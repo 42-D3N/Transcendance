@@ -15,7 +15,7 @@ export async function load ({ cookies }) {
     if (!JWTtoken || JWTtoken === '-1')
     {
         cookies.set('JWTtoken', '-1', { path: '/' });
-        // throw redirect(308, '/sign_in');
+        throw redirect(308, '/sign_in');
     }
     else
     {
