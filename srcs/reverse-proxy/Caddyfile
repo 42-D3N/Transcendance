@@ -1,0 +1,12 @@
+http://localhost {
+    redir https://{host}:8081{uri} permanent
+}
+
+localhost {
+    handle /api* {
+        reverse_proxy api:9090
+    }
+	handle {
+		reverse_proxy website:5173
+	}
+}
