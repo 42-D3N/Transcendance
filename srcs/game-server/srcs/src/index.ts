@@ -24,7 +24,6 @@ const start = async () => {
             storeInputs(socket, message);
             break;
         }
-        console.log(message);
       });
       socket.on("close", () => { console.log("Client déconnecté"); removeClient(socket); });
     })

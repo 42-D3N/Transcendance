@@ -223,8 +223,6 @@ function gameTick(vars: Game)
 {
   vars.state.tick++;
   vars.state.elapsedTime += vars.DT;
-  if (vars.state.tick % 60 === 0)
-    console.log("time :", vars.state.tick / 60, "sec | Ball velX :", vars.ball.vel.x, "Ball velY :", vars.ball.vel.y);
 
   if (vars.state.status === "round_end")
   {
