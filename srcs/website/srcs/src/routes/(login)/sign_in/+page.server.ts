@@ -4,15 +4,18 @@ import { redirect } from '@sveltejs/kit';
 import { db } from '$lib/server/db/index';
 import { eq, lt, gte, ne } from 'drizzle-orm';
 import { users, inventory, shop } from '$lib/server/db/schema';
-import { createJWT } from '$lib/server/user_management/jwt.js';
+import { createJWT, validateJWT } from '$lib/server/user_management/jwt.js';
 import bcrypt from 'bcryptjs';
 
 export const load = async ({ cookies }) => {
 	const JWT = cookies.get('JWTtoken');
 
-	if (!JWT || JWT != '-1')
-		redirect(308, '/');
-
+	if (JWT && JWT != '-1')
+    {
+        let validation = validateJWT(JWT);
+        console.log(validation);
+		redirect(303, '/');
+    }
 };
 
 export const actions = {
@@ -21,7 +24,7 @@ export const actions = {
         {
             const isEmail:RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             const isPass:RegExp = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])[^\s]{12,67}$/;
-            const isUsername:RegExp = /^.{3,128}$/;
+            const isUsername:RegExp = /^.{4,128}$/;
 
             const form = await event.request.formData();
             const email = form.get('email');
@@ -65,7 +68,7 @@ export const actions = {
                 own: false,})));
             if (userInfos.length > 0)
             {
-                const JWT = createJWT(userInfos[0]);
+                const JWT = await createJWT(userInfos[0]);
 
                 event.cookies.set('JWTtoken', JWT, { path: '/' });
             }

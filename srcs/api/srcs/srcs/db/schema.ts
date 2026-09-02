@@ -10,6 +10,7 @@ export const users = pgTable('users', {
 	losses: integer().default(0),
 	matches: integer().default(0),
 	wallet: integer().default(0),
+	icon: varchar({ length:128 }),
 	code: boolean().default(false),
 	skin_rac: integer().default(null).references(() => shop.id),
 	skin_ball: integer().default(null).references(() => shop.id),

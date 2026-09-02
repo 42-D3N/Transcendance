@@ -3,7 +3,7 @@ import type { logOperation } from '@babylonjs/core';
 import { fail } from '@sveltejs/kit';
 import { redirect } from '@sveltejs/kit';
 import { db } from '$lib/server/db/index';
-import { eq, lt, gte, ne } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { users } from '$lib/server/db/schema';
 import { createJWT } from '$lib/server/user_management/jwt.js';
 import bcrypt from 'bcryptjs';
@@ -12,8 +12,8 @@ import { inventory } from '../../../lib/server/db/schema';
 export const load = async ({ cookies }) => {
 	const JWT = cookies.get('JWTtoken');
 
-	if (!JWT || JWT != '-1')
-		redirect(308, '/');
+	if (JWT && JWT != '-1')
+		redirect(303, '/');
 
 };
 
@@ -21,7 +21,7 @@ export const actions = {
 	login: async (event) => {
 		try
 		{
-			const isUsername:RegExp = /^.{3,128}$/;
+			const isUsername:RegExp = /^.{4,128}$/;
 			const isEmail:RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 			const form = await event.request.formData();
@@ -62,6 +62,7 @@ export const actions = {
 					losses:users.losses,
 					matches:users.matches,
 					wallets:users.wallet,
+					icon:users.icon,
 					code:users.code,
 					skin_rac:users.skin_rac,
 					skin_ball:users.skin_ball,})
@@ -76,6 +77,7 @@ export const actions = {
 					losses:users.losses,
 					matches:users.matches,
 					wallets:users.wallet,
+					icon:users.icon,
 					code:users.code,
 					skin_rac:users.skin_rac,
 					skin_ball:users.skin_ball,})

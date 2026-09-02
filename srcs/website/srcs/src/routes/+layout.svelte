@@ -128,10 +128,14 @@
 		</div>
 		{:else}
 		<a class="flex justify-around gap-[0.4rem] text-left items-center overflow-visible relative whitespace-nowrap w-full break-unset border-0 text-[1.4rem]/1.1428 p-[0.8rem] rounded-lg bg-[#292626FF] hover:bg-[#333131FF]" href="/user/profile">
-			<img class="block h-[3.6rem] w-[3.6rem] bg-amber-50 border rounded-lg" src={usericon} alt="icon"/>
+			{#if !data.icon}
+				<img class="upload block lg:h-[3.6rem] lg:w-[3.6rem] h-[3.6rem] w-[3.6rem] border-solid rounded-md bg-amber-50" src={usericon} alt=""/>
+			{:else}
+				<img class="upload block lg:h-[3.6rem] lg:w-[3.6rem] h-[3.6rem] w-[3.6rem] border-solid rounded-md bg-amber-50" src={data.icon} alt={data.icon}/>
+			{/if}
 			<div id="user-info-container">	
 				<span class="lg:max-xl:hidden text-white">{data.username}</span><br>
-				<span class="content-center w-5 text-lg max-lg:hidden text-white">wallet: {data.wallet}</span>
+				<span class="content-center w-5 text-lg hidden xl:block text-white">wallet: {data.wallet}</span>
 			</div>
 		</a>
 		<div class="sidebar-footer-icons mobile-hidden">
