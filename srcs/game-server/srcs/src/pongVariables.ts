@@ -2,17 +2,17 @@ import type { Ball, GameRules, GameState, Player, AILevel } from "../../../websi
 
 export function serverVariable()
 {
-  const GAME_WIDTH    = 650;
-  const GAME_HEIGHT    = 730;
+  const GAME_WIDTH = 650;
+  const GAME_HEIGHT = 730;
   const TICK_RATE = 60;
   const TICK_INTERVAL = 1000 / TICK_RATE;
   const DT = 1 / TICK_RATE;
   const ROUND_PAUSE_TICKS = TICK_RATE * 2;
-  const POWER_PAUSE_TICKS = Math.round(TICK_RATE / 2);
+  const POWER_PAUSE_TICKS = Math.round(TICK_RATE / 4);
   const POWER_TRIGGER_LINE_Y = GAME_HEIGHT / 2;
   const POWER_MAX_USES = 3;
   const POWER_SPEED_MULTIPLIER = 2;
-  const POWER_DIRECTION_VARIATION = 0.15;
+  const POWER_DIRECTION_VARIATION = 0.35;
   const BALL_SIZE = { w: 15, h: 15 } as const;
   const BALL_BASE_POSITION = {
     x: (GAME_WIDTH - BALL_SIZE.w) / 2,
@@ -29,7 +29,7 @@ export function serverVariable()
 
   let rules: GameRules = 
   {
-    acceleration:	6,
+    acceleration:	60,
     racketSpeed:	600,
     scoreToWin:		15,
     maxSpeed:		720,

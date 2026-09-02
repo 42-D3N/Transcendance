@@ -438,3 +438,9 @@ export function gameLoop()
 {
   setInterval(() => { gameTick(vars); }, vars.TICK_INTERVAL);
 }
+
+/*
+const expected = 1 / (1 + Math.pow(10, (opponentElo - playerElo) / 400));
+const result = won ? 1 : 0;
+return ( Math.round(20 * (result - expected)) );
+*/
