@@ -7,6 +7,7 @@ import { eq } from 'drizzle-orm';
 import { users } from '$lib/server/db/schema';
 import { createJWT } from '$lib/server/user_management/jwt.js';
 import bcrypt from 'bcryptjs';
+import { inventory } from '../../../lib/server/db/schema';
 
 export const load = async ({ cookies }) => {
 	const JWT = cookies.get('JWTtoken');
@@ -53,11 +54,37 @@ export const actions = {
 			{
 				let userInfos;
 				if (isEmail.test(username as string))
-					userInfos = await db.select({ id:users.id, username:users.username, email:users.email, wins:users.wins, losses:users.losses, matches:users.matches, wallets:users.wallet, icon:users.icon}).from(users).where(eq(users.email, username as string));
+					userInfos = await db.select({ 
+					id:users.id,
+					username:users.username,
+					email:users.email,
+					wins:users.wins,
+					losses:users.losses,
+					matches:users.matches,
+					wallets:users.wallet,
+					icon:users.icon,
+					code:users.code,
+					skin_rac:users.skin_rac,
+					skin_ball:users.skin_ball,})
+					.from(users)
+					.where(eq(users.email, username as string));
 				else
-					userInfos = await db.select({ id:users.id, username:users.username, email:users.email, wins:users.wins, losses:users.losses, matches:users.matches, wallets:users.wallet, icon:users.icon}).from(users).where(eq(users.username, username as string));
+					userInfos = await db.select({
+					id:users.id,
+					username:users.username,
+					email:users.email,
+					wins:users.wins,
+					losses:users.losses,
+					matches:users.matches,
+					wallets:users.wallet,
+					icon:users.icon,
+					code:users.code,
+					skin_rac:users.skin_rac,
+					skin_ball:users.skin_ball,})
+					.from(users)
+					.where(eq(users.username, username as string));
+				console.log(userInfos[0]);
 				const JWT = await createJWT(userInfos[0]);
-
 				event.cookies.set('JWTtoken', JWT, { path: '/' });
 			}
 
