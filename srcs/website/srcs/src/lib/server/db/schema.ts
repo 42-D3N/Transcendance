@@ -9,7 +9,8 @@ export const users = pgTable('users', {
 	wins: integer().default(0),
 	losses: integer().default(0),
 	matches: integer().default(0),
-	wallet: integer().default(0)
+	wallet: integer().default(0),
+	icon: varchar({ length:128 })
 });
 
 export const friends = pgTable('friends', {

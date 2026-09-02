@@ -1,7 +1,7 @@
-import { validateJWT } from '$lib/server/user_management/jwt.js';
 import { redirect } from '@sveltejs/kit';
+import { validateJWT } from '$lib/server/user_management/jwt.js';
 
-export function load ({ cookies })  {
+export async function load ({ cookies }) {
     let JWTtoken = cookies.get('JWTtoken');
     let id = '-1';
     let username = '';
@@ -10,6 +10,7 @@ export function load ({ cookies })  {
     let losses = '0';
     let matches = '0';
     let wallet = '0';
+    let icon = 'default.svg';
 
     if (!JWTtoken || JWTtoken === '-1')
     {
@@ -18,10 +19,18 @@ export function load ({ cookies })  {
     }
     else
     {
-        let userInfos = validateJWT(JWTtoken);
+        let userInfos = await validateJWT(JWTtoken);
 
         if (!userInfos)
-            throw redirect(308, '/sign_in');
+        {
+            cookies.set('JWTtoken', "-1", { path: '/' });
+            throw redirect(303, '/sign_in');
+        }
+        if (userInfos["JWT"] != undefined)
+        {
+            cookies.set('JWTtoken', userInfos["JWT"], { path: '/' });
+            throw redirect(303, "./profile");
+        }
 
         if (userInfos.length == 0)
             console.error("couldn't retrieve userData");
@@ -33,6 +42,8 @@ export function load ({ cookies })  {
         losses = userInfos.losses;
         matches = userInfos.matches;
         wallet = userInfos.wallets;
+        if (userInfos.icon != '')
+            icon = userInfos.icon
     }
 
     return ({
@@ -43,6 +54,7 @@ export function load ({ cookies })  {
         wins: wins,
         losses: losses,
         matches: matches,
-        wallet: wallet
+        wallet: wallet,
+        icon: icon
     });
 };
