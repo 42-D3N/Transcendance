@@ -8,6 +8,11 @@ export function serverVariable()
   const TICK_INTERVAL = 1000 / TICK_RATE;
   const DT = 1 / TICK_RATE;
   const ROUND_PAUSE_TICKS = TICK_RATE * 2;
+  const POWER_PAUSE_TICKS = Math.round(TICK_RATE / 2);
+  const POWER_TRIGGER_LINE_Y = GAME_HEIGHT / 2;
+  const POWER_MAX_USES = 3;
+  const POWER_SPEED_MULTIPLIER = 2;
+  const POWER_DIRECTION_VARIATION = 0.15;
   const BALL_SIZE = { w: 15, h: 15 } as const;
   const BALL_BASE_POSITION = {
     x: (GAME_WIDTH - BALL_SIZE.w) / 2,
@@ -90,6 +95,16 @@ export function serverVariable()
     ai: { level: aiLevels.easy, lastDecisionTime: 0 }
   };
 
+  const power =
+  {
+    pendingOwner: null as 1 | 2 | null,
+    pauseUntilTick: 0,
+    boostedTarget: null as 1 | 2 | null,
+    baseSpeedBeforeBoost: null as number | null,
+    remainingUses: { p1: POWER_MAX_USES, p2: POWER_MAX_USES },
+    specialLatch: { p1: false, p2: false }
+  };
+
   return {
     GAME_WIDTH,
     GAME_HEIGHT,
@@ -97,11 +112,16 @@ export function serverVariable()
     TICK_INTERVAL,
     DT,
     ROUND_PAUSE_TICKS,
+    POWER_PAUSE_TICKS,
+    POWER_TRIGGER_LINE_Y,
+    POWER_SPEED_MULTIPLIER,
+    POWER_DIRECTION_VARIATION,
     roundEndTick: 0,
     ball,
     player1,
     player2,
     state,
-    rules
+    rules,
+    power
   };
 }

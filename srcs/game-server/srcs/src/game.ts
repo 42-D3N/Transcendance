@@ -2,6 +2,7 @@ import { serverVariable } from './pongVariables';
 import type { ClientInputMessage, ConnectedPlayer, ClientGameState, Player } from '../../../website/srcs/src/lib/game/both/interfaces';
 
 type Game = ReturnType<typeof serverVariable>;
+type PlayerSide = 1 | 2;
 
 const vars = serverVariable();
 const clients = new Set<WebSocket>();
@@ -44,7 +45,9 @@ export function storeInputs(socket: WebSocket, message: ClientInputMessage)
 
 function buildClientGameState(vars: Game): ClientGameState
 {
-  const prediction = vars.state.status === "round_end" ? predictLanding(vars) : null;
+  const prediction = vars.state.status === "round_end"
+    ? predictLanding(vars)
+    : vars.state.status === "power_pause" ? predictPoweredTrajectory(vars) : null;
   return {
     status: vars.state.status,
     score: vars.state.score,
@@ -55,13 +58,22 @@ function buildClientGameState(vars: Game): ClientGameState
   };
 }
 
+function getBallCenter(vars: Game)
+{
+  return {
+    x: vars.ball.pos.x + vars.ball.size.w / 2,
+    y: vars.ball.pos.y + vars.ball.size.h / 2
+  };
+}
+
 function predictLanding(vars: Game)
 {
   const distance = 140;
   const speed = Math.max(Math.hypot(vars.ball.vel.x, vars.ball.vel.y), 1);
   let remaining = distance;
-  let x = vars.ball.pos.x + vars.ball.size.w / 2;
-  let y = vars.ball.pos.y + vars.ball.size.h / 2;
+  const start = getBallCenter(vars);
+  let x = start.x;
+  let y = start.y;
   let velocityX = vars.ball.vel.x / speed;
   const velocityY = vars.ball.vel.y / speed;
   const minX = vars.ball.size.w / 2;
@@ -80,9 +92,50 @@ function predictLanding(vars: Game)
   }
 
   return {
-    start: { x: vars.ball.pos.x + vars.ball.size.w / 2, y: vars.ball.pos.y + vars.ball.size.h / 2 },
+    start,
     end: { x, y }
   };
+}
+
+function predictPoweredTrajectory(vars: Game)
+{
+  if (vars.power.boostedTarget === null)
+    return (null);
+
+  const speed = Math.max(Math.hypot(vars.ball.vel.x, vars.ball.vel.y), 1);
+  const start = getBallCenter(vars);
+  let x = start.x;
+  let y = start.y;
+  let velocityX = vars.ball.vel.x / speed;
+  const velocityY = vars.ball.vel.y / speed;
+  const minX = vars.ball.size.w / 2;
+  const maxX = vars.GAME_WIDTH - vars.ball.size.w / 2;
+  const targetY = vars.power.boostedTarget === 1
+    ? vars.player1.racket.pos.y - vars.ball.size.h / 2
+    : vars.player2.racket.pos.y + vars.player2.racket.size.h + vars.ball.size.h / 2;
+
+  if (velocityY === 0)
+    return { start, end: start };
+
+  for (let guard = 0; guard < 16; guard++)
+  {
+    const distanceToTarget = (targetY - y) / velocityY;
+    const distanceToWall = velocityX === 0
+      ? Number.POSITIVE_INFINITY
+      : Math.abs(((velocityX > 0 ? maxX : minX) - x) / velocityX);
+
+    if (distanceToTarget <= distanceToWall)
+      return {
+        start,
+        end: { x: x + velocityX * distanceToTarget, y: targetY }
+      };
+
+    x += velocityX * distanceToWall;
+    y += velocityY * distanceToWall;
+    velocityX *= -1;
+  }
+
+  return { start, end: { x, y } };
 }
 
 function updateRackets(player: Player, vars: Game)
@@ -108,14 +161,141 @@ function updateAI(vars: Game)
   vars.player2.input.move = ballCenter < racketCenter - 5 ? -1 : ballCenter > racketCenter + 5 ? 1 : 0;
 }
 
+function getRemainingPowerUses(side: PlayerSide, vars: Game)
+{
+  return (side === 1 ? vars.power.remainingUses.p1 : vars.power.remainingUses.p2);
+}
+
+function consumePowerUse(side: PlayerSide, vars: Game)
+{
+  if (side === 1)
+    vars.power.remainingUses.p1--;
+  else
+    vars.power.remainingUses.p2--;
+}
+
+function isBallMovingTowardOpponent(side: PlayerSide, vars: Game)
+{
+  return (side === 1 ? vars.ball.vel.y < 0 : vars.ball.vel.y > 0);
+}
+
+function isBallOnOwnerHalf(side: PlayerSide, vars: Game)
+{
+  const { y } = getBallCenter(vars);
+  return (side === 1 ? y > vars.POWER_TRIGGER_LINE_Y : y < vars.POWER_TRIGGER_LINE_Y);
+}
+
+function armPowerIfPossible(side: PlayerSide, vars: Game)
+{
+  if (vars.state.status !== "playing"
+    || vars.power.pendingOwner !== null
+    || vars.power.boostedTarget !== null
+    || getRemainingPowerUses(side, vars) <= 0
+    || !isBallMovingTowardOpponent(side, vars)
+    || !isBallOnOwnerHalf(side, vars))
+    return;
+
+  consumePowerUse(side, vars);
+  vars.power.pendingOwner = side;
+}
+
+function updatePowerInputs(vars: Game)
+{
+  const players = [
+    { side: 1 as const, input: vars.player1.input, latched: vars.power.specialLatch.p1 },
+    { side: 2 as const, input: vars.player2.input, latched: vars.power.specialLatch.p2 }
+  ];
+
+  for (const player of players)
+  {
+    if (player.input.special && !player.latched)
+      armPowerIfPossible(player.side, vars);
+
+    if (player.side === 1)
+      vars.power.specialLatch.p1 = player.input.special;
+    else
+      vars.power.specialLatch.p2 = player.input.special;
+  }
+
+  if (vars.power.pendingOwner !== null && !isBallMovingTowardOpponent(vars.power.pendingOwner, vars))
+    vars.power.pendingOwner = null;
+}
+
+function applyPoweredDirectionShift(vars: Game)
+{
+  const previousVerticalDirection = Math.sign(vars.ball.vel.y) || 1;
+  const boostedSpeed = vars.ball.speed;
+  const horizontalOffset = boostedSpeed * vars.POWER_DIRECTION_VARIATION * (Math.random() < 0.5 ? -1 : 1);
+  const maxHorizontalSpeed = boostedSpeed * 0.85;
+  const nextX = Math.max(
+    -maxHorizontalSpeed,
+    Math.min(maxHorizontalSpeed, vars.ball.vel.x + horizontalOffset)
+  );
+  const nextY = previousVerticalDirection * Math.sqrt(boostedSpeed * boostedSpeed - nextX * nextX);
+
+  vars.ball.vel.x = nextX;
+  vars.ball.vel.y = nextY;
+}
+
+function triggerPowerPause(owner: PlayerSide, vars: Game)
+{
+  vars.power.pendingOwner = null;
+  vars.power.pauseUntilTick = vars.state.tick + vars.POWER_PAUSE_TICKS;
+  vars.power.boostedTarget = owner === 1 ? 2 : 1;
+  vars.power.baseSpeedBeforeBoost = vars.ball.speed;
+  vars.ball.speed *= vars.POWER_SPEED_MULTIPLIER;
+  applyPoweredDirectionShift(vars);
+  vars.state.status = "power_pause";
+}
+
+function maybeTriggerPowerAtMidline(previousCenterY: number, vars: Game)
+{
+  if (vars.power.pendingOwner === null)
+    return false;
+
+  const currentCenterY = getBallCenter(vars).y;
+  const crossedMidline = vars.power.pendingOwner === 1
+    ? previousCenterY > vars.POWER_TRIGGER_LINE_Y && currentCenterY <= vars.POWER_TRIGGER_LINE_Y
+    : previousCenterY < vars.POWER_TRIGGER_LINE_Y && currentCenterY >= vars.POWER_TRIGGER_LINE_Y;
+
+  if (!crossedMidline)
+    return (false);
+
+  triggerPowerPause(vars.power.pendingOwner, vars);
+  return (true);
+}
+
+function clearPowerState(vars: Game)
+{
+  vars.power.pendingOwner = null;
+  vars.power.pauseUntilTick = 0;
+  vars.power.boostedTarget = null;
+  vars.power.baseSpeedBeforeBoost = null;
+}
+
+function finishPoweredShot(vars: Game)
+{
+  if (vars.power.boostedTarget === null)
+    return;
+
+  vars.ball.speed = Math.min(
+    Math.max(vars.power.baseSpeedBeforeBoost ?? vars.rules.baseSpeed, vars.rules.baseSpeed),
+    vars.rules.maxSpeed
+  );
+  vars.power.boostedTarget = null;
+  vars.power.baseSpeedBeforeBoost = null;
+}
+
 function overlapsRacket(player: Player, vars: Game)
 {
   const ball = vars.ball;
   const racket = player.racket;
-  return ball.pos.x < racket.pos.x + racket.size.w
+  return (
+    ball.pos.x < racket.pos.x + racket.size.w
     && ball.pos.x + ball.size.w > racket.pos.x
     && ball.pos.y < racket.pos.y + racket.size.h
-    && ball.pos.y + ball.size.h > racket.pos.y;
+    && ball.pos.y + ball.size.h > racket.pos.y
+  );
 }
 
 function bounceOnRacket(player: Player, vars: Game, verticalDirection: 1 | -1)
@@ -129,10 +309,11 @@ function bounceOnRacket(player: Player, vars: Game, verticalDirection: 1 | -1)
   ));
   const maxAngle = Math.PI / 3;
   const angle = impact * maxAngle;
-  const speed = Math.min(
-    Math.max(ball.speed, vars.rules.baseSpeed),
-    vars.rules.maxSpeed
+  ball.speed = Math.min(
+    Math.max(ball.speed, vars.rules.baseSpeed) + vars.rules.acceleration,
+    vars.power.boostedTarget === null ? vars.rules.maxSpeed : ball.speed
   );
+  const speed = ball.speed;
 
   ball.vel.x = Math.sin(angle) * speed;
   ball.vel.y = verticalDirection * Math.cos(angle) * speed;
@@ -140,6 +321,7 @@ function bounceOnRacket(player: Player, vars: Game, verticalDirection: 1 | -1)
 
 function resetBall(vars: Game, direction: 1 | -1)
 {
+  clearPowerState(vars);
   vars.ball.pos.x = vars.BALL_BASE_POSITION.x;
   vars.ball.pos.y = vars.BALL_BASE_POSITION.y;
   vars.ball.speed = vars.rules.baseSpeed;
@@ -150,9 +332,12 @@ function resetBall(vars: Game, direction: 1 | -1)
 
 export function updateBall(vars: Game)
 {
-//   console.log(vars.ball.vel.x * vars.DT)
+  const previousCenterY = getBallCenter(vars).y;
   vars.ball.pos.x += vars.ball.vel.x * vars.DT;
   vars.ball.pos.y += vars.ball.vel.y * vars.DT;
+
+  if (maybeTriggerPowerAtMidline(previousCenterY, vars))
+    return;
 
   if (vars.ball.pos.x <= 0)
   {
@@ -168,11 +353,15 @@ export function updateBall(vars: Game)
   if (vars.ball.vel.y > 0 && overlapsRacket(vars.player1, vars))
   {
     vars.ball.pos.y = vars.player1.racket.pos.y - vars.ball.size.h;
+    if (vars.power.boostedTarget === 1)
+      finishPoweredShot(vars);
     bounceOnRacket(vars.player1, vars, -1);
   }
   if (vars.ball.vel.y < 0 && overlapsRacket(vars.player2, vars))
   {
     vars.ball.pos.y = vars.player2.racket.pos.y + vars.player2.racket.size.h;
+    if (vars.power.boostedTarget === 2)
+      finishPoweredShot(vars);
     bounceOnRacket(vars.player2, vars, 1);
   }
 
@@ -196,10 +385,11 @@ export function updateBall(vars: Game)
   else if (vars.roundEndTick > vars.state.tick)
     vars.state.status = "round_end";
 
-  vars.ball.speed = Math.min(
-    vars.ball.speed + vars.rules.acceleration * vars.DT,
-    vars.rules.maxSpeed
-  );
+  if (vars.power.boostedTarget === null)
+    vars.ball.speed = Math.min(
+      vars.ball.speed + vars.rules.acceleration * vars.DT,
+      vars.rules.maxSpeed
+    );
 }
 
 export function updatePlayers(vars: Game)
@@ -223,10 +413,17 @@ function gameTick(vars: Game)
 {
   vars.state.tick++;
   vars.state.elapsedTime += vars.DT;
+  updatePowerInputs(vars);
 
   if (vars.state.status === "round_end")
   {
     if (vars.state.tick >= vars.roundEndTick)
+      vars.state.status = "playing";
+  }
+  else if (vars.state.status === "power_pause")
+  {
+    updatePlayers(vars);
+    if (vars.state.tick >= vars.power.pauseUntilTick)
       vars.state.status = "playing";
   }
   else if (vars.state.status === "playing")

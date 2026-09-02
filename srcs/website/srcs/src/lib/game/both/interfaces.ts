@@ -48,6 +48,7 @@ export interface Racket
 export type GameStatus =
   | "waiting"
   | "playing"
+  | "power_pause"
   | "round_end"
   | "game_end";
 

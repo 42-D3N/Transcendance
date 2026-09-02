@@ -34,8 +34,8 @@
     connection(socket, state => renderGameState(game, state));
     const Resize = () => updateScale(game);
     window.addEventListener('keydown',	KeyDown);
-    window.addEventListener('keyup',		KeyUp);
-    window.addEventListener('resize', Resize);
+    window.addEventListener('keyup',	KeyUp);
+    window.addEventListener('resize',	Resize);
     Resize();
     return () =>
     {
@@ -73,7 +73,7 @@
         <div class="info-row"><span>ROUND</span><b>01</b></div>
         <div class="pixel-divider"></div>
         <p class="tip">READY PLAYER ONE?</p>
-        <p class="small-copy">Use the arrow keys or the buttons below to move your paddle.</p>
+        <p class="small-copy">Use the arrow keys to move your paddle and Shift to arm your power-up.</p>
       </aside>
 
       <div class="game-column">

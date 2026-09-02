@@ -64,9 +64,10 @@ export function renderGameState(game_vars: any, state: ClientGameState)
     game_vars.whereElem.style.width = `${width}px`;
     game_vars.whereElem.style.transform = `rotate(${angle}rad)`;
   }
-  game_vars.whereElem.style.display = state.status === "round_end" ? "block" : "none";
+  game_vars.whereElem.style.display = state.status === "round_end" || state.status === "power_pause" ? "block" : "none";
   game_vars.scoreElem.textContent = `${state.score.p1}  -  ${state.score.p2}`;
   game_vars.statusElem.textContent = state.status === "round_end"
     ? "Reprise imminente"
+    : state.status === "power_pause" ? "Power-up actif"
     : state.status === "game_end" ? "Partie terminee" : state.status === "waiting" ? "En attente d'un adversaire" : "En jeu";
 }
