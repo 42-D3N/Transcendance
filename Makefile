@@ -14,6 +14,4 @@ devre: fclean devup
 prune: fclean
 	docker system prune -af --volumes
 
-devgrrrrrr: devre
-
-.PHONY: devup devdown clean fclean devre prune devgrrrrrr
+.PHONY: devup devdown clean fclean devre prune
