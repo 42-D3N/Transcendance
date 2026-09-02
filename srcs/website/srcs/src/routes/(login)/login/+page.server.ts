@@ -84,7 +84,7 @@ export const actions = {
 					.from(users)
 					.where(eq(users.username, username as string));
 				console.log(userInfos[0]);
-				const JWT = createJWT(userInfos[0]);
+				const JWT = await createJWT(userInfos[0]);
 				event.cookies.set('JWTtoken', JWT, { path: '/' });
 			}
 

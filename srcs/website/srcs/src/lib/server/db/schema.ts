@@ -29,7 +29,7 @@ export const matches = pgTable('matches', {
 	user1: integer().notNull().references(() => users.id),
 	user2: integer().notNull().references(() => users.id),
 	user1Score: integer('user1_score').default(0),
-	user12core: integer('user2_score').default(0),
+	user2Score: integer('user2_score').default(0),
 	date: timestamp().defaultNow(),
 	winner: integer().notNull()
 	}, (table) => [

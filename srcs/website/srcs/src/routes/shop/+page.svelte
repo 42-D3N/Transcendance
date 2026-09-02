@@ -32,12 +32,8 @@
         })
         const result = await response.json();
         const data = JSON.parse(result.data);
-        if (data[2] === 1)
-            return_val = data[2];
-        if (data[2] === 2)
-            return_val = data[2];
-        if (data[2] === 10)
-            return_val = data[2];
+        console.log(data);
+        return_val = data[2];
     }
     
     async function save_code() {

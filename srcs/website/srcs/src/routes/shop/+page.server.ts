@@ -12,19 +12,26 @@ import { shop } from '../../lib/server/db/schema';
 
 
 export async function load({ cookies }) {
-    try
+    const JWTtoken = cookies.get('JWTtoken');
+    
+    if (!JWTtoken || JWTtoken === '-1') {
+        throw redirect(308, '/login');
+    }
+    else
     {
-        const JWTtoken = cookies.get('JWTtoken');
-        
-        if (!JWTtoken || JWTtoken === '-1') {
+        let userInfos = await validateJWT(JWTtoken);
+        console.log(userInfos);
+        if (!userInfos)
+        {
+            cookies.set('JWTtoken', "-1", { path: '/' });
             throw redirect(308, '/login');
         }
-        
-        const userInfos = validateJWT(JWTtoken);
-        
-        if (!userInfos) {
-            throw redirect(308, '/login');
+        if (userInfos["JWT"] != undefined)
+        {
+            cookies.set('JWTtoken', userInfos["JWT"], { path: '/' });
+            throw redirect(308, "/shop");
         }
+        
         return {
             Token: JWTtoken,
             id: userInfos.id,
@@ -37,11 +44,6 @@ export async function load({ cookies }) {
             code: userInfos.code,
         };
     }
-    catch (error)
-	{
-		console.error("Erreur lors de la requête :", error);
-	}
-    throw redirect(308, '/login');
 }
 
 export const actions = {
@@ -50,7 +52,8 @@ export const actions = {
         {
             const formData = await request.formData();
             const JWTtoken = cookies.get('JWTtoken');
-            const userInfos = validateJWT(JWTtoken);
+            const userInfos = await validateJWT(JWTtoken);
+            console.log(userInfos);
             if (!userInfos) {
                 throw redirect(308, '/login');
             }
@@ -76,6 +79,7 @@ export const actions = {
                     code: 10
                 }
             const price = await db.select({ price:shop.price }).from(shop).where(eq(product.id, shop.id));
+            console.log("user ", userInfos.id, " product ", product.id);
             const own = await db.select({ own:inventory.own }).from(inventory).where(and(eq(userInfos.id, inventory.user), eq(product.id, inventory.product)))
             if (!price || !price[0] || !price[0].price || !check_price(userInfos, price[0].price) || !own || !own[0] || own[0].own === null || own[0].own === true)
             {
@@ -145,12 +149,13 @@ async function recreatejtw(cookies: RequestEvent["cookies"] ,data:any) {
         losses:users.losses,
         matches:users.matches,
         wallets:users.wallet,
+        icon:users.icon,
         code:users.code,
         skin_rac:users.skin_rac,
         skin_ball:users.skin_ball,})
         .from(users)
         .where(eq(users.id, data.id));
-        const JWT = createJWT(userInfos[0]);
+        const JWT = await createJWT(userInfos[0]);
         cookies.set('JWTtoken', JWT, { path: '/' })
     }
     catch (error)
