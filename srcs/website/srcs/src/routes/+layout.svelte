@@ -6,6 +6,7 @@
 	import gameicon from '$lib/assets/game_icon.svg';
 	import profileicon from '$lib/assets/profile_icon.svg';
 	import setticon from '$lib/assets/settings_icon.svg';
+	import shopicon from '$lib/assets/shop_icon.svg';
 
 	let sidebar:any;
 	let header:any;
@@ -98,6 +99,10 @@
 				<a class="ft-button ft-button-medium sidebar-link hover:bg-[#333131FF]" href="/user/profile">
 					<img class="ft-icon-img ft-icon-size-24" src={profileicon} alt="icon"/>
 					<span class="ft-sidebar-link-text text-2xl/tight text-white">Profile</span>
+				</a>
+				<a class="ft-button ft-button-medium sidebar-link hover:bg-[#333131FF]" href="/shop">
+					<img class="ft-icon-img ft-icon-size-24" src={shopicon} alt="icon"/>
+					<span class="ft-sidebar-link-text text-2xl/tight text-white">Shop</span>
 				</a>
 				<a class="ft-button ft-button-medium sidebar-link hover:bg-[#333131FF]" href="/settings">
 					<img class="ft-icon-img ft-icon-size-24" src={setticon} alt="icon"/>

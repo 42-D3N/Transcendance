@@ -1,5 +1,7 @@
 import { validateJWT } from '$lib/server/user_management/jwt.js';
 import { redirect } from '@sveltejs/kit';
+import { db } from '$lib/server/db/index';
+import { eq, lt, gte, ne } from 'drizzle-orm';
 
 export async function load ({ cookies }) {
     let JWTtoken = cookies.get('JWTtoken');
