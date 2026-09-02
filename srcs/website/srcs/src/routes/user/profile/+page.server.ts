@@ -32,8 +32,11 @@ export async function load ({ cookies }) {
             throw redirect(303, "./profile");
         }
 
-        if (userInfos.length == 0)
-            console.error("couldn't retrieve userData");
+        if (userInfos["empty"] == 0)
+		{
+			cookies.set('JWTtoken', "-1", { path: '/' });
+			throw redirect(303, '/login');
+		}
 
         id = userInfos.id;
         username = userInfos.username;

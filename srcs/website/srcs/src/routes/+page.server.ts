@@ -12,6 +12,7 @@ export async function load ({ cookies }) {
 	let wallet = '0';
 	let icon = 'default.svg';
 
+	console.log("Token :",JWTtoken);
 	if (!JWTtoken || JWTtoken === '-1')
 	{
 		cookies.set('JWTtoken', '-1', { path: '/' });
@@ -21,6 +22,7 @@ export async function load ({ cookies }) {
 	{
 		let userInfos = await validateJWT(JWTtoken);
 
+		console.log(userInfos);
 		if (!userInfos)
 		{
 			cookies.set('JWTtoken', "-1", { path: '/' });
@@ -31,9 +33,12 @@ export async function load ({ cookies }) {
 			cookies.set('JWTtoken', userInfos["JWT"], { path: '/' });
 			throw redirect(303, ".");
 		}
-
-		if (userInfos.length == 0)
-			console.error("couldn't retrieve userData");
+			
+		if (userInfos["empty"] == 0)
+		{
+			cookies.set('JWTtoken', "-1", { path: '/' });
+			throw redirect(303, '/login');
+		}
 
 		id = userInfos.id;
 		username = userInfos.username;

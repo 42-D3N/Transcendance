@@ -3,7 +3,7 @@
     import { page } from '$app/state';
     import type { ActionData } from './$types';
     import arrow from '$lib/assets/side_arrow.svg';
-
+    
 	let { data, form }: PageProps = $props();
 </script>
 
@@ -30,7 +30,7 @@
             <input minlength="12" maxlength="67" name="password" type="password" value={form?.password} class="border border-solid border-zinc-400 bg-[#333131FF] focus:bg-black/20 max-w-full">
         </label><br>
         {#if form?.skill_issue}<p class="error text-sm text-red-700 italic">Password must contain at least 12 caracters, a upper case and a lower case letter, a number and a special caracter</p>{/if}
-        <a class="" href="./sign_in">
+        <a class="" href="./login">
             <span class="lg:max-xl:hidden text-amber-600 overflow-hidden text-xl/tight text-ellipsis underline font-bold">Already registered?</span>
         </a>
         <div class="flex justify-end">
