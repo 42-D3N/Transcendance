@@ -14,6 +14,8 @@
     {
         redirect(308, "./edit");
     }
+
+    console.log(data.icon);
 </script>
 
 <div class="absolute inset-0 z-0 bg-[#333131FF]"></div>
@@ -26,7 +28,7 @@
             {#if !data.icon}
                 <img class="upload block lg:h-[12rem] lg:w-[12rem] h-[8rem] w-[8rem] border-solid rounded-md bg-amber-50" src={usericon} alt=""/>
             {:else}
-                <img class="upload block lg:h-[12rem] lg:w-[12rem] h-[8rem] w-[8rem] border-solid rounded-md bg-amber-50" src={data.icon} alt={data.icon}/>
+                <img class="upload block lg:h-[12rem] lg:w-[12rem] h-[8rem] w-[8rem] border-solid rounded-md bg-amber-50" src={data.icon} alt=""/>
             {/if}
             <div>
                 <span class="block pl-6 font-black text-white text-4xl">{data.username}</span>

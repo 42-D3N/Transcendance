@@ -4,14 +4,18 @@ import { redirect } from '@sveltejs/kit';
 import { db } from '$lib/server/db/index';
 import { eq, lt, gte, ne } from 'drizzle-orm';
 import { users } from '$lib/server/db/schema';
-import { createJWT } from '$lib/server/user_management/jwt.js';
+import { createJWT, validateJWT } from '$lib/server/user_management/jwt.js';
 import bcrypt from 'bcryptjs';
 
 export const load = async ({ cookies }) => {
 	const JWT = cookies.get('JWTtoken');
 
 	if (JWT && JWT != '-1')
+    {
+        let validation = validateJWT(JWT);
+        console.log(validation);
 		redirect(303, '/');
+    }
 };
 
 export const actions = {

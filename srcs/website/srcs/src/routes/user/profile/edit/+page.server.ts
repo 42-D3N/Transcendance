@@ -37,7 +37,7 @@ export const actions = {
             await db.update(users).set({email: newMail}).where(eq(users.id, userInfos.id));
         }
 
-
+        console.log(icon);
         if (icon && icon.size != 0)
         {
             let randomString = randomBytes(48);
@@ -117,6 +117,7 @@ export async function load ({ cookies }) {
         losses: losses,
         matches: matches,
         wallet: wallet,
-        icon: icon
+        icon: icon,
+        fileError: 0
     });
 };

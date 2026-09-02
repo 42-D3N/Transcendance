@@ -19,7 +19,6 @@ export async function load ({ cookies }) {
     else
     {
         let userInfos = await validateJWT(JWTtoken);
-
 		if (!userInfos)
             throw redirect(303, '/sign_in');
 
