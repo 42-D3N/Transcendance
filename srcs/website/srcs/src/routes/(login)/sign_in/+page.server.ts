@@ -3,7 +3,7 @@ import { fail } from '@sveltejs/kit';
 import { redirect } from '@sveltejs/kit';
 import { db } from '$lib/server/db/index';
 import { eq, lt, gte, ne } from 'drizzle-orm';
-import { users, inventory } from '$lib/server/db/schema';
+import { users, inventory, shop } from '$lib/server/db/schema';
 import { createJWT } from '$lib/server/user_management/jwt.js';
 import bcrypt from 'bcryptjs';
 
@@ -55,9 +55,14 @@ export const actions = {
                 }
             );
             
-            const userInfos = await db.select({ id:users.id, username:users.username, email:users.email, wins:users.wins, losses:users.losses, matches:users.matches, wallets:users.wallet}).from(users).where(eq(users.username, username as string));
+            const userInfos = await db.select({ id:users.id, username:users.username, email:users.email, wins:users.wins, losses:users.losses, matches:users.matches, wallets:users.wallet, code:users.code, skin_rac:users.skin_rac, skin_ball:users.skin_ball}).from(users).where(eq(users.username, username as string));
             console.log(userInfos);
-            await db.insert(inventory).values({user:userInfos[0].id});
+            const products = await db.select().from(shop);
+            await db.insert(inventory).values(
+            products.map((product) => ({
+                user: userInfos[0].id,
+                product: product.id,
+                own: false,})));
             if (userInfos.length > 0)
             {
                 const JWT = createJWT(userInfos[0]);

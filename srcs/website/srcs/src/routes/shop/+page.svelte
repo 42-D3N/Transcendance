@@ -1,11 +1,15 @@
 <script lang="ts">
+    import Popup from "$lib/Popup.svelte";
     import noise from "$lib/assets/noise.png";
     import test from "$lib/assets/test.jpg";
-    let { data } = $props();
 
+    let { data } = $props();
+    let return_val:number = $state(0);
+    let showmodal:boolean = $state(false);
+    let code:string = $state("");
     let shep:number = $state(0);
     if (data.code === true)
-        shep = 0.75;
+        shep = 0.50;
     else
         shep = 1;
     let products = $state([
@@ -20,29 +24,38 @@
     ]);
 
     async function sendData(product) {
+        const formData = new FormData();
+        formData.append('product', JSON.stringify(product));
         const response = await fetch('/shop', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                product: product,
-                data: data,
-            })
+            body: formData
+        })
+        const result = await response.json();
+        const data = JSON.parse(result.data);
+        if (data[2] === 1)
+            return_val = data[2];
+        if (data[2] === 2)
+            return_val = data[2];
+        if (data[2] === 10)
+            return_val = data[2];
+    }
+    
+    async function save_code() {
+        const formData = new FormData();
+        formData.append('code', code);
+        const response = await fetch('/shop', {
+            method: 'POST',
+            body: formData
         });
-            const result = await response.json();
-            console.log(result);
-    }
-    let showmodal = $state(false);
-    let code = $state("");
-    function secret() {
-        showmodal = true;
-    }
-    function save_code() {
-        if (code === "Citadel")
-            shep = 0.75;
+        const result = await response.json();
+        const data = JSON.parse(result.data);
+        if (data[1] === true)
+            alert("Please reload the page to activate the code.")
         showmodal = false;
         code = "";
+    }
+    function secret() {
+        showmodal = true;
     }
     function close_popup() {
         showmodal = false;
@@ -76,27 +89,23 @@
     {#each products as product}
         <div>
             <img src={product.src} class="scale-80 mx-auto" alt=""/>
-            <form method="POST">
-                <input
-                type="hidden"
-                name="productId"
-                value={product.id}/>
-                 
-                <input
-                type="hidden"
-                name="price"
-                value={product.price}/>
-
-                <input
-                type="hidden"
-                name="shep"
-                value={data.code}/>
-                <button type="submit" class="text-wrap inline-block rounded-xl bg-[#C41E3AFF] z-10 w-[90%] min-h-[15%] max-h-[50%] text-center">
+                <button onclick={() => sendData({id: product.id})} type="button" class="text-wrap inline-block rounded-xl bg-[#C41E3AFF] z-10 w-[90%] min-h-[15%] max-h-[50%] text-center">
                     <span class="break-words text-l sm:text-xl md:text-3xl lg:text-4xl">
                         {product.name} {product.price * shep}
                     </span>
                 </button>
-            </form>
         </div>
     {/each}
 </div>
+{#if return_val === 1}
+<Popup message="Not enough money" duration = {5000} onClose={() => return_val = 0}/>
+{/if}
+{#if return_val === 2}
+<Popup message="Already own the item" duration = {5000} onClose={() => return_val = 0}/>
+{/if}
+{#if return_val === 3}
+<Popup message="Thanks for your buy" duration = {5000} onClose={() => return_val = 0}/>
+{/if}
+{#if return_val === 10}
+<Popup message="Error while trying please reload the page or try later" duration = {5000} onClose={() => return_val = 0}/>
+{/if}

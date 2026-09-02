@@ -101,8 +101,8 @@
 					<span class="ft-sidebar-link-text text-2xl/tight text-white">Profile</span>
 				</a>
 				<a class="ft-button ft-button-medium sidebar-link hover:bg-[#333131FF]" href="/shop">
-					<img class="block h-[2.4rem] w-[2.4rem]" src={shopicon} alt="icon"/>
-					<span class="lg:max-xl:hidden overflow-hidden text-2xl/tight text-ellipsis">Shop</span>
+					<img class="ft-icon-img ft-icon-size-24" src={shopicon} alt="icon"/>
+					<span class="ft-sidebar-link-text text-2xl/tight text-white">Shop</span>
 				</a>
 				<a class="ft-button ft-button-medium sidebar-link hover:bg-[#333131FF]" href="/settings">
 					<img class="ft-icon-img ft-icon-size-24" src={setticon} alt="icon"/>

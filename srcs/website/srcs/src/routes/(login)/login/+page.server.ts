@@ -61,7 +61,10 @@ export const actions = {
 					wins:users.wins,
 					losses:users.losses,
 					matches:users.matches,
-					wallets:users.wallet})
+					wallets:users.wallet,
+					code:users.code,
+					skin_rac:users.skin_rac,
+					skin_ball:users.skin_ball,})
 					.from(users)
 					.where(eq(users.email, username as string));
 				else
@@ -72,12 +75,14 @@ export const actions = {
 					wins:users.wins,
 					losses:users.losses,
 					matches:users.matches,
-					wallets:users.wallet})
+					wallets:users.wallet,
+					code:users.code,
+					skin_rac:users.skin_rac,
+					skin_ball:users.skin_ball,})
 					.from(users)
 					.where(eq(users.username, username as string));
 				console.log(userInfos[0]);
 				const JWT = createJWT(userInfos[0]);
-
 				event.cookies.set('JWTtoken', JWT, { path: '/' });
 			}
 

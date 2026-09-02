@@ -9,7 +9,10 @@ export const users = pgTable('users', {
 	wins: integer().default(0),
 	losses: integer().default(0),
 	matches: integer().default(0),
-	wallet: integer().default(0)
+	wallet: integer().default(0),
+	code: boolean().default(false),
+	skin_rac: integer().default(null).references(() => shop.id),
+	skin_ball: integer().default(null).references(() => shop.id),
 });
 
 export const friends = pgTable('friends', {
@@ -33,9 +36,22 @@ export const matches = pgTable('matches', {
 ]);
 
 export const inventory = pgTable('inventory', {
-	user: integer().primaryKey().notNull().unique().references(() => users.id),
-	code: boolean().default(false),
-})
+	user: integer().notNull().references(() => users.id),
+	product: integer().notNull().references(() => shop.id),
+	own: boolean().notNull().default(false),
+	},
+	(table) => [
+  	  primaryKey({
+    	  columns: [table.user, table.product],
+		}),
+	],
+);
+
+export const shop = pgTable('shop', {
+	id: serial().primaryKey(),
+	name: varchar({ length:128 }).notNull(),
+	price: integer().notNull().default(0),
+});
 
 export const api_users = pgTable('api_users', {
 	user: integer().primaryKey().notNull().unique().references(() => users.id),
