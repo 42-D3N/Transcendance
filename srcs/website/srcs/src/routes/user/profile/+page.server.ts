@@ -1,5 +1,10 @@
-import { redirect } from '@sveltejs/kit';
+import { redirect, fail } from '@sveltejs/kit';
 import { validateJWT } from '$lib/server/user_management/jwt.js';
+import type { Actions } from './$types';
+import { db } from '$lib/server/db/index';
+import { eq, or } from 'drizzle-orm';
+import { users, friends } from '$lib/server/db/schema';
+
 
 export async function load ({ cookies }) {
     let JWTtoken = cookies.get('JWTtoken');
@@ -15,7 +20,7 @@ export async function load ({ cookies }) {
     if (!JWTtoken || JWTtoken === '-1')
     {
         cookies.set('JWTtoken', '-1', { path: '/' });
-        throw redirect(308, '/sign_in');
+        throw redirect(308, '/login');
     }
     else
     {
@@ -24,7 +29,7 @@ export async function load ({ cookies }) {
         if (!userInfos)
         {
             cookies.set('JWTtoken', "-1", { path: '/' });
-            throw redirect(303, '/sign_in');
+            throw redirect(303, '/login');
         }
         if (userInfos["JWT"] != undefined)
         {
@@ -61,3 +66,69 @@ export async function load ({ cookies }) {
         icon: icon
     });
 };
+
+export const actions = {
+    default: async (event) => {
+        const form = await event.request.formData();
+        
+        let friend = form.get('username') as string;
+        let infoTab = friend.split('#');
+
+        if (infoTab.length != 2)
+            return(fail(400, {friend, nameFormat: true}));
+        
+        if (infoTab[0] == "" || infoTab[1] == "")
+            return(fail(400, {friend, nameFormat: true}));
+
+        const friendId = parseInt(infoTab[1]);
+        if (isNaN(friendId))
+            return fail(400, { friend, nameFormat: true });
+        
+        let userNameFromId = (await db.select({ username: users.username }).from(users).where(eq(users.id, parseInt(infoTab[1]))));
+        
+        if (userNameFromId.length == 0)
+            return(fail(400, {userNameFromId, accountNotFound: true}));
+        
+        if (userNameFromId[0].username != infoTab[0])
+            return(fail(400, {userNameFromId, usernameNotMatching: true}));
+        
+        // check if its not me
+        let userToken = event.cookies.get('JWTtoken');
+        
+        if (!userToken || userToken == '-1')
+            throw redirect(303, '/login');
+        
+        let myUsername = (await validateJWT(userToken));
+
+        if (myUsername.username == "")
+            return(fail(400, {myUsername, tryAgain: true }));
+        if (userNameFromId[0].username == myUsername.username)
+            return(fail(400, {myUsername, sillyTester: true }));
+
+        // check if not already friends
+        let requestExisting = (await db.select({ user1:friends.user1, user2:friends.user2, isaccepted:friends.isaccepted })
+        .from(friends)
+        .where(or(
+            eq(friends.user1, parseInt(infoTab[1])),
+            eq(friends.user2, parseInt(infoTab[1]))
+        )));
+
+        if (requestExisting[0])
+        {
+            console.log(requestExisting[0]);
+            if (requestExisting[0].isaccepted)
+                return (fail(400, {userNameFromId, relationExisting: true}));
+            return (fail(400, {userNameFromId, requestPending: true}));
+        }
+
+        await db.insert(friends).values(
+            {
+                user1: myUsername.id,
+                user2: parseInt(infoTab[1]),
+                sender: myUsername.id,
+                isaccepted: false
+            }
+        );
+        console.log("request sended");
+    }
+} satisfies Actions;

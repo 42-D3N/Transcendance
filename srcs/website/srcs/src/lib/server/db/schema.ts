@@ -19,6 +19,7 @@ export const users = pgTable('users', {
 export const friends = pgTable('friends', {
 	user1: integer().notNull().references(() => users.id),
 	user2: integer().notNull().references(() => users.id),
+	sender: integer().notNull().references(() => users.id),
 	isaccepted: boolean().default(false)
 	}, (table) => [
  	primaryKey({ columns: [table.user1, table.user2] })

@@ -7,7 +7,6 @@ import { eq } from 'drizzle-orm';
 import { users } from '$lib/server/db/schema';
 import { createJWT } from '$lib/server/user_management/jwt.js';
 import bcrypt from 'bcryptjs';
-import { inventory } from '../../../lib/server/db/schema';
 
 export const load = async ({ cookies }) => {
 	const JWT = cookies.get('JWTtoken');
