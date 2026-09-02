@@ -1,4 +1,15 @@
 services:
+  reverse-proxy:
+    image: transcendance-reverse-proxy
+    build: ./srcs/reverse-proxy
+    pull_policy: never
+    restart: always
+    networks:
+      - transcendance
+    ports:
+      - "8080:80"
+      - "8081:443"
+      - "8081:443/udp"
   database:
     image: postgres:18-trixie
     restart: always
@@ -14,8 +25,6 @@ services:
     pull_policy: never
     env_file:
       - ./srcs/api/srcs/.env
-    ports:
-      - 9090:9090
     restart: always
     depends_on:
       database:
@@ -40,8 +49,6 @@ services:
       - ./srcs/website/srcs/.env
     networks:
       - transcendance
-    ports:
-      - "5173:5173"
     restart: always
     develop:
       watch:
@@ -58,7 +65,7 @@ services:
     networks:
       - transcendance
     ports:
-      - 8080:8080
+      - 4040:8080
 
 volumes:
   pgdata:
