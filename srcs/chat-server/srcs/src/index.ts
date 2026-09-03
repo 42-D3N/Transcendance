@@ -73,7 +73,7 @@ const start = async () => {
 					switch (packet.type) {
 						case "message":
 							try {
-								const targetId = await db.select().from(users).where(eq(users.username, packet.target));
+								const targetId = await db.select({id: users.id}).from(users).where(eq(users.username, packet.target));
 								if (targetId.length === 0) {
 									socket.send(JSON.stringify({error: "User does not exist."}));
 									break ;
@@ -87,13 +87,27 @@ const start = async () => {
 
 						case "history":
 							try {
-								const userId = await db.select({id: users.id}).from(users).where(eq(users.username, packet.target));
-								if (userId.length === 0) {
+								const targetId = await db.select({id: users.id}).from(users).where(eq(users.username, packet.target));
+								if (targetId.length === 0) {
 									socket.send(JSON.stringify({error: "User does not exist."}));
 									break ;
 								}
-								const history = await db.select().from(chat).where(or(eq(userId[0].id, chat.dest), eq(userId[0].id, chat.author))).orderBy(chat.timestamp);
+								const history = await db.select().from(chat).where(or(eq(targetId[0].id, chat.dest), eq(targetId[0].id, chat.author))).orderBy(chat.timestamp);
 								socket.send(JSON.stringify({type: "history", history}));
+							} catch (error) {
+								console.log(error);
+							}
+							break;
+
+						case "newChat":
+							try {
+								const targetId = await db.select({id: users.id, name: users.username}).from(users).where(eq(users.username, packet.target));
+								if (targetId.length === 0)
+									socket.send(JSON.stringify({type:"newChat", isOk:false, reason: "User does not exist.", index: packet.index}));
+								else if (targetId[0].id === connections.get(socket))
+									socket.send(JSON.stringify({type:"newChat", isOk:false, reason: "Cannot chat with yourself.", index: packet.index}));
+								else
+									socket.send(JSON.stringify({type:"newChat", isOk:true, user: targetId[0], index: packet.index}));
 							} catch (error) {
 								console.log(error);
 							}

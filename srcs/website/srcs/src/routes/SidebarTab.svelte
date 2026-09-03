@@ -1,13 +1,19 @@
 <script lang="ts">
 	import "../app.css";
-	import { activeChats } from '$lib/chat-client';
-	let { name } = $props();
+	import { activeChats } from '$lib/chat-client.svelte.ts';
+	let { name, openedChats } = $props();
     let show = $state(false);
 	let container:any;
 
 	function onTabClick(e:any) {
 		if (container.contains(e.target) == false)
 			show = false;
+	}
+
+	function addEmptyChat() {
+		if (openedChats.length === 4)
+			openedChats.pop();
+		openedChats.unshift({id: -1, name: "null", hasError: false, error: null});
 	}
 
 	function formatTime(e:Date):string {
@@ -44,9 +50,9 @@
 	</button>
 	{#if show}
 	<div id={name+"-widget-slot"} class="fixed max-xl:left-[52px] left-[8px] pl-[unset] box-content max-h-[calc(100svh - 2 * 0.8rem)] overflow-hidden w-[30rem] z-1 max-xl:bottom-[12px] bottom-[50px]">
-		<div class="oveflow-hidden border-white border-[0.1rem] border-solid rounded-lg overscroll-contain box-border h-full cursor-default bg-black/50 text-white">
+		<div class="oveflow-hidden border-white border-[0.1rem] border-solid rounded-lg overscroll-contain box-border h-full cursor-default bg-black text-white">
 			<div class="p-0 h-full">
-				<div class="grid h-[44rem]">
+				<div class="sidebar-widget-container{name == "friends"?" sidebar-widget-has-tabs":""}">
 					{#if name == "friends"}
 					<section>
 						<div class="flex max-w-full">
@@ -81,6 +87,16 @@
 							{/each}
 						</div>
 					</section>
+					<footer class="items-center border-t-[0.1rem] border-white border-solid flex justify-between p-[0.8rem]">
+						<button class="ft-button-small ft-button" onclick={addEmptyChat}>
+							<span class="h-[1.6rem] w-[1.6rem] inline-grid place-content-center">
+								<svg data-glyph="mark-plus" aria-hidden="true" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="h-[1.6rem] w-[1.6rem]">
+									<path fill="currentColor" d="m12.07 22h-.13c-1.6 0-1.93-.33-1.93-1.93v-6.07h-6.07c-1.6 0-1.93-.33-1.93-1.93v-.13c0-1.6.33-1.93 1.93-1.93h6.07v-6.07c0-1.6.33-1.93 1.93-1.93h.13c1.6 0 1.93.33 1.93 1.93v6.07h6.07c1.6 0 1.93.33 1.93 1.93v.13c0 1.6-.33 1.93-1.93 1.93h-6.07v6.07c0 1.6-.33 1.93-1.93 1.93zm0 0"></path>
+								</svg>
+							</span>
+							<span>Nouveau chat</span>
+						</button>
+					</footer>
 					{:else if name === "settings"}
 					{/if}
 				</div>

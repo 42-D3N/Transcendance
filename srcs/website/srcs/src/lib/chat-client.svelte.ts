@@ -7,7 +7,10 @@ interface ChatContact {
 	time: Date
 }
 
+type OpenedChatsType = [ChatContact?, ChatContact?, ChatContact?, ChatContact?]
+
 export let activeChats:ChatContact[] = [];
+export let openedChats = $state([]);
 
 class ChatClient {
 	private ws: WebSocket | null = null;
@@ -35,7 +38,20 @@ class ChatClient {
 						activeChats.push({id: element.id, name: element.name, message: element.message, time:new Date(element.time)});
 					});
 					break ;
-			
+
+				case "newChat":
+					openedChats[data.index].hasError = false;
+					openedChats[data.index].error = null;
+					if (data.isOk) {
+						openedChats[data.index].id = data.user.id;
+						openedChats[data.index].name = data.user.name;
+					}
+					else {
+						openedChats[data.index].hasError = true;
+						openedChats[data.index].error = data.reason;
+					}
+					break;
+
 				default:
 					console.log(data);
 					break ;
@@ -54,6 +70,10 @@ class ChatClient {
 
 	sendRequest(target: string) {
 		this.ws?.send(JSON.stringify({ type: "history", target: target }));
+	}
+
+	checkUserExists(target: string, index: number) {
+		this.ws?.send(JSON.stringify({ type: "newChat", target: target, index: index}));
 	}
 }
 

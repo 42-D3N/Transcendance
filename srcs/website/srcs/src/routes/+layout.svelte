@@ -16,7 +16,7 @@
 
 	import { redirect } from '@sveltejs/kit';
 	import { browser } from "$app/environment";
-	import { chatClient } from '$lib/chat-client';
+	import { chatClient, openedChats } from '$lib/chat-client.svelte.ts';
 
 	$effect(() => {
         if (!browser) return;
@@ -33,6 +33,7 @@
 	import "../app.css";
     import { GridBlock } from '@babylonjs/core';
 	import SidebarTab from './SidebarTab.svelte';
+    import ChatWindow from './ChatWindow.svelte';
 	function disableScroll() {
 		document.querySelector('body')?.classList.add('overflow-hidden');
 		document.querySelector('body')?.classList.add('h-full');
@@ -89,7 +90,11 @@
 <svelte:window onclick={onClick} />
 
 <div id="sidebar" class="lg:left-0 lg:fixed lg:z-100">
-	<div id="opened-chats-container"></div>
+	<div class="opened-chats-container">
+		{#each openedChats as chat, i}
+		<ChatWindow chat={openedChats} index={i}/>
+		{/each}
+	</div>
 	<div id="mobile-shroud-sidebar" class="lg:hidden {(!displayNav)?"hidden":""} inset-0 fixed z-2 bg-black/30"></div>
 	<nav id="sidebar-main-menu" class="flex max-lg:fixed flex-col h-svh max-lg:h-[unset] max-lg:top-19 px-[0.8rem] pt-[0.8rem] pb-[1.2rem] max-lg:bottom-0 w-68 lg:max-xl:w-[5.6rem] bg-[#292626FF] max-lg:z-100 max-lg:{(!displayNav)?"hidden":""}" bind:this={sidebar} data-sveltekit-reload>
 		<a href="/" class="items-center grid gap-[1.2rem] relative max-lg:hidden w-full">
@@ -150,9 +155,9 @@
 			</div>
 		</a>
 		<div class="sidebar-footer-icons mobile-hidden">
-			<SidebarTab name="friends"/>
-			<SidebarTab name="chats"/>
-			<SidebarTab name="settings"/>
+			<SidebarTab name="friends" openedChats={openedChats}/>
+			<SidebarTab name="chats" openedChats={openedChats}/>
+			<SidebarTab name="settings" openedChats={openedChats}/>
 			<div class="ft-sidebar-footing-icon">
 				<a class="ft-button ft-button-small sidebar-link hover:bg-white/30" href="/user/logout" aria-label="Log out">
 					<span class="ft-icon-size-20 ft-icon-glyph">
