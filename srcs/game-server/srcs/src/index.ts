@@ -1,6 +1,6 @@
 import Fastify from 'fastify';
 import fastifyWebsocket from '@fastify/websocket';
-import { gameLoop, storeInputs, addClient, removeClient } from './game';
+import { gameLoop, storeInputs, addClient, removeClient, setPlayerReady } from './game';
 import type { ClientMessage } from '../../../website/srcs/src/lib/game/both/interfaces';
 
 const server = Fastify({logger: true});
@@ -11,7 +11,9 @@ const start = async () => {
   {
     server.get('/api/game_server', { websocket:true }, (socket: any, req: any) => {
       console.log("Client connecté");
-      addClient(socket);
+      const side = addClient(socket);
+      if (side !== null)
+        socket.send(JSON.stringify({ type: "playerAssigned", side }));
       socket.on("message", async (data: any) =>
       {
         const message = JSON.parse(data.toString()) as ClientMessage;
@@ -22,6 +24,9 @@ const start = async () => {
             break;
           case "input":
             storeInputs(socket, message);
+            break;
+          case "ready":
+            setPlayerReady(socket);
             break;
         }
       });

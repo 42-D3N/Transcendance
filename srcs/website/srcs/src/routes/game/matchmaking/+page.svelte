@@ -1,10 +1,33 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
+  import type { ClientGameState } from '$lib/game/both/interfaces';
   import { initGameClient } from '$lib/game/frontend/pongVariables'
-  import { connection, sendInput } from '$lib/game/backend/network'
+  import { connection, sendInput, sendReady } from '$lib/game/backend/network'
   import { handleKeyDown, handleKeyUp, updateScale, updateInput, renderGameState } from '$lib/game/frontend/front1';
 
   let socket: WebSocket;
+  let connected = $state(false);
+  let localSide = $state<1 | 2 | null>(null);
+  let gameState = $state<ClientGameState | null>(null);
+  let localReady = $state(false);
+
+  function updateLocalReadyFromState(state: ClientGameState)
+  {
+    if (localSide === 1)
+      localReady = state.ready.p1;
+    else if (localSide === 2)
+      localReady = state.ready.p2;
+  }
+
+  function clickReady()
+  {
+    if (!socket || socket.readyState !== WebSocket.OPEN || localReady)
+      return;
+    sendReady(socket);
+  }
+
+  const showReadyOverlay = $derived(!gameState || gameState.status === "waiting" || gameState.status === "ready_check");
+  const isReadyPhase = $derived(!gameState || gameState.status === "waiting" || gameState.status === "ready_check");
 
   function setMove(move: -1 | 0 | 1)
   {
@@ -16,35 +39,73 @@
   onMount(() =>
   {// c2r7p6
     socket = new WebSocket("wss://localhost:8081/api/game_server");// ws://localhost:3310
+    socket.onopen = () => { connected = true; };
+    socket.onclose = () => { connected = false; };
     const game = initGameClient();
     let keyboardState = { left: false, right: false, special: false };
+
+    const cleanup = () =>
+    {
+      if (socket && socket.readyState === WebSocket.OPEN)
+        socket.close();
+    };
 
     const KeyDown = (event: KeyboardEvent) =>
     {
       handleKeyDown(event, keyboardState);
       updateInput(keyboardState, game.input);
-      sendInput(socket, game.input);
+      if (!(gameState && (gameState.status === "waiting" || gameState.status === "ready_check")))
+        sendInput(socket, game.input);
     }
     const KeyUp = (event: KeyboardEvent) =>
     {
       handleKeyUp(event, keyboardState);
       updateInput(keyboardState, game.input);
-      sendInput(socket, game.input);
+      if (!(gameState && (gameState.status === "waiting" || gameState.status === "ready_check")))
+        sendInput(socket, game.input);
     }
-    connection(socket, state => renderGameState(game, state));
+    connection(
+      socket,
+      state =>
+      {
+        gameState = state;
+        updateLocalReadyFromState(state);
+        renderGameState(game, state);
+      },
+      side =>
+      {
+        localSide = side;
+      }
+    );
     const Resize = () => updateScale(game);
     window.addEventListener('keydown',	KeyDown);
     window.addEventListener('keyup',	KeyUp);
     window.addEventListener('resize',	Resize);
+    window.addEventListener('beforeunload', cleanup);
+    window.addEventListener('pagehide', cleanup);
+    document.addEventListener('visibilitychange', () =>
+    {
+      if (document.visibilityState === 'hidden' && socket)
+        cleanup();
+    });
     Resize();
     return () =>
     {
       window.removeEventListener('keydown', KeyDown);
       window.removeEventListener('keyup', KeyUp);
       window.removeEventListener('resize', Resize);
-      socket.close();
+      window.removeEventListener('beforeunload', cleanup);
+      window.removeEventListener('pagehide', cleanup);
+      document.removeEventListener('visibilitychange', cleanup as EventListener);
+      cleanup();
     };
   })
+
+  onDestroy(() =>
+  {
+    if (socket && socket.readyState === WebSocket.OPEN)
+      socket.close();
+  });
 
 </script>
 
@@ -90,6 +151,36 @@
             <div id="racketDown" class="racket racket-down"></div>
             <div id="ball" class="ball"></div>
             <div id="where" class="trajectory"></div>
+
+            {#if showReadyOverlay}
+              <div class="ready-overlay" aria-live="polite">
+                <p class="ready-title">READY CHECK</p>
+                <p class="ready-subtitle">
+                  {#if !connected}
+                    Connexion au serveur...
+                  {:else if localReady}
+                    En attente de l'autre joueur...
+                  {:else}
+                    Clique sur Ready pour signaler que tu es pret.
+                  {/if}
+                </p>
+                {#if isReadyPhase}
+                  <button
+                    type="button"
+                    class="ready-button"
+                    onclick={clickReady}
+                    disabled={!connected || localReady}
+                  >
+                    {localReady ? 'PRET' : 'READY'}
+                  </button>
+                {/if}
+                {#if gameState}
+                  <p class="ready-progress">
+                    J1: {gameState.ready.p1 ? 'pret' : 'attente'} • J2: {gameState.ready.p2 ? 'pret' : 'attente'}
+                  </p>
+                {/if}
+              </div>
+            {/if}
           </div>
         </div>
 
@@ -218,6 +309,7 @@
   .signal i, .status-dot { width: .55rem; height: .55rem; flex: 0 0 auto; border-radius: 50%; background: #62e6a8; box-shadow: 0 0 0 2px #235f55; }
   .high-score { display: block; font: 900 1.5rem/1 monospace; }
   .status-line { display: flex; align-items: center; gap: .5rem; margin-bottom: .6rem; color: #fff8da; font: 700 1.4rem/1 monospace; }
+  #game-status { font-size: clamp(2.2rem, 4vw, 3.2rem); line-height: 1; letter-spacing: .08em; font-weight: 900; }
 
   .board-frame {
     width: min(100%, calc((100vh - 10rem) * .84));
@@ -251,6 +343,55 @@
   .touch-controls { display: flex; align-items: center; justify-content: center; gap: 1rem; margin-top: .9rem; color: #aaa8ef; font: 1.3rem/1 monospace; }
   .touch-controls button { min-height: 3.2rem; padding: 0 1rem; border: 3px solid #111131; background: #ff668d; color: #211f5a; box-shadow: 3px 3px 0 #111131; font: 900 1.4rem/1 monospace; touch-action: none; }
   .touch-controls button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 #111131; }
+
+  .ready-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 6;
+    display: grid;
+    place-items: center;
+    align-content: center;
+    gap: .8rem;
+    background: linear-gradient(180deg, #08131dd9 0%, #111131e6 100%);
+    text-align: center;
+    padding: 1rem;
+  }
+
+  .ready-title {
+    margin: 0;
+    color: #ffdf4b;
+    font: 900 clamp(1.3rem, 3vw, 2rem)/1 monospace;
+    letter-spacing: .08em;
+  }
+
+  .ready-subtitle {
+    margin: 0;
+    color: #fff8da;
+    font: 700 1rem/1.4 monospace;
+  }
+
+  .ready-button {
+    min-width: 9rem;
+    min-height: 3rem;
+    padding: 0 1.2rem;
+    border: 3px solid #111131;
+    background: #62e6a8;
+    color: #111131;
+    box-shadow: 3px 3px 0 #111131;
+    font: 900 1.2rem/1 monospace;
+    cursor: pointer;
+  }
+
+  .ready-button:disabled {
+    opacity: .65;
+    cursor: not-allowed;
+  }
+
+  .ready-progress {
+    margin: 0;
+    color: #aaa8ef;
+    font: 700 .9rem/1.2 monospace;
+  }
 
   @media (min-width: 700px) { .touch-controls { display: none; } }
   @media (max-width: 760px) { .portal-body { grid-template-columns: 1fr; } .side-panel { display: none; } .board-frame { width: 100%; } }

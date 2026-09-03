@@ -8,6 +8,7 @@ export function serverVariable()
   const TICK_INTERVAL = 1000 / TICK_RATE;
   const DT = 1 / TICK_RATE;
   const ROUND_PAUSE_TICKS = TICK_RATE * 2;
+  const MATCH_START_COUNTDOWN_TICKS = TICK_RATE * 3;
   const POWER_PAUSE_TICKS = Math.round(TICK_RATE / 4);
   const POWER_TRIGGER_LINE_Y = GAME_HEIGHT / 2;
   const POWER_MAX_USES = 3;
@@ -105,23 +106,40 @@ export function serverVariable()
     specialLatch: { p1: false, p2: false }
   };
 
+  const ready =
+  {
+    p1: false,
+    p2: true
+  };
+
+  const player2WasHuman = false;
+
   return {
     GAME_WIDTH,
     GAME_HEIGHT,
     BALL_BASE_POSITION,
+    TICK_RATE,
     TICK_INTERVAL,
     DT,
     ROUND_PAUSE_TICKS,
+    MATCH_START_COUNTDOWN_TICKS,
     POWER_PAUSE_TICKS,
     POWER_TRIGGER_LINE_Y,
     POWER_SPEED_MULTIPLIER,
     POWER_DIRECTION_VARIATION,
     roundEndTick: 0,
+    countdownEndTick: 0,
+    countdownLaunchVelocity: null as { x: number; y: number } | null,
+    waitingForReconnect: false,
+    waitingForReconnectSide: null as 1 | 2 | null,
+    waitingForReconnectUntilTick: 0,
     ball,
     player1,
     player2,
     state,
     rules,
-    power
+    power,
+    ready,
+    player2WasHuman
   };
 }

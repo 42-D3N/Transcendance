@@ -47,10 +47,18 @@ export interface Racket
 
 export type GameStatus =
   | "waiting"
+  | "ready_check"
+  | "countdown"
   | "playing"
   | "power_pause"
   | "round_end"
   | "game_end";
+
+export interface ReadyState
+{
+  p1: boolean;
+  p2: boolean;
+}
 
 export interface GameState
 {
@@ -93,7 +101,9 @@ export interface ClientGameState
   prediction: { start: Position; end: Position } | null;
   player1:	{ racket: Position; };
   player2:	{ racket: Position; };
-  status:	GameStatus
+  status:	GameStatus;
+  ready: ReadyState;
+  countdown: number | null;
 }
 
 export interface ClientInputMessage
@@ -107,6 +117,11 @@ export interface ClientPingMessage
   type: "ping";
 }
 
+export interface ClientReadyMessage
+{
+  type: "ready";
+}
+
 export interface ConnectedPlayer
 {
   socket: WebSocket;
@@ -115,7 +130,8 @@ export interface ConnectedPlayer
 
 export type ClientMessage =
   | ClientInputMessage
-  | ClientPingMessage;
+  | ClientPingMessage
+  | ClientReadyMessage;
 
 
 export interface ServerGameStateMessage
@@ -129,6 +145,12 @@ export interface ServerPongMessage
   type: "pong";
 }
 
+export interface ServerPlayerAssignedMessage
+{
+  type: "playerAssigned";
+  side: 1 | 2;
+}
+
 export interface ServerErrorMessage
 {
   type: "error";
@@ -138,4 +160,5 @@ export interface ServerErrorMessage
 export type ServerMessage =
   | ServerGameStateMessage
   | ServerPongMessage
+  | ServerPlayerAssignedMessage
   | ServerErrorMessage;

@@ -1,9 +1,13 @@
 import type { ClientGameState, PlayerInput, ServerMessage } from "../both/interfaces";
 
-export function connection(socket: WebSocket, onGameState: (state: ClientGameState) => void)
+export function connection(
+  socket: WebSocket,
+  onGameState: (state: ClientGameState) => void,
+  onPlayerAssigned?: (side: 1 | 2) => void
+)
 {
-  socket.onopen = () => { console.log("Connected"); };
-  socket.onmessage = event =>
+  socket.addEventListener("open", () => { console.log("Connected"); });
+  socket.addEventListener("message", event =>
   {
     const message = JSON.parse(event.data.toString()) as ServerMessage;
     switch (message.type)
@@ -14,8 +18,11 @@ export function connection(socket: WebSocket, onGameState: (state: ClientGameSta
       case "gameState":
         onGameState(message.state);
         break;
+      case "playerAssigned":
+        onPlayerAssigned?.(message.side);
+        break;
     }
-  };
+  });
 }
 
 export function ping(socket: WebSocket)
@@ -26,4 +33,9 @@ export function ping(socket: WebSocket)
 export function sendInput(socket: WebSocket, input: PlayerInput)
 {
   socket.send(JSON.stringify({ type: "input", input }));
+}
+
+export function sendReady(socket: WebSocket)
+{
+  socket.send(JSON.stringify({ type: "ready" }));
 }
