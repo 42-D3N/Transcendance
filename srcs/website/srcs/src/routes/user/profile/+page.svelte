@@ -76,7 +76,7 @@
         </div>
         <div class="m-4">
             {#each data.friendRequests as frRequests}
-                <form method="POST" enctype="multipart/form-data" class="bg-stone-700 rounded-md" use:enhance={({ formData }) => {
+                <form method="POST" enctype="multipart/form-data" class="bg-stone-700 rounded-md mb-2" use:enhance={({ formData }) => {
                     formData.append('user1', JSON.stringify(frRequests.user1));
                     formData.append('user2', JSON.stringify(frRequests.user2));
                 }}

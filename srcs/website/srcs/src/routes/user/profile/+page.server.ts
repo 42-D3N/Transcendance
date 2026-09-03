@@ -2,7 +2,7 @@ import { redirect, fail } from '@sveltejs/kit';
 import { validateJWT } from '$lib/server/user_management/jwt.js';
 import type { Actions } from './$types';
 import { db } from '$lib/server/db/index';
-import { eq, or, and } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import { users, friends } from '$lib/server/db/schema';
 
 
@@ -115,7 +115,7 @@ export const actions = {
         // check if not already friends
         let requestExisting = (await db.select({ user1:friends.user1, user2:friends.user2, isaccepted:friends.isaccepted })
         .from(friends)
-        .where(or(
+        .where(and(
             eq(friends.user1, parseInt(infoTab[1])),
             eq(friends.user2, parseInt(infoTab[1]))
         )));
