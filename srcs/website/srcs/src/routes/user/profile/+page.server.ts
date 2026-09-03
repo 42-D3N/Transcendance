@@ -2,7 +2,7 @@ import { redirect, fail } from '@sveltejs/kit';
 import { validateJWT } from '$lib/server/user_management/jwt.js';
 import type { Actions } from './$types';
 import { db } from '$lib/server/db/index';
-import { eq, or } from 'drizzle-orm';
+import { eq, or, and } from 'drizzle-orm';
 import { users, friends } from '$lib/server/db/schema';
 
 
@@ -16,6 +16,7 @@ export async function load ({ cookies }) {
     let matches = '0';
     let wallet = '0';
     let icon = 'default.svg';
+    let friendRequests = [];
 
     if (!JWTtoken || JWTtoken === '-1')
     {
@@ -43,6 +44,11 @@ export async function load ({ cookies }) {
 			throw redirect(303, '/login');
 		}
 
+        friendRequests = (await db.select({ user1: friends.user1, user2: friends.user2, isaccepted: friends.isaccepted })
+            .from(friends)
+            .where(and(eq(friends.user2, userInfos.id), eq(friends.isaccepted, false)))
+            .limit(5)
+        );
         id = userInfos.id;
         username = userInfos.username;
         email = userInfos.email;
@@ -63,12 +69,13 @@ export async function load ({ cookies }) {
         losses: losses,
         matches: matches,
         wallet: wallet,
-        icon: icon
+        icon: icon,
+        friendRequests: friendRequests
     });
 };
 
 export const actions = {
-    default: async (event) => {
+    sendRequest: async (event) => {
         const form = await event.request.formData();
         
         let friend = form.get('username') as string;
@@ -115,7 +122,6 @@ export const actions = {
 
         if (requestExisting[0])
         {
-            console.log(requestExisting[0]);
             if (requestExisting[0].isaccepted)
                 return (fail(400, {userNameFromId, relationExisting: true}));
             return (fail(400, {userNameFromId, requestPending: true}));
@@ -125,10 +131,27 @@ export const actions = {
             {
                 user1: myUsername.id,
                 user2: parseInt(infoTab[1]),
-                sender: myUsername.id,
                 isaccepted: false
             }
         );
         console.log("request sended");
+    },
+    acceptRequest: async (event) => {
+        const form = await event.request.formData();
+        
+        const user1 = form.get('user1') as string;
+        const user2 = form.get('user2') as string;
+
+        if (!user1 || !user2)
+            return (fail(400, {user1, user2, dataError: true}));
+        await db.update(friends).set({ isaccepted: true }).where(and(eq(parseInt(user1), friends.user1), eq(parseInt(user2), friends.user2)));
+    },
+    refuseRequest: async (event) => {
+        const form = await event.request.formData();
+        
+        const user1 = form.get('user1');
+        const user2 = form.get('user2');
+
+        await db.delete(friends).where(and(eq(parseInt(user1), friends.user1), eq(parseInt(user2), friends.user2)));
     }
 } satisfies Actions;

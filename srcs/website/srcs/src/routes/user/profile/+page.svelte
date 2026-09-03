@@ -54,22 +54,40 @@
                 <span class="text-zinc-400 text-4xl font-bold">({data.matches})</span>
         </div>
     </div>
-    <div class="flex lg:mt-[5.5%] pb-8 w-[20%] bg-[#292626FF] border-solid rounded-lg z-10 pt-4">
+    <div class="block lg:mt-[5.5%] pb-8 w-[20%] bg-[#292626FF] border-solid rounded-lg z-10 pt-4">
+        <div class="flex">
             <span class="text-white text-xl font-bold p-4 pt-1">Friends</span>
             <div>
-                <form method="POST" enctype="multipart/form-data" class="flex size-fit">
-                <input name="username" type="username" class="inline font-normal size-fit bg-[#333131FF] text-white text-2xl w-[14ch]" placeholder="<username>#<id>">
+                <form method="POST" enctype="multipart/form-data" class="flex size-fit" action="?/sendRequest">
+                <input name="username" type="username" class="inline font-normal size-fit bg-[#333131FF] text-white text-2xl w-[14ch]" placeholder="<username>#<tag>eule">
                 <button class="ml-1 mr-2 size-fit p-2 bg-green-600 hover:bg-green-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.35),0_1px_2px_rgba(0,0,0,0.4)] rounded-md" type="submit">
                     <img class="size-4" src={profileicon} alt="icon"/>
                 </button>
                 </form>
-                {#if form?.nameFormat }<p class="error text-sm text-red-700 italic">Wrong username format</p>{/if}
-                {#if form?.accountNotFound }<p class="error text-sm text-red-700 italic">Account not found</p>{/if}
-                {#if form?.usernameNotMatching }<p class="error text-sm text-red-700 italic">Verify the username</p>{/if}
-                {#if form?.tryAgain }<p class="error text-sm text-red-700 italic">Something went wrong</p>{/if}
-                {#if form?.sillyTester }<p class="error text-sm text-red-700 italic">Tuff test fr fr</p>{/if}
-                {#if form?.relationExisting }<p class="error text-sm text-red-700 italic">Already your friend</p>{/if}
-                {#if form?.requestPending }<p class="error text-sm text-red-700 italic">invite already pending</p>{/if}
+                {#if form?.nameFormat }<p class="error">Wrong username format</p>{/if}
+                {#if form?.accountNotFound }<p class="error">Account not found</p>{/if}
+                {#if form?.usernameNotMatching }<p class="error">Verify the username</p>{/if}
+                {#if form?.tryAgain }<p class="error">Something went wrong</p>{/if}
+                {#if form?.sillyTester }<p class="error">Tuff test fr fr</p>{/if}
+                {#if form?.relationExisting }<p class="error">Already your friend</p>{/if}
+                {#if form?.requestPending }<p class="error">invite already pending</p>{/if}
             </div>
+
+        </div>
+        <div class="m-4">
+            {#each data.friendRequests as frRequests}
+                <form method="POST" enctype="multipart/form-data" class="bg-stone-700 rounded-md" use:enhance={({ formData }) => {
+                    formData.append('user1', JSON.stringify(frRequests.user1));
+                    formData.append('user2', JSON.stringify(frRequests.user2));
+                }}
+                >
+                    <span class="pl-2">{frRequests.user1} </span>
+                    <span> ---> </span>
+                    <span>{frRequests.user2}</span>
+                    <button class="ml-1 mr-2 h-[16%] w-[8%] p-2 bg-green-600 hover:bg-green-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.35),0_1px_2px_rgba(0,0,0,0.4)] rounded-md" type="submit" title="accept" formaction="?/acceptRequest"></button>
+                    <button class="ml-1 mr-2 h-[16%] w-[8%] p-2 bg-red-600 hover:bg-red-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.35),0_1px_2px_rgba(0,0,0,0.4)] rounded-md" type="submit" title="refuse" formaction="?/refuseRequest"></button>
+                </form>
+            {/each}
+        </div>
     </div>
 </div>

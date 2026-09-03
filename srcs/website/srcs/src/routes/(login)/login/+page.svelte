@@ -3,7 +3,6 @@
     import arrow from '$lib/assets/side_arrow.svg';
 
 	let { data, form }: PageProps = $props();
-
 </script>
 
 <div class="absolute inset-0 z-0 bg-linear-to-b from-olive-500 to-120% to-white"></div>

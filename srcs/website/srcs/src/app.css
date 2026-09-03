@@ -126,3 +126,7 @@
 		@apply hidden;
 	}
 }
+
+.error {
+	@apply text-sm text-red-700 italic;
+}
