@@ -13,6 +13,12 @@
 		if (event.key === "Enter")
 			chatClient.checkUserExists(userNewChat, index);
 	}
+	function handleChatInput(event: any) {
+		if (event.key === "Enter") {
+			chatClient.sendMessage(chatMessage, chat[index].name);
+			chatMessage = "";
+		}
+	}
 	function onKeyDown(event: any) {
 		return event.keyCode != 13;
 	}
@@ -25,7 +31,7 @@
 			<div>
 				<span></span>
 				<span>
-					<input id="chat-text-{index}" class="send-message-field send-message-editor" onkeydown={onKeyDown} onkeyup={handleUsernameInput} bind:value={userNewChat} data-no-scrollbar/>
+					<input class="send-message-field send-message-editor" onkeydown={onKeyDown} onkeyup={handleUsernameInput} bind:value={userNewChat} data-no-scrollbar/>
 				</span>
 			</div>
 			{#if chat[index].hasError}
@@ -53,7 +59,7 @@
 	<div class="basis-full grow-2 shrink overflow-hidden relative"></div>
 	<div>
 		<div class="border-t-[0.1rem] border-solid border-white flex max-w-full relative">
-			<div id="chat-text-{index}" class="send-message-field send-message-editor" data-placeholder="Envoyer un message..." contenteditable="true" bind:innerText={chatMessage} data-no-scrollbar></div>
+			<input class="send-message-field send-message-editor" data-placeholder="Envoyer un message..." onkeydown={onKeyDown} onkeyup={handleChatInput} bind:value={chatMessage} data-no-scrollbar/>
 		</div>
 	</div>
 </div>

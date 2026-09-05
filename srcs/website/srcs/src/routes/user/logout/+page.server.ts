@@ -1,5 +1,5 @@
 import { redirect } from '@sveltejs/kit';
-import { chatClient } from '$lib/chat-client';
+import { chatClient } from '$lib/chat-client.svelte.ts';
 
 
 export function load ({ cookies })  {
