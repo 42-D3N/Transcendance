@@ -20,7 +20,6 @@ export async function load({ cookies }) {
     else
     {
         let userInfos = await validateJWT(JWTtoken);
-
         if (!userInfos)
         {
             cookies.set('JWTtoken', "-1", { path: '/' });
@@ -53,7 +52,6 @@ export const actions = {
             const formData = await request.formData();
             const JWTtoken = cookies.get('JWTtoken');
             const userInfos = await validateJWT(JWTtoken);
-
             if (!userInfos) {
                 throw redirect(308, '/login');
             }
