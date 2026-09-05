@@ -27,9 +27,17 @@ export const friends = pgTable('friends', {
 export const matches = pgTable('matches', {
 	id: serial().primaryKey(),
 	user1: integer().notNull().references(() => users.id),
+	user1Pseudo: varchar({ length:128 }).notNull(),
+	user1EloChange: integer().notNull(),
 	user2: integer().notNull().references(() => users.id),
+	user2Pseudo: varchar({ length:128 }).notNull(),
+	user2EloChange: integer().notNull(),
 	user1Score: integer('user1_score').default(0),
 	user2Score: integer('user2_score').default(0),
+	idBall1: integer().default(null).references(() => shop.id),
+	idBall2: integer().default(null).references(() => shop.id),
+	skinRac1: integer().default(null).references(() => shop.id),
+	skinRac2: integer().default(null).references(() => shop.id),
 	date: timestamp().defaultNow(),
 	winner: integer().notNull()
 	}, (table) => [
