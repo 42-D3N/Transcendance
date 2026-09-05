@@ -11,11 +11,11 @@ export function validateDataBody() {
 }
 
 function validateUpdateEmail() {
-  return body("email").optional({ checkFalsy: true }).isString().trim().isEmail().normalizeEmail();
+  return body("email").optional({ checkFalsy: true }).isString().trim().isEmail().normalizeEmail().custom((email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email));
 }
 
 function validateUpdateUsername() {
-  return body("username").optional({ checkFalsy: true }).isString().trim().escape();
+  return body("username").optional({ checkFalsy: true }).isString().trim().escape().custom((username: string) => /^.{4,128}$/.test(username));;
 }
 
 function validateUpdatePassword() {
@@ -57,20 +57,18 @@ export function validateIdFriends() {
   ];
 }
 
-
-//Validating id from route parameter
 export function validateIdParam() {
   return param("id").toInt().isInt();
 }
 
 export function validateUsername() {
-  return body("username").notEmpty().isString().trim();
+  return body("username").notEmpty().isString().trim().custom((username: string) => /^.{4,128}$/.test(username));
 }
 
 export function validateEmail() {
-  return body("email").notEmpty().isString().trim().escape().isEmail().normalizeEmail();
+  return body("email").notEmpty().isString().trim().escape().isEmail().normalizeEmail().custom((email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email));;
 }
 
 export function validatePassword() {
-  return body("password").notEmpty().isString().trim();
+  return body("password").notEmpty().isString().trim().custom((password: string) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])[^\s]{12,67}$/.test(password));
 }
