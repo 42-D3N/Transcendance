@@ -3,16 +3,19 @@ import { fail } from '@sveltejs/kit';
 import { redirect } from '@sveltejs/kit';
 import { db } from '$lib/server/db/index';
 import { eq, lt, gte, ne } from 'drizzle-orm';
-import { users } from '$lib/server/db/schema';
-import { createJWT } from '$lib/server/user_management/jwt.js';
+import { users, inventory, shop } from '$lib/server/db/schema';
+import { createJWT, validateJWT } from '$lib/server/user_management/jwt.js';
 import bcrypt from 'bcryptjs';
 
 export const load = async ({ cookies }) => {
 	const JWT = cookies.get('JWTtoken');
 
-	if (!JWT || JWT != '-1')
-		redirect(308, '/');
-
+	if (JWT && JWT != '-1')
+    {
+        let validation = validateJWT(JWT);
+        console.log(validation);
+		redirect(303, '/');
+    }
 };
 
 export const actions = {
@@ -21,7 +24,7 @@ export const actions = {
         {
             const isEmail:RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             const isPass:RegExp = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])[^\s]{12,67}$/;
-            const isUsername:RegExp = /^.{3,128}$/;
+            const isUsername:RegExp = /^.{4,128}$/;
 
             const form = await event.request.formData();
             const email = form.get('email');
@@ -55,10 +58,17 @@ export const actions = {
                 }
             );
             
-            const userInfos = await db.select({ id:users.id, username:users.username, email:users.email, wins:users.wins, losses:users.losses, matches:users.matches, wallets:users.wallet}).from(users).where(eq(users.username, username as string));
+            const userInfos = await db.select({ id:users.id, username:users.username, email:users.email, wins:users.wins, losses:users.losses, matches:users.matches, wallets:users.wallet, code:users.code, skin_rac:users.skin_rac, skin_ball:users.skin_ball}).from(users).where(eq(users.username, username as string));
+            console.log(userInfos);
+            const products = await db.select().from(shop);
+            await db.insert(inventory).values(
+            products.map((product) => ({
+                user: userInfos[0].id,
+                product: product.id,
+                own: false,})));
             if (userInfos.length > 0)
             {
-                const JWT = createJWT(userInfos[0]);
+                const JWT = await createJWT(userInfos[0]);
 
                 event.cookies.set('JWTtoken', JWT, { path: '/' });
             }
