@@ -35,10 +35,6 @@ export async function adduser(req: Request, res: Response, next: NextFunction) {
     console.log("User added",Data);
     res.status(201).json({ Data });
   } catch (error) {
-    console.error("DELETE ERROR:", error);
-    console.error("Code:", error?.code);
-    console.error("Cause:", error?.cause);
-    console.error("Cause code:", error?.cause?.code);
     const { username } = req.body;
     const used = await db.select({username: users.username}).from(users).where(eq(username, users.username));
     if (handleErrorCode(error, next, used))
@@ -57,10 +53,6 @@ export async function getalluser(req: Request, res: Response, next: NextFunction
     console.log("All users",Data);
     res.status(200).json({ Data });
   } catch (error) {
-    console.error("DELETE ERROR:", error);
-    console.error("Code:", error?.code);
-    console.error("Cause:", error?.cause);
-    console.error("Cause code:", error?.cause?.code);
     next (new CustomError("Error: Error: Failed to fetch all Users", 500));
   }
 }
@@ -77,9 +69,7 @@ export async function getuserid(req: Request, res: Response, next: NextFunction)
       .select()
       .from(users)
       .where(eq(username, users.username));
-    console.log(req.body.username);
     if (Data.length === 0) {
-      console.log("User not found");
       return next (new CustomError("Error: User not found", 404));
     }
     delete Data[0].password;
@@ -87,10 +77,6 @@ export async function getuserid(req: Request, res: Response, next: NextFunction)
     console.log("user",Data);
     res.status(200).json({ Data });
   } catch (error) {
-    console.error("DELETE ERROR:", error);
-    console.error("Code:", error?.code);
-    console.error("Cause:", error?.cause);
-    console.error("Cause code:", error?.cause?.code);
     next (new CustomError("Error: Failed to fetch user", 500));
   }
 }
@@ -107,17 +93,12 @@ export async function admingetuserid(req: Request, res: Response, next: NextFunc
       .from(users)
       .where(eq(users.username, +req.body.username));
     if (Data.length === 0) {
-      console.log("User not found");
       return next (new CustomError("Error: User not found", 404));
     }
     delete Data[0].password;
     console.log("user",Data);
     res.status(200).json({ Data });
   } catch (error) {
-    console.error("DELETE ERROR:", error);
-    console.error("Code:", error?.code);
-    console.error("Cause:", error?.cause);
-    console.error("Cause code:", error?.cause?.code);
     next (new CustomError("Error: Failed to fetch user", 500));
   }
 }
@@ -131,7 +112,6 @@ export async function deleteuser(req: Request, res: Response, next: NextFunction
   try {
     const user = await db.select({id: users.id}).from(users).where(eq(users.id, +req.params.id));
     if (user.length == 0) {
-      console.log("User not found");
       return next (new CustomError("Error: User not found", 404));
     }
     const product = await db.select().from(shop);
@@ -149,16 +129,11 @@ export async function deleteuser(req: Request, res: Response, next: NextFunction
         deleteDataId: users.id,
       });
     if (Data.length == 0) {
-      console.log("User not found");
       return next (new CustomError("Error: User not found", 404));
     }
     console.log("deleted user",Data);
     res.status(200).json({ Data });
   } catch (error) {
-    console.error("DELETE ERROR:", error);
-    console.error("Code:", error?.code);
-    console.error("Cause:", error?.cause);
-    console.error("Cause code:", error?.cause?.code);
     next(new CustomError("Error: Failed to delete user", 500));
   }
 }
@@ -180,17 +155,12 @@ export async function updateuser(req: Request, res: Response, next: NextFunction
       .where(eq(users.id, Number(req.params.id)))
       .returning();
     if (Data.length == 0) {
-      console.log("User not found");
       return next (new CustomError("Error: User not found", 404));
     }
     delete Data[0].password;
     console.log("user updated",Data);
     res.status(200).json({ Data });
   } catch (error) {
-    console.error("DELETE ERROR:", error);
-    console.error("Code:", error?.code);
-    console.error("Cause:", error?.cause);
-    console.error("Cause code:", error?.cause?.code);
     const { username } = req.body;
     const used = await db.select({username: users.username}).from(users).where(eq(username, users.username));
     if (handleErrorCode(error, next, used))
@@ -214,17 +184,12 @@ export async function P_updateuser(req: Request, res: Response,next: NextFunctio
       .where(eq(users.id, +req.params.id))
       .returning();
     if (Data.length == 0) {
-      console.log("User not found");
       return next (new CustomError("Error: User not found", 404));
     }
     delete Data[0].password;
     console.log("user updated",Data);
     res.status(201).json({ Data });
   } catch (error) {
-    console.error("DELETE ERROR:", error);
-    console.error("Code:", error?.code);
-    console.error("Cause:", error?.cause);
-    console.error("Cause code:", error?.cause?.code);
     const { username } = req.body;
     const used = await db.select({username: users.username}).from(users).where(eq(username, users.username));
     if (handleErrorCode(error, next, used))
