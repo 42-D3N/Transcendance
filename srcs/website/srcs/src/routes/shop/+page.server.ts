@@ -20,10 +20,6 @@ export async function load({ cookies }) {
     else
     {
         let userInfos = await validateJWT(JWTtoken);
-<<<<<<< HEAD
-=======
-
->>>>>>> main
         if (!userInfos)
         {
             cookies.set('JWTtoken', "-1", { path: '/' });
@@ -34,10 +30,7 @@ export async function load({ cookies }) {
             cookies.set('JWTtoken', userInfos["JWT"], { path: '/' });
             throw redirect(308, "/shop");
         }
-<<<<<<< HEAD
-=======
         
->>>>>>> main
         return {
             Token: JWTtoken,
             id: userInfos.id,
