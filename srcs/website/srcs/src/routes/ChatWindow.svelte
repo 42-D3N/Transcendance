@@ -14,7 +14,7 @@
 			chatClient.checkUserExists(userNewChat, index);
 	}
 	function handleChatInput(event: any) {
-		if (event.key === "Enter") {
+		if (event.key === "Enter" && chatMessage != "" && chat[index].id != -1) {
 			chatClient.sendMessage(chatMessage, chat[index].name);
 			chatMessage = "";
 		}
@@ -59,7 +59,7 @@
 	<div class="basis-full grow-2 shrink overflow-hidden relative"></div>
 	<div>
 		<div class="border-t-[0.1rem] border-solid border-white flex max-w-full relative">
-			<input class="send-message-field send-message-editor" data-placeholder="Envoyer un message..." onkeydown={onKeyDown} onkeyup={handleChatInput} bind:value={chatMessage} data-no-scrollbar/>
+			<div class="send-message-field send-message-editor" data-placeholder="Envoyer un message..." contenteditable="true" onkeydown={onKeyDown} onkeyup={handleChatInput} bind:innerText={chatMessage} data-no-scrollbar></div>
 		</div>
 	</div>
 </div>
