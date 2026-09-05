@@ -1,6 +1,6 @@
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { db } from "../db/db.ts";
-import { users } from "../db/schema.ts";
+import { users, shop, inventory } from "../db/schema.ts";
 import bcrypt, { hashSync } from "bcryptjs";
 import type { Response, Request, NextFunction } from "express";
 import { CustomError } from "../lib/custom-error.ts";
@@ -14,11 +14,9 @@ export async function adduser(req: Request, res: Response, next: NextFunction) {
   }
   try {
     const { username, email, password } = req.body;
-    const already = await db.select({username: users.username, password: users.password}).from(users).where(eq(email, users.email)).where(eq(username, users.username));
-    console.log(already.length);
+    const already = await db.select({username: users.username}).from(users).where(eq(email, users.email)).where(eq(username, users.username));
     if (already.length !== 0) {
-      console.log("user already in database")
-      return next(new CustomError("user already in database", 400));
+      return next(new CustomError("Error: user already in database", 400));
     }
     const hashedPassword = await bcrypt.hash(password, 10);
     const Data = await db.insert(users).values({
@@ -26,16 +24,26 @@ export async function adduser(req: Request, res: Response, next: NextFunction) {
       email,
       password: hashedPassword
     }).returning();
+    const product = await db.select().from(shop);
+    await db.insert(inventory).values(
+      product.map((product) => ({
+        user: Data[0].id,
+        product: product.id,
+        own: false,
+      })));
     delete Data[0].password;
     console.log("User added",Data);
     res.status(201).json({ Data });
   } catch (error) {
+    console.error("DELETE ERROR:", error);
+    console.error("Code:", error?.code);
+    console.error("Cause:", error?.cause);
+    console.error("Cause code:", error?.cause?.code);
     const { username } = req.body;
     const used = await db.select({username: users.username}).from(users).where(eq(username, users.username));
     if (handleErrorCode(error, next, used))
       return;
-    console.log("Failed to add user ", error.cause.code);
-    next(new CustomError("Failed to add user", 500));
+    next(new CustomError("Error: Failed to add user", 500));
   }
 }
 
@@ -49,8 +57,11 @@ export async function getalluser(req: Request, res: Response, next: NextFunction
     console.log("All users",Data);
     res.status(200).json({ Data });
   } catch (error) {
-    console.log("Failed to fetch all users ", error.cause.code);
-    next (new CustomError("Failed to fetch all Users", 500));
+    console.error("DELETE ERROR:", error);
+    console.error("Code:", error?.code);
+    console.error("Cause:", error?.cause);
+    console.error("Cause code:", error?.cause?.code);
+    next (new CustomError("Error: Error: Failed to fetch all Users", 500));
   }
 }
 
@@ -69,15 +80,18 @@ export async function getuserid(req: Request, res: Response, next: NextFunction)
     console.log(req.body.username);
     if (Data.length === 0) {
       console.log("User not found");
-      return next (new CustomError("User not found", 404));
+      return next (new CustomError("Error: User not found", 404));
     }
     delete Data[0].password;
     delete Data[0].email;
     console.log("user",Data);
     res.status(200).json({ Data });
   } catch (error) {
-    console.log("Failed to fetch user ", error.cause.error);
-    next (new CustomError("Failed to fetch user", 500));
+    console.error("DELETE ERROR:", error);
+    console.error("Code:", error?.code);
+    console.error("Cause:", error?.cause);
+    console.error("Cause code:", error?.cause?.code);
+    next (new CustomError("Error: Failed to fetch user", 500));
   }
 }
 
@@ -91,17 +105,20 @@ export async function admingetuserid(req: Request, res: Response, next: NextFunc
     const Data = await db
       .select()
       .from(users)
-      .where(eq(users.username, req.body.username));
+      .where(eq(users.username, +req.body.username));
     if (Data.length === 0) {
       console.log("User not found");
-      return next (new CustomError("User not found", 404));
+      return next (new CustomError("Error: User not found", 404));
     }
     delete Data[0].password;
     console.log("user",Data);
     res.status(200).json({ Data });
   } catch (error) {
-    console.log("Failed to fetch user ", error.cause.error);
-    next (new CustomError("Failed to fetch user", 500));
+    console.error("DELETE ERROR:", error);
+    console.error("Code:", error?.code);
+    console.error("Cause:", error?.cause);
+    console.error("Cause code:", error?.cause?.code);
+    next (new CustomError("Error: Failed to fetch user", 500));
   }
 }
 
@@ -112,6 +129,19 @@ export async function deleteuser(req: Request, res: Response, next: NextFunction
     return next(new CustomError(JSON.stringify(result.array()), 400));
   }
   try {
+    const user = await db.select({id: users.id}).from(users).where(eq(users.id, +req.params.id));
+    if (user.length == 0) {
+      console.log("User not found");
+      return next (new CustomError("Error: User not found", 404));
+    }
+    const product = await db.select().from(shop);
+    await Promise.all(
+      product.map(
+      (product) => db.delete(inventory)
+      .where(
+        and(
+          eq(inventory.user, user[0].id),
+          eq(inventory.product, product.id)))))
     const Data = await db
       .delete(users)
       .where(eq(users.id, + req.params.id))
@@ -120,13 +150,16 @@ export async function deleteuser(req: Request, res: Response, next: NextFunction
       });
     if (Data.length == 0) {
       console.log("User not found");
-      return next (new CustomError("User not found", 404));
+      return next (new CustomError("Error: User not found", 404));
     }
     console.log("deleted user",Data);
     res.status(200).json({ Data });
   } catch (error) {
-    console.log("Failed to delete user ", error.cause.code);
-    next(new CustomError("Failed to delete user", 500));
+    console.error("DELETE ERROR:", error);
+    console.error("Code:", error?.code);
+    console.error("Cause:", error?.cause);
+    console.error("Cause code:", error?.cause?.code);
+    next(new CustomError("Error: Failed to delete user", 500));
   }
 }
 
@@ -148,18 +181,21 @@ export async function updateuser(req: Request, res: Response, next: NextFunction
       .returning();
     if (Data.length == 0) {
       console.log("User not found");
-      return next (new CustomError("User not found", 404));
+      return next (new CustomError("Error: User not found", 404));
     }
     delete Data[0].password;
     console.log("user updated",Data);
     res.status(200).json({ Data });
   } catch (error) {
+    console.error("DELETE ERROR:", error);
+    console.error("Code:", error?.code);
+    console.error("Cause:", error?.cause);
+    console.error("Cause code:", error?.cause?.code);
     const { username } = req.body;
     const used = await db.select({username: users.username}).from(users).where(eq(username, users.username));
     if (handleErrorCode(error, next, used))
       return;
-    console.log("Failed to update user ", error.cause.code);
-    next(new CustomError("Failed to update user", 500));
+    next(new CustomError("Error: Failed to update user", 500));
   }
 }
 
@@ -179,17 +215,20 @@ export async function P_updateuser(req: Request, res: Response,next: NextFunctio
       .returning();
     if (Data.length == 0) {
       console.log("User not found");
-      return next (new CustomError("User not found", 404));
+      return next (new CustomError("Error: User not found", 404));
     }
     delete Data[0].password;
     console.log("user updated",Data);
     res.status(201).json({ Data });
   } catch (error) {
+    console.error("DELETE ERROR:", error);
+    console.error("Code:", error?.code);
+    console.error("Cause:", error?.cause);
+    console.error("Cause code:", error?.cause?.code);
     const { username } = req.body;
     const used = await db.select({username: users.username}).from(users).where(eq(username, users.username));
     if (handleErrorCode(error, next, used))
       return;
-    console.log("Failed to update user ", error.cause.code);
-    next(new CustomError("Failed to update Data", 500));
+    next(new CustomError("Error: Failed to update Data", 500));
   }
 }

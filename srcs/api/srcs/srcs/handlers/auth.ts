@@ -20,17 +20,17 @@ export async function register(req: Request, res: Response, next: NextFunction) 
         const user = await db.select({email: users.email, password: users.password, id: users.id}).from(users).where(eq(email, users.email));
         if (user.length === 0) {
             console.log("Api register no game user found");
-            return next (new CustomError("Api register wrong credentials", 400)); 
+            return next (new CustomError("Error: Api register wrong credentials", 400)); 
         }
         const isMatch = await bcrypt.compare(password, user[0].password);
         if (!isMatch) {
             console.log("Api register wrong credentials");
-            return next( new CustomError("Api register wrong credentials", 400));
+            return next( new CustomError("Error: Api register wrong credentials", 400));
         }
         const isdup = await db.select({id: api_users.user}).from(api_users).where(eq(user[0].id, api_users.user));
         if (isdup.length !== 0) {
             console.log("user already register to the api")
-            return next(new CustomError("user already register to the api", 400));
+            return next(new CustomError("Error: user already register to the api", 400));
         }
         const secret_key = generateHexString();
         const Data = await db.insert(api_users).values({
@@ -41,11 +41,13 @@ export async function register(req: Request, res: Response, next: NextFunction) 
         console.log("Api user added",Data);
         res.status(201).json({ Data });
     } catch (error) {
-		console.log(error)
+		console.error("DELETE ERROR:", error);
+        console.error("Code:", error?.code);
+        console.error("Cause:", error?.cause);
+        console.error("Cause code:", error?.cause?.code);
         if (handleErrorCode(error, next, null))
             return;
-        console.log("Failed to add api user ", error.cause.code);
-        next(new CustomError("Failed to add api user", 500));
+        next(new CustomError("Error: Failed to add api user", 500));
     }
 }
 
@@ -55,17 +57,16 @@ export async function login(req: Request, res: Response, next: NextFunction) {
         return (HandleParsingError(result, next));
     }
     try {
-        const secret =  req.headers.secret;
         const { email, password } = req.body;
         const user = await db.select({email: users.email, password: users.password, id: users.id}).from(users).where(eq(email, users.email));
         if (user.length === 0) {
             console.log("Api register no game user found");
-            return next (new CustomError("Api register wrong credentials", 400));
+            return next (new CustomError("Error: Api register wrong credentials", 400));
         }
         const isMatch = await bcrypt.compare(password, user[0].password);
         if (!isMatch) {
             console.log("Api register wrong credentials");
-            return next( new CustomError("Api register wrong credentials", 400));
+            return next( new CustomError("Error: Api register wrong credentials", 400));
         }
         const role = await db.select({role: api_users.role, secret_key: api_users.secret_key}).from(api_users).where(eq(api_users.user, user[0].id));
         const token = jwt.sign(
@@ -75,10 +76,13 @@ export async function login(req: Request, res: Response, next: NextFunction) {
         console.log(`user: ${user[0].id}\nrole: ${role[0].role}\nsecret: ${role[0].secret_key}\ntoken: ${token} valid for ${expire_time}`);
         res.status(201).json({ token, message: 'Logged in successfuly', role, secret: role[0].secret_key });
     } catch (error) {
+        console.error("DELETE ERROR:", error);
+        console.error("Code:", error?.code);
+        console.error("Cause:", error?.cause);
+        console.error("Cause code:", error?.cause?.code);
         if (handleErrorCode(error, next, null))
             return;
-        console.log("Failed to add api user ", error.cause.code);
-        next(new CustomError("Failed to add api user", 500));
+        next(new CustomError("Error: Failed to add api user", 500));
     }
 }
 
@@ -92,23 +96,26 @@ export async function deleteapiuser(req: Request, res: Response, next: NextFunct
         const user = await db.select({email: users.email, password: users.password, id: users.id}).from(users).where(eq(email, users.email));
         if (user.length === 0) {
             console.log("Api register no game user found");
-            return next (new CustomError("Api register wrong credentials", 400));
+            return next (new CustomError("Error: Api register wrong credentials", 400));
         }
         const isMatch = await bcrypt.compare(password, user[0].password);
         if (!isMatch) {
             console.log("Api wrong password");
-            return next( new CustomError("Api wrong password", 400));
+            return next( new CustomError("Error: Api wrong password", 400));
         }
         const ishere = await db.select({id: api_users.user}).from(api_users).where(eq(user[0].id, api_users.user));
         if (ishere.length === 0) {
             console.log("user not register in api")
-            return next(new CustomError("user not register in api", 400));
+            return next(new CustomError("Error: user not register in api", 400));
         }
         const Data = await db.delete(api_users).where(eq(api_users.user, user[0].id)).returning()
         console.log("delete user form api user ", Data);
         res.status(200).json({ "msg": "User delete from the data base" });
     } catch (error) {
-        console.log("Failed to delete user ", error.cause.code);
-        next (new CustomError("Failedto delete user", 500));
+        console.error("DELETE ERROR:", error);
+        console.error("Code:", error?.code);
+        console.error("Cause:", error?.cause);
+        console.error("Cause code:", error?.cause?.code);
+        next (new CustomError("Error: Failedto delete user", 500));
     }
 }
