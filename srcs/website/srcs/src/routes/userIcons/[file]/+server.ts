@@ -1,5 +1,5 @@
-import { error } from '@sveltejs/kit';
-import { readFile } from 'fs/promises';
+import { error, json } from '@sveltejs/kit';
+import { readFile, unlink } from 'fs/promises';
 import path from 'path';
 import type { RequestHandler } from './$types';
 
@@ -25,6 +25,21 @@ export const GET: RequestHandler = async ({ params }) => {
         return new Response(data, {
             headers: { 'Content-Type': contentType }
         });
+    } catch {
+        throw error(404, 'Not found');
+    }
+};
+
+export const DELETE: RequestHandler = async ({ params }) => {
+    const filePath = path.join(uploadDir, params.file);
+
+    if (!filePath.startsWith(uploadDir)) {
+        throw error(400, 'Invalid file path');
+    }
+
+    try {
+        await unlink(filePath);
+        return json({ success: true });
     } catch {
         throw error(404, 'Not found');
     }

@@ -1,5 +1,5 @@
 import type { PageServerLoad, Actions } from './$types';
-import type { logOperation } from '@babylonjs/core';
+import { FlowGraphFunctionReferenceBlock, type logOperation } from '@babylonjs/core';
 import { fail } from '@sveltejs/kit';
 import { redirect } from '@sveltejs/kit';
 import { db } from '$lib/server/db/index';
@@ -7,7 +7,6 @@ import { eq } from 'drizzle-orm';
 import { users } from '$lib/server/db/schema';
 import { createJWT } from '$lib/server/user_management/jwt.js';
 import bcrypt from 'bcryptjs';
-import { inventory } from '../../../lib/server/db/schema';
 
 export const load = async ({ cookies }) => {
 	const JWT = cookies.get('JWTtoken');
@@ -83,7 +82,6 @@ export const actions = {
 					skin_ball:users.skin_ball,})
 					.from(users)
 					.where(eq(users.username, username as string));
-				console.log(userInfos[0]);
 				const JWT = await createJWT(userInfos[0]);
 				event.cookies.set('JWTtoken', JWT, { path: '/' });
 			}

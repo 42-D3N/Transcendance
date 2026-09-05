@@ -59,7 +59,7 @@ export async function validateJWT( Token:string ){
         {
             let validToken = (await checkPayload(userInfos));
             if (validToken === 2 || validToken === 3)
-                return ({});
+                return ({ 'empty': 0 });
             if (validToken === 1)
                 userInfos["JWT"] = await createJWT((await db.select({ id:users.id, username:users.username, email:users.email, wins:users.wins, losses:users.losses, matches:users.matches, wallets:users.wallet, icon:users.icon}).from(users).where(eq(users.id, userInfos["id"])))[0]);
             return (userInfos);
@@ -67,12 +67,11 @@ export async function validateJWT( Token:string ){
     }
     catch (error)
     {
-        console.log(error);
-        return (null);
+        return ({ 'empty': 0 });
     }
     
     console.log("error retrieving user infos from JWT payload");
-    return ({});
+    return ({ 'empty': 0 });
 }
 
 // 0 -> not modified; 1 -> modified; 2 -> expired; 3 -> non existing
