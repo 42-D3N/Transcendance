@@ -13,7 +13,6 @@ export const load = async ({ cookies }) => {
 	if (JWT && JWT != '-1')
     {
         let validation = validateJWT(JWT);
-        console.log(validation);
 		redirect(303, '/');
     }
 };
@@ -59,7 +58,6 @@ export const actions = {
             );
             
             const userInfos = await db.select({ id:users.id, username:users.username, email:users.email, wins:users.wins, losses:users.losses, matches:users.matches, wallets:users.wallet, code:users.code, skin_rac:users.skin_rac, skin_ball:users.skin_ball}).from(users).where(eq(users.username, username as string));
-            console.log(userInfos);
             const products = await db.select().from(shop);
             await db.insert(inventory).values(
             products.map((product) => ({

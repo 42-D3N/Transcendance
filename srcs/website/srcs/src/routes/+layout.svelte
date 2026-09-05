@@ -29,7 +29,6 @@
 		document.querySelector('html')?.classList.add('h-full');
 	}
 	function enableScroll() {
-		console.log("scroll enabled");
 		document.querySelector('body')?.classList.remove('overflow-hidden');
 		document.querySelector('body')?.classList.remove('h-full');
 		document.querySelector('html')?.classList.remove('overflow-hidden');
@@ -45,7 +44,6 @@
 		enableScroll();
 	}
 	function buttonClick(button:any) {
-		console.log("buttonClick called");
 		if (mobToolbarEnabled !== button)
 		{
 			disableScroll();
