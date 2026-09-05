@@ -17,6 +17,7 @@ export async function load ({ cookies }) {
     let wallet = '0';
     let icon = 'default.svg';
     let friendRequests = [];
+    let requestsInfos: {id: number; username: string; icon: string | null}[] = [];
 
     if (!JWTtoken || JWTtoken === '-1')
     {
@@ -48,7 +49,24 @@ export async function load ({ cookies }) {
             .from(friends)
             .where(and(eq(friends.user2, userInfos.id), eq(friends.isaccepted, false)))
             .limit(5)
+        )
+
+        requestsInfos = await Promise.all(
+            friendRequests.map(async (request) => {
+                let user: { id: number, username: string, icon: string | null, user1: number, user2: number}[] = await db
+                    .select({
+                        id: users.id,
+                        username: users.username,
+                        icon: users.icon
+                    })
+                    .from(users)
+                    .where(eq(request.user1, users.id));
+                user[0].user1 = request.user1;
+                user[0].user2 = request.user2;
+                return user[0];
+            })
         );
+
         id = userInfos.id;
         username = userInfos.username;
         email = userInfos.email;
@@ -60,6 +78,7 @@ export async function load ({ cookies }) {
             icon = userInfos.icon
     }
 
+
     return ({
         Token: JWTtoken,
         id: id,
@@ -70,7 +89,7 @@ export async function load ({ cookies }) {
         matches: matches,
         wallet: wallet,
         icon: icon,
-        friendRequests: friendRequests
+        friendRequests: requestsInfos
     });
 };
 
@@ -136,6 +155,7 @@ export const actions = {
         );
         console.log("request sended");
     },
+
     acceptRequest: async (event) => {
         const form = await event.request.formData();
         
@@ -146,6 +166,7 @@ export const actions = {
             return (fail(400, {user1, user2, dataError: true}));
         await db.update(friends).set({ isaccepted: true }).where(and(eq(parseInt(user1), friends.user1), eq(parseInt(user2), friends.user2)));
     },
+
     refuseRequest: async (event) => {
         const form = await event.request.formData();
         
@@ -154,4 +175,5 @@ export const actions = {
 
         await db.delete(friends).where(and(eq(parseInt(user1), friends.user1), eq(parseInt(user2), friends.user2)));
     }
+    
 } satisfies Actions;

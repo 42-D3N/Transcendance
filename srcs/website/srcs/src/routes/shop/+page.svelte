@@ -32,7 +32,7 @@
         })
         const result = await response.json();
         const data = JSON.parse(result.data);
-        console.log(data);
+
         return_val = data[2];
     }
     

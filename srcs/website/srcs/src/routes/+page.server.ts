@@ -12,7 +12,6 @@ export async function load ({ cookies }) {
 	let wallet = '0';
 	let icon = 'default.svg';
 
-	console.log("Token :",JWTtoken);
 	if (!JWTtoken || JWTtoken === '-1')
 	{
 		cookies.set('JWTtoken', '-1', { path: '/' });
@@ -22,7 +21,6 @@ export async function load ({ cookies }) {
 	{
 		let userInfos = await validateJWT(JWTtoken);
 
-		console.log(userInfos);
 		if (!userInfos)
 		{
 			cookies.set('JWTtoken', "-1", { path: '/' });

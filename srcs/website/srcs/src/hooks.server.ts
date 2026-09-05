@@ -5,7 +5,7 @@ import { eq, lt, gte, ne } from 'drizzle-orm';
 
 export const init: ServerInit = async () => {
     const tmp =  await db.select({ id:shop.id}).from(shop).where(eq(shop.id, 1));
-    console.log(tmp);
+
     if(!tmp[0])
     {
         await db.insert(shop).values([

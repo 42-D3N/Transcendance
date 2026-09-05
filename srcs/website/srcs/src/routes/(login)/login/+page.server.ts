@@ -82,7 +82,6 @@ export const actions = {
 					skin_ball:users.skin_ball,})
 					.from(users)
 					.where(eq(users.username, username as string));
-				console.log(userInfos[0]);
 				const JWT = await createJWT(userInfos[0]);
 				event.cookies.set('JWTtoken', JWT, { path: '/' });
 			}

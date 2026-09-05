@@ -90,7 +90,6 @@ export const actions = {
         bdInfos.forEach((entry) => {
             if (entry.id != userInfos.id)
                 return (fail(400, {bdInfos, somethingExists: true }));
-
         });
 
         if (newName != userInfos.username)
