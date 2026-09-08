@@ -28,7 +28,7 @@ async function addadmin():Promise<number> {
 	// a delete uniquement pout des test a pas mettre en prod
 	const tmp =  await db.select({ id:shop.id}).from(shop).where(eq(shop.id, 1));
 	for (let i:number = 0; i !== 10; i++)
-		console.log("DELETE ELEMENTS ICI SHOP INSERT")
+		console.log('DELETE ELEMENTS ICI SHOP INSERT1')
     if(!tmp[0])
     {
         await db.insert(shop).values([
