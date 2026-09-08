@@ -12,6 +12,7 @@ var expire_time = '1h';
 
 export async function register(req: Request, res: Response, next: NextFunction) {
     const result = validationResult(req);
+    console.log(result);
     if (!result.isEmpty()) {
         return (HandleParsingError(result, next));
     }
