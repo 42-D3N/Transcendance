@@ -3,7 +3,7 @@
     handle /api* {
         reverse_proxy api:9090
     }
-    handle {
-        reverse_proxy website:5173
-    }
+	reverse_proxy /* website:5173 {
+		header_up Host website
+	}
 }
