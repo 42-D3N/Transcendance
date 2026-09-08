@@ -43,10 +43,10 @@ function newConn(sock: WebSocket, token: string) {
 async function sendContacts(sock: WebSocket) {
 	const userId = connections.get(sock)?.id;
 	try {
-		const authors:ChatContact[] = await db.select({id: chat.author, name: users.username, time: chat.timestamp, message: chat.content}).from(chat).where(eq(userId, chat.dest)).innerJoin(users, eq(chat.author, users.id));
-		const dests:ChatContact[] = await db.select({id: chat.dest, name: users.username, time: chat.timestamp, message: chat.content}).from(chat).where(eq(userId, chat.author)).innerJoin(users, eq(chat.dest, users.id));
-		const res:ChatContact[] = authors.concat(dests).sort(timeSort).filter(onlyUnique);
-		sock.send(JSON.stringify({type: "contacts", res}));
+		const authors:ChatContact[] = await db.select({id: chat.author, name: users.username, avatar:users.icon, time: chat.timestamp, message: chat.content}).from(chat).where(eq(userId, chat.dest)).innerJoin(users, eq(chat.author, users.id));
+		const dests:ChatContact[] = await db.select({id: chat.dest, name: users.username, avatar:users.icon, time: chat.timestamp, message: chat.content}).from(chat).where(eq(userId, chat.author)).innerJoin(users, eq(chat.dest, users.id));
+		const body:ChatContact[] = authors.concat(dests).sort(timeSort).filter(onlyUnique);
+		sock.send(JSON.stringify({type: "contacts", body}));
 	} catch (error) {
 		console.log(error);
 	}
