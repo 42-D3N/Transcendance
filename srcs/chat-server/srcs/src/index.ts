@@ -8,11 +8,7 @@ import { validateJWT } from './jwt';
 
 const server = fastify({ logger: true })
 
-interface UserData {
-	id: number,
-	name: string
-}
-const connections = new Map<WebSocket, UserData>();
+const connections = new Map<WebSocket, number>();
 
 interface ChatContact {
 	id: number,
@@ -37,12 +33,12 @@ function newConn(sock: WebSocket, token: string) {
 		return 1;
 	}
 	// TODO: Check if jwt data is correct
-	connections.set(sock, {id:userInfos.id, name:userInfos.name});
+	connections.set(sock, userInfos.id);
 	return 0;
 }
 
 async function sendContacts(sock: WebSocket) {
-	const userId = connections.get(sock)?.id;
+	const userId = connections.get(sock);
 	try {
 		const authors:ChatContact[] = await db.select({id: chat.author, name: users.username, avatar:users.icon, time: chat.timestamp, message: chat.content}).from(chat).where(eq(userId, chat.dest)).innerJoin(users, eq(chat.author, users.id));
 		const dests:ChatContact[] = await db.select({id: chat.dest, name: users.username, avatar:users.icon, time: chat.timestamp, message: chat.content}).from(chat).where(eq(userId, chat.author)).innerJoin(users, eq(chat.dest, users.id));
@@ -55,9 +51,9 @@ async function sendContacts(sock: WebSocket) {
 
 async function broadcast(authorId: number | undefined, dest: number, packet: any, stamp: any) {
 	const author = await db.select({name: users.username}).from(users).where(eq(users.id, authorId));
-	connections.forEach((userInfos, sock) => {
-		if (userInfos.id === authorId || userInfos.id === dest)
-			sock.send(JSON.stringify({type: "message", message: packet.message, author: author[0].name, dest: packet.dest, timestamp: stamp}));
+	connections.forEach((userId, sock) => {
+		if (userId === authorId || userId === dest)
+			sock.send(JSON.stringify({type: "message", valid:true, body:{author: author[0].name, target: packet.dest, message: packet.message, timestamp: stamp}}));
 	});
 }
 
@@ -70,7 +66,7 @@ const start = async () => {
 					return ;
 				await sendContacts(socket);
 				socket.on('close', () => {
-					console.log("User "+connections.get(socket)?.name+" disconnected.");
+					console.log("User "+connections.get(socket)+" disconnected.");
 					connections.delete(socket);
 				});
 				socket.on('message', async (message: string) => {
@@ -78,13 +74,21 @@ const start = async () => {
 					switch (packet.type) {
 						case "message":
 							try {
-								const targetId = await db.select({id: users.id}).from(users).where(eq(users.username, packet.target));
-								if (targetId.length === 0) {
-									socket.send(JSON.stringify({error: "User does not exist."}));
+								if (packet.message.length === 0) {
+									socket.send(JSON.stringify({type: "message", valid:false, body:{cause: "Message is empty."}}));
 									break ;
 								}
-								const stamp: any = await db.insert(chat).values({author: connections.get(socket)?.id, dest: targetId[0].id, content: packet.message}).returning({timestamp: chat.timestamp});
-								await broadcast(connections.get(socket)?.id, targetId[0].id, packet, stamp[0].timestamp);
+								if (packet.target === connections.get(socket)) {
+									socket.send(JSON.stringify({type: "message", valid:false, body:{cause: "Cannot chat with yourself."}}));
+									break ;
+								}
+								const targetId = await db.select({id: users.id}).from(users).where(eq(users.id, packet.target));
+								if (targetId.length === 0) {
+									socket.send(JSON.stringify({type: "message", valid:false, body:{cause: "User does not exist."}}));
+									break ;
+								}
+								const stamp: any = await db.insert(chat).values({author: connections.get(socket), dest: packet.target, content: packet.message}).returning({timestamp: chat.timestamp});
+								await broadcast(connections.get(socket), packet.target, packet, stamp[0].timestamp);
 							} catch (error) {
 								console.log(error);
 							}
@@ -92,13 +96,13 @@ const start = async () => {
 
 						case "history":
 							try {
-								const targetId = await db.select({id: users.id}).from(users).where(eq(users.username, packet.target));
+								const targetId = await db.select({id: users.id}).from(users).where(eq(users.id, packet.target));
 								if (targetId.length === 0) {
-									socket.send(JSON.stringify({error: "User does not exist."}));
+									socket.send(JSON.stringify({type: "history", valid:false, body:{cause: "User does not exist."}}));
 									break ;
 								}
-								const history = await db.select().from(chat).where(or(eq(targetId[0].id, chat.dest), eq(targetId[0].id, chat.author))).orderBy(chat.timestamp);
-								socket.send(JSON.stringify({type: "history", history}));
+								const body = await db.select({author: chat.author, target: chat.dest, message: chat.content, timestamp: chat.timestamp}).from(chat).where(or(eq(packet.target, chat.dest), eq(packet.target, chat.author))).orderBy(chat.timestamp);
+								socket.send(JSON.stringify({type: "history", valid:true, body}));
 							} catch (error) {
 								console.log(error);
 							}
@@ -108,14 +112,43 @@ const start = async () => {
 							try {
 								const targetId = await db.select({id: users.id, name: users.username}).from(users).where(eq(users.username, packet.target));
 								if (targetId.length === 0)
-									socket.send(JSON.stringify({type:"newChat", isOk:false, reason: "User does not exist.", index: packet.index}));
-								else if (targetId[0].id === connections.get(socket)?.id)
-									socket.send(JSON.stringify({type:"newChat", isOk:false, reason: "Cannot chat with yourself.", index: packet.index}));
+									socket.send(JSON.stringify({type:"newChat", valid:false, body:{cause: "User does not exist.", index: packet.index}}));
+								else if (targetId[0].id === connections.get(socket))
+									socket.send(JSON.stringify({type:"newChat", valid:false, body:{cause: "Cannot chat with yourself.", index: packet.index}}));
 								else
-									socket.send(JSON.stringify({type:"newChat", isOk:true, user: targetId[0], index: packet.index}));
+									socket.send(JSON.stringify({type:"newChat", valid:true, body:{id:targetId[0].id, name:targetId[0].username, avatar:targetId[0].icon, index:packet.index}}));
 							} catch (error) {
 								console.log(error);
 							}
+							break;
+
+						case "infos":
+							try {
+								const body = await db.select({id: users.id, name: users.username, avatar: users.icon}).from(users).where(eq(users.id, packet.target));
+								if (body.length === 0) {
+									socket.send(JSON.stringify({type: "infos", valid:false, body:{cause: "User does not exist."}}));
+									break ;
+								}
+								socket.send(JSON.stringify({type: "infos", valid:true, body:body[0]}));
+							} catch (error) {
+								console.log(error);
+							}
+							break;
+
+						case "nameChange":
+							const thisUser = connections.get(socket);
+							connections.forEach((userId, sock) => {
+								if (userId != thisUser)
+									sock.send(JSON.stringify({type: "nameChange", valid:true, body:{id: thisUser, name: packet.name}}));
+							});
+							break;
+
+						case "iconChange":
+							const thatUser = connections.get(socket);
+							connections.forEach((userId, sock) => {
+								if (userId != thatUser)
+									sock.send(JSON.stringify({type: "iconChange", valid:true, body:{id: thatUser, path: packet.avatar}}));
+							});
 							break;
 
 						default:
