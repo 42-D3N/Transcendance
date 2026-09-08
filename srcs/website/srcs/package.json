@@ -4,7 +4,7 @@
 	"version": "0.0.1",
 	"type": "module",
 	"scripts": {
-		"dev": "vite dev",
+		"dev": "vite dev --host",
 		"build": "vite build",
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",
@@ -37,7 +37,7 @@
 		"bcryptjs": "^3.0.3",
 		"cookie": "^1.1.1",
 		"earcut": "^3.0.2",
-		"node": "^26.3.0",
+		"image-dimensions": "^2.5.1",
 		"tailwindcss": "^4.3.0"
 	}
 }

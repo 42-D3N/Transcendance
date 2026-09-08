@@ -1,4 +1,6 @@
 FROM node:26-trixie
+RUN mkdir -p /user/profile/userIcons
+RUN chmod 777 /user/profile/userIcons
 RUN useradd -ms /bin/sh -u 1001 app
 USER app
 

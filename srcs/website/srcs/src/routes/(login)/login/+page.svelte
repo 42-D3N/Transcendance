@@ -3,7 +3,6 @@
     import arrow from '$lib/assets/side_arrow.svg';
 
 	let { data, form }: PageProps = $props();
-
 </script>
 
 <div class="absolute inset-0 z-0 bg-linear-to-b from-olive-500 to-120% to-white"></div>
@@ -13,11 +12,10 @@
     <p class="text-3xl lg:ml-24 m-4">Log in</p>
 
     <div class="lg:flex content-center space-x-4">
-
         <div class="hidden lg:block ml-2 mt-2 relative w-lg h-160 rounded-xl overflow-hidden bg-linear-to-b from-sky-200 via-sky-400 to-blue-500 p-6 pt-8 text-center">
-            <button class="bg-green-500 hover:bg-green-600 text-white font-bold mt-4 px-16 py-4 rounded-md shadow-[inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.35),0_1px_2px_rgba(0,0,0,0.4)]">
+            <a class="bg-green-500 hover:bg-green-600 text-white font-bold mt-16 px-16 py-4 rounded-md shadow-[inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.35),0_1px_2px_rgba(0,0,0,0.4)]" href="./sign_in">
                 Sign up!
-            </button>
+            </a>
             <h2 class="text-white font-extrabold text-5xl mt-8">Blog, Profile, Chat ...</h2>
             <p class="text-white text-2xl mt-1">Make tons of friends!</p>
             <div class="absolute bottom-0 left-0 w-full flex justify-center items-end pointer-events-none">
@@ -42,15 +40,15 @@
                     Username or Email:
                     <br><input name="username" type="username" class="border border-solid border-zinc-400 bg-white focus:bg-black/20 max-w-full">
                 </label><br>
-                {#if form?.accNotFound}<p class="error">Account not found</p>{/if}
-                {#if form?.emptyName}<p class="error">Usename or email cannot be empty</p>{/if}
-                {#if form?.wrong}<p class="error">You must enter your email or username</p>{/if}
+                {#if form?.accNotFound}<p class="error text-sm text-red-700 italic">Account not found</p>{/if}
+                {#if form?.emptyName}<p class="error text-sm text-red-700 italic">Usename or email cannot be empty</p>{/if}
+                {#if form?.wrong}<p class="error text-sm text-red-700 italic">You must enter your email or username</p>{/if}
                 <label>
                     Password:
                     <br><input name="password" type="password" class="border border-solid border-zinc-400 bg-white focus:bg-black/20 max-w-full">
                 </label><br>
-                {#if form?.emptyPass}<p class="error">Password cannot be empty</p>{/if}
-                {#if form?.invalidPass}<p class="error">Incorrect password</p>{/if}
+                {#if form?.emptyPass}<p class="error text-sm text-red-700 italic">Password cannot be empty</p>{/if}
+                {#if form?.invalidPass}<p class="error text-sm text-red-700 italic">Incorrect password</p>{/if}
                 <a class="" href="./sign_in">
                     <span class="lg:max-xl:hidden text-amber-600 overflow-hidden text-xl/tight text-ellipsis underline font-bold">Sign up!</span>
                 </a>

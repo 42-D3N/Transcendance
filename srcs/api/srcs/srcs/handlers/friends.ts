@@ -22,14 +22,12 @@ export async function deletefriends(req: Request, res: Response, next: NextFunct
             User2: friends.user2
         });
         if (Data.length == 0) {
-            console.log("Users not found or not in friends list");
-            return next (new CustomError("Users not found or not in friends list", 404));
+            return next (new CustomError("Error: Users not found or not in friends list", 404));
         }
         console.log("Deleted friends ", Data);
         res.status(200).json({ Data });
     } catch (error) {
-        console.log("Failed to delete Friend link ", error.cause.error);
-        return next (new CustomError("Failed to delete Friend link", 500));
+        return next (new CustomError("Error: Failed to delete Friend link", 500));
     }
 }
 
@@ -51,8 +49,7 @@ export async function addfriends(req: Request, res: Response, next: NextFunction
     } catch (error) {
         if (handleErrorCode(error, next, null))
             return;
-        console.log("Failed to add user ", error.cause.code);
-        next (new CustomError("Failed to add friends", 500));
+        next (new CustomError("Error: Failed to add friends", 500));
     }
 }
 
@@ -68,13 +65,11 @@ export async function getfriends(req: Request, res: Response, next: NextFunction
             .from(friends)
             .where(eq(friends.user1, + req.params.id));
         if (Data.length == 0) {
-            console.log("User not found");
-            return next (new CustomError("user not found", 400));
+            return next (new CustomError("Error: user not found", 400));
         }
         console.log(`get friends list`,Data);
         res.status(200).json({ Data });
     } catch (error) {
-        console.log("Failed to fetch friends ", error.cause.code);
-        next (new CustomError("Failed to fetch friends", 500));
+        next (new CustomError("Error: Failed to fetch friends", 500));
     }
 }

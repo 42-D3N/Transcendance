@@ -9,7 +9,11 @@ export const users = pgTable('users', {
 	wins: integer().default(0),
 	losses: integer().default(0),
 	matches: integer().default(0),
-	wallet: integer().default(0)
+	wallet: integer().default(0),
+	icon: varchar({ length:128 }),
+	code: boolean().default(false),
+	skin_rac: integer().default(null).references(() => shop.id),
+	skin_ball: integer().default(null).references(() => shop.id),
 });
 
 export const friends = pgTable('friends', {
@@ -23,17 +27,43 @@ export const friends = pgTable('friends', {
 export const matches = pgTable('matches', {
 	id: serial().primaryKey(),
 	user1: integer().notNull().references(() => users.id),
+	user1Pseudo: varchar({ length:128 }).notNull(),
+	user1EloChange: integer().notNull(),
 	user2: integer().notNull().references(() => users.id),
+	user2Pseudo: varchar({ length:128 }).notNull(),
+	user2EloChange: integer().notNull(),
 	user1Score: integer('user1_score').default(0),
-	user12core: integer('user2_score').default(0),
+	user2Score: integer('user2_score').default(0),
+	idBall1: integer().default(null).references(() => shop.id),
+	idBall2: integer().default(null).references(() => shop.id),
+	skinRac1: integer().default(null).references(() => shop.id),
+	skinRac2: integer().default(null).references(() => shop.id),
 	date: timestamp().defaultNow(),
 	winner: integer().notNull()
 	}, (table) => [
     check("winner_check", sql`${table.winner} = ${table.user1} or ${table.winner} = ${table.user2}`)
 ]);
 
+export const inventory = pgTable('inventory', {
+	user: integer().notNull().references(() => users.id),
+	product: integer().notNull().references(() => shop.id),
+	own: boolean().notNull().default(false),
+	},
+	(table) => [
+  	  primaryKey({
+    	  columns: [table.user, table.product],
+		}),
+	],
+);
+
+export const shop = pgTable('shop', {
+	id: serial().primaryKey(),
+	name: varchar({ length:128 }).notNull(),
+	price: integer().notNull().default(0),
+});
+
 export const api_users = pgTable('api_users', {
-	user: integer().notNull().unique().references(() => users.id),
+	user: integer().primaryKey().notNull().unique().references(() => users.id),
 	role: varchar({ length:128 }).notNull().default("user"),
-	secret_key: varchar({ length:64 }).notNull()
+	secret_key: varchar({ length:64 })
 });
