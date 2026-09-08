@@ -1,14 +1,31 @@
 import { serverVariable } from './pongVariables';
 import type { ClientInputMessage, ConnectedPlayer, ClientGameState, Player } from '../../../website/srcs/src/lib/game/both/interfaces';
+import type { AIDifficulty, MatchConfig, MatchMode } from './pongVariables';
 
 type Game = ReturnType<typeof serverVariable>;
-type PlayerSide = 1 | 2;
+export type PlayerSide = 1 | 2;
 
-const vars = serverVariable();
-const clients = new Set<WebSocket>();
-const connectedPlayers: ConnectedPlayer[] = [];
+export interface GameSessionConfig
+{
+  mode: MatchMode;
+  aiDifficulty?: AIDifficulty;
+}
 
-function getPlayerSide(player: Player): PlayerSide
+export interface GameSession
+{
+  id: string;
+  config: GameSessionConfig;
+  start: () => void;
+  stop: () => void;
+  addClient: (socket: WebSocket) => PlayerSide | null;
+  removeClient: (socket: WebSocket) => void;
+  storeInputs: (socket: WebSocket, message: ClientInputMessage) => void;
+  setPlayerReady: (socket: WebSocket) => void;
+  playerCount: () => number;
+  isFull: () => boolean;
+}
+
+function getPlayerSide(vars: Game, player: Player): PlayerSide
 {
   return (player === vars.player1 ? 1 : 2);
 }
@@ -34,10 +51,10 @@ function startMatch(vars: Game)
   vars.ball.vel.x = 0;
   vars.ball.vel.y = 0;
   vars.countdownEndTick = vars.state.tick + vars.MATCH_START_COUNTDOWN_TICKS;
-  vars.state.status = "countdown";
+  vars.state.status = 'countdown';
 }
 
-function maybeStartMatch(vars: Game)
+function maybeStartMatch(vars: Game, connectedPlayers: ConnectedPlayer[])
 {
   if (vars.waitingForReconnect)
     return;
@@ -45,117 +62,19 @@ function maybeStartMatch(vars: Game)
   if (vars.ready.p1 && vars.ready.p2)
     startMatch(vars);
   else if (connectedPlayers.length > 0)
-    vars.state.status = "ready_check";
+    vars.state.status = 'ready_check';
   else
-    vars.state.status = "waiting";
-}
-
-export function addClient(socket: WebSocket): PlayerSide | null
-{
-  if (connectedPlayers.length >= 2)
-  {
-    socket.close(1013, "Game is full");
-    return null;
-  }
-  clients.add(socket);
-  const player = connectedPlayers.length === 0 ? vars.player1 : vars.player2;
-  connectedPlayers.push({ socket, player });
-  const side = getPlayerSide(player);
-
-  if (vars.waitingForReconnect && side === vars.waitingForReconnectSide)
-  {
-    vars.waitingForReconnect = false;
-    vars.waitingForReconnectSide = null;
-    vars.waitingForReconnectUntilTick = 0;
-    vars.ready.p1 = connectedPlayers.some(client => client.player === vars.player1);
-    vars.ready.p2 = connectedPlayers.some(client => client.player === vars.player2);
-    vars.countdownLaunchVelocity = { x: vars.ball.vel.x, y: vars.ball.vel.y };
-    vars.ball.vel.x = 0;
-    vars.ball.vel.y = 0;
-    vars.countdownEndTick = vars.state.tick + vars.MATCH_START_COUNTDOWN_TICKS;
-    vars.state.status = "countdown";
-    return side;
-  }
-
-  if (side === 1)
-    vars.ready.p1 = false;
-  else
-  {
-    vars.ready.p2 = false;
-    vars.player2WasHuman = true;
-  }
-
-  if (!vars.player2WasHuman && !connectedPlayers.some(client => client.player === vars.player2))
-    vars.ready.p2 = true;
-
-  maybeStartMatch(vars);
-  return side;
-}
-
-export function removeClient(socket: WebSocket)
-{
-  clients.delete(socket);
-  const playerIndex = connectedPlayers.findIndex(client => client.socket === socket);
-  if (playerIndex === -1)
-    return;
-
-  const removedSide = getPlayerSide(connectedPlayers[playerIndex].player);
-  connectedPlayers.splice(playerIndex, 1);
-
-  if (connectedPlayers.length === 0)
-  {
-    vars.ready.p1 = false;
-    vars.ready.p2 = false;
-    vars.state.status = "waiting";
-    vars.waitingForReconnect = false;
-    vars.waitingForReconnectSide = null;
-    vars.waitingForReconnectUntilTick = 0;
-    return;
-  }
-
-  if (vars.state.status === "playing" || vars.state.status === "round_end" || vars.state.status === "power_pause" || vars.state.status === "countdown")
-  {
-    vars.waitingForReconnect = true;
-    vars.waitingForReconnectSide = removedSide;
-    vars.waitingForReconnectUntilTick = vars.state.tick + vars.TICK_RATE * 30;
-    return;
-  }
-
-  vars.state.status = "waiting";
-  vars.ready.p1 = connectedPlayers.some(client => client.player === vars.player1);
-  vars.ready.p2 = connectedPlayers.some(client => client.player === vars.player2);
-}
-
-export function storeInputs(socket: WebSocket, message: ClientInputMessage)
-{
-  const client = connectedPlayers.find(player => player.socket === socket);
-  if (client)
-    client.player.input = message.input;
-}
-
-export function setPlayerReady(socket: WebSocket)
-{
-  const client = connectedPlayers.find(player => player.socket === socket);
-  if (!client)
-    return;
-
-  const side = getPlayerSide(client.player);
-  if (side === 1)
-    vars.ready.p1 = true;
-  else
-    vars.ready.p2 = true;
-
-  maybeStartMatch(vars);
+    vars.state.status = 'waiting';
 }
 
 function buildClientGameState(vars: Game): ClientGameState
 {
-  const prediction = vars.state.status === "round_end"
+  const prediction = vars.state.status === 'round_end'
     ? predictLanding(vars)
-    : vars.state.status === "power_pause" ? predictPoweredTrajectory(vars) : null;
-  const countdown = vars.state.status === "countdown"
+    : vars.state.status === 'power_pause' ? predictPoweredTrajectory(vars) : null;
+  const countdown = vars.state.status === 'countdown'
     ? Math.max(1, Math.min(3, Math.ceil((vars.countdownEndTick - vars.state.tick) / vars.TICK_RATE)))
-    : vars.state.status === "round_end"
+    : vars.state.status === 'round_end'
       ? Math.max(1, Math.min(3, Math.ceil((vars.roundEndTick - vars.state.tick + 1) / vars.TICK_RATE)))
       : null;
 
@@ -264,7 +183,7 @@ function updateRackets(player: Player, vars: Game)
     player.racket.pos.x = max;
 }
 
-function updateAI(vars: Game)
+function updateAI(vars: Game, connectedPlayers: ConnectedPlayer[])
 {
   if (connectedPlayers.some(client => client.player === vars.player2) || vars.player2WasHuman)
     return;
@@ -300,7 +219,7 @@ function isBallOnOwnerHalf(side: PlayerSide, vars: Game)
 
 function armPowerIfPossible(side: PlayerSide, vars: Game)
 {
-  if (vars.state.status !== "playing"
+  if (vars.state.status !== 'playing'
     || vars.power.pendingOwner !== null
     || vars.power.boostedTarget !== null
     || getRemainingPowerUses(side, vars) <= 0
@@ -375,7 +294,7 @@ function triggerPowerPause(owner: PlayerSide, vars: Game)
   vars.power.baseSpeedBeforeBoost = vars.ball.speed;
   vars.ball.speed *= vars.POWER_SPEED_MULTIPLIER;
   applyPoweredDirectionShift(vars);
-  vars.state.status = "power_pause";
+  vars.state.status = 'power_pause';
 }
 
 function maybeTriggerPowerAtMidline(previousCenterY: number, vars: Game)
@@ -460,7 +379,7 @@ function resetBall(vars: Game, direction: 1 | -1)
   vars.ball.vel.y = Math.cos(angle) * vars.ball.speed * direction;
 }
 
-export function updateBall(vars: Game)
+function updateBall(vars: Game)
 {
   const previousCenterY = getBallCenter(vars).y;
   vars.ball.pos.x += vars.ball.vel.x * vars.DT;
@@ -511,9 +430,9 @@ export function updateBall(vars: Game)
   }
 
   if (vars.state.score.p1 >= vars.rules.scoreToWin || vars.state.score.p2 >= vars.rules.scoreToWin)
-    vars.state.status = "game_end";
+    vars.state.status = 'game_end';
   else if (vars.roundEndTick > vars.state.tick)
-    vars.state.status = "round_end";
+    vars.state.status = 'round_end';
 
   if (vars.power.boostedTarget === null)
     vars.ball.speed = Math.min(
@@ -522,96 +441,236 @@ export function updateBall(vars: Game)
     );
 }
 
-export function updatePlayers(vars: Game)
+export function createGameSession(id: string, config: GameSessionConfig): GameSession
 {
-  updateAI(vars);
-  updateRackets(vars.player1, vars);
-  updateRackets(vars.player2, vars);
-}
+  const schedule = (handler: () => void, intervalMs: number) => (globalThis as any).setInterval(handler, intervalMs);
+  const unschedule = (handle: any) => (globalThis as any).clearInterval(handle);
+  const vars = serverVariable(config as MatchConfig);
+  const clients = new Set<WebSocket>();
+  const connectedPlayers: ConnectedPlayer[] = [];
+  const maxPlayers = config.mode === 'pve' ? 1 : 2;
+  let tickInterval: any = null;
 
-function broadcast(message: unknown)
-{
-  const packet = JSON.stringify(message);
-  for (const cli of clients)
+  function playerCount()
   {
-    if (cli.readyState === WebSocket.OPEN)
-      cli.send(packet);
-  }
-}
-
-function gameTick(vars: Game)
-{
-  vars.state.tick++;
-  vars.state.elapsedTime += vars.DT;
-
-  if (vars.waitingForReconnect && vars.state.status === "waiting" && vars.state.tick >= vars.waitingForReconnectUntilTick)
-  {
-    const winnerSide = vars.waitingForReconnectSide === 1 ? 2 : 1;
-    vars.state.status = "game_end";
-    vars.state.score = winnerSide === 1
-      ? { p1: vars.rules.scoreToWin, p2: vars.state.score.p2 }
-      : { p1: vars.state.score.p1, p2: vars.rules.scoreToWin };
-    vars.waitingForReconnect = false;
-    vars.waitingForReconnectSide = null;
-    vars.waitingForReconnectUntilTick = 0;
-    broadcast({type: "gameState", state: buildClientGameState(vars) });
-    return;
+    return connectedPlayers.length;
   }
 
-  updatePowerInputs(vars);
-
-  if (vars.state.status === "round_end")
+  function isFull()
   {
-    updatePlayers(vars);
-    if (vars.state.tick >= vars.roundEndTick)
+    return connectedPlayers.length >= maxPlayers;
+  }
+
+  function updatePlayersForSession()
+  {
+    updateAI(vars, connectedPlayers);
+    updateRackets(vars.player1, vars);
+    updateRackets(vars.player2, vars);
+  }
+
+  function broadcast(message: unknown)
+  {
+    const packet = JSON.stringify(message);
+    for (const cli of clients)
     {
-      if (vars.waitingForReconnect)
-      {
-        vars.state.status = "waiting";
-        vars.ready.p1 = connectedPlayers.some(client => client.player === vars.player1);
-        vars.ready.p2 = connectedPlayers.some(client => client.player === vars.player2);
-      }
-      else
-      {
-        vars.state.status = "playing";
-      }
+      if (cli.readyState === WebSocket.OPEN)
+        cli.send(packet);
     }
   }
-  else if (vars.state.status === "countdown")
+
+  function gameTick()
   {
-    updatePlayers(vars);
-    if (vars.state.tick >= vars.countdownEndTick)
+    vars.state.tick++;
+    vars.state.elapsedTime += vars.DT;
+
+    if (vars.waitingForReconnect && vars.state.status === 'waiting' && vars.state.tick >= vars.waitingForReconnectUntilTick)
     {
-      if (vars.countdownLaunchVelocity)
-      {
-        vars.ball.vel.x = vars.countdownLaunchVelocity.x;
-        vars.ball.vel.y = vars.countdownLaunchVelocity.y;
-      }
-      vars.countdownLaunchVelocity = null;
-      vars.state.status = "playing";
+      const winnerSide = vars.waitingForReconnectSide === 1 ? 2 : 1;
+      vars.state.status = 'game_end';
+      vars.state.score = winnerSide === 1
+        ? { p1: vars.rules.scoreToWin, p2: vars.state.score.p2 }
+        : { p1: vars.state.score.p1, p2: vars.rules.scoreToWin };
+      vars.waitingForReconnect = false;
+      vars.waitingForReconnectSide = null;
+      vars.waitingForReconnectUntilTick = 0;
+      broadcast({ type: 'gameState', state: buildClientGameState(vars) });
+      return;
     }
-  }
-  else if (vars.state.status === "power_pause")
-  {
-    updatePlayers(vars);
-    if (vars.state.tick >= vars.power.pauseUntilTick)
-      vars.state.status = "playing";
-  }
-  else if (vars.state.status === "playing")
-  {
-    updatePlayers(vars);
-    updateBall(vars);
-  }
-  broadcast({type: "gameState", state: buildClientGameState(vars) });
-}
 
-export function gameLoop()
-{
-  setInterval(() => { gameTick(vars); }, vars.TICK_INTERVAL);
-}
+    updatePowerInputs(vars);
 
-/*
-const expected = 1 / (1 + Math.pow(10, (opponentElo - playerElo) / 400));
-const result = won ? 1 : 0;
-return ( Math.round(20 * (result - expected)) );
-*/
+    if (vars.state.status === 'round_end')
+    {
+      updatePlayersForSession();
+      if (vars.state.tick >= vars.roundEndTick)
+      {
+        if (vars.waitingForReconnect)
+        {
+          vars.state.status = 'waiting';
+          vars.ready.p1 = connectedPlayers.some(client => client.player === vars.player1);
+          vars.ready.p2 = connectedPlayers.some(client => client.player === vars.player2);
+        }
+        else
+        {
+          vars.state.status = 'playing';
+        }
+      }
+    }
+    else if (vars.state.status === 'countdown')
+    {
+      updatePlayersForSession();
+      if (vars.state.tick >= vars.countdownEndTick)
+      {
+        if (vars.countdownLaunchVelocity)
+        {
+          vars.ball.vel.x = vars.countdownLaunchVelocity.x;
+          vars.ball.vel.y = vars.countdownLaunchVelocity.y;
+        }
+        vars.countdownLaunchVelocity = null;
+        vars.state.status = 'playing';
+      }
+    }
+    else if (vars.state.status === 'power_pause')
+    {
+      updatePlayersForSession();
+      if (vars.state.tick >= vars.power.pauseUntilTick)
+        vars.state.status = 'playing';
+    }
+    else if (vars.state.status === 'playing')
+    {
+      updatePlayersForSession();
+      updateBall(vars);
+    }
+
+    broadcast({ type: 'gameState', state: buildClientGameState(vars) });
+  }
+
+  function start()
+  {
+    if (tickInterval)
+      return;
+
+    tickInterval = schedule(() => { gameTick(); }, vars.TICK_INTERVAL);
+  }
+
+  function stop()
+  {
+    if (!tickInterval)
+      return;
+
+    unschedule(tickInterval);
+    tickInterval = null;
+  }
+
+  function addClient(socket: WebSocket): PlayerSide | null
+  {
+    if (connectedPlayers.length >= maxPlayers)
+    {
+      socket.close(1013, 'Game is full');
+      return null;
+    }
+
+    clients.add(socket);
+    const player = connectedPlayers.length === 0 ? vars.player1 : vars.player2;
+    connectedPlayers.push({ socket, player });
+    const side = getPlayerSide(vars, player);
+
+    if (vars.waitingForReconnect && side === vars.waitingForReconnectSide)
+    {
+      vars.waitingForReconnect = false;
+      vars.waitingForReconnectSide = null;
+      vars.waitingForReconnectUntilTick = 0;
+      vars.ready.p1 = connectedPlayers.some(client => client.player === vars.player1);
+      vars.ready.p2 = connectedPlayers.some(client => client.player === vars.player2);
+      vars.countdownLaunchVelocity = { x: vars.ball.vel.x, y: vars.ball.vel.y };
+      vars.ball.vel.x = 0;
+      vars.ball.vel.y = 0;
+      vars.countdownEndTick = vars.state.tick + vars.MATCH_START_COUNTDOWN_TICKS;
+      vars.state.status = 'countdown';
+      return side;
+    }
+
+    if (side === 1)
+      vars.ready.p1 = false;
+    else
+    {
+      vars.ready.p2 = false;
+      vars.player2WasHuman = true;
+    }
+
+    if (!vars.player2WasHuman && !connectedPlayers.some(client => client.player === vars.player2))
+      vars.ready.p2 = true;
+
+    maybeStartMatch(vars, connectedPlayers);
+    return side;
+  }
+
+  function removeClient(socket: WebSocket)
+  {
+    clients.delete(socket);
+    const playerIndex = connectedPlayers.findIndex(client => client.socket === socket);
+    if (playerIndex === -1)
+      return;
+
+    const removedSide = getPlayerSide(vars, connectedPlayers[playerIndex].player);
+    connectedPlayers.splice(playerIndex, 1);
+
+    if (connectedPlayers.length === 0)
+    {
+      vars.ready.p1 = false;
+      vars.ready.p2 = false;
+      vars.state.status = 'waiting';
+      vars.waitingForReconnect = false;
+      vars.waitingForReconnectSide = null;
+      vars.waitingForReconnectUntilTick = 0;
+      return;
+    }
+
+    if (vars.state.status === 'playing' || vars.state.status === 'round_end' || vars.state.status === 'power_pause' || vars.state.status === 'countdown')
+    {
+      vars.waitingForReconnect = true;
+      vars.waitingForReconnectSide = removedSide;
+      vars.waitingForReconnectUntilTick = vars.state.tick + vars.TICK_RATE * 30;
+      return;
+    }
+
+    vars.state.status = 'waiting';
+    vars.ready.p1 = connectedPlayers.some(client => client.player === vars.player1);
+    vars.ready.p2 = connectedPlayers.some(client => client.player === vars.player2);
+  }
+
+  function storeInputs(socket: WebSocket, message: ClientInputMessage)
+  {
+    const client = connectedPlayers.find(player => player.socket === socket);
+    if (client)
+      client.player.input = message.input;
+  }
+
+  function setPlayerReady(socket: WebSocket)
+  {
+    const client = connectedPlayers.find(player => player.socket === socket);
+    if (!client)
+      return;
+
+    const side = getPlayerSide(vars, client.player);
+    if (side === 1)
+      vars.ready.p1 = true;
+    else
+      vars.ready.p2 = true;
+
+    maybeStartMatch(vars, connectedPlayers);
+  }
+
+  return {
+    id,
+    config,
+    start,
+    stop,
+    addClient,
+    removeClient,
+    storeInputs,
+    setPlayerReady,
+    playerCount,
+    isFull
+  };
+}

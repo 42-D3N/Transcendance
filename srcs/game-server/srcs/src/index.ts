@@ -1,9 +1,24 @@
 import Fastify from 'fastify';
 import fastifyWebsocket from '@fastify/websocket';
-import { gameLoop, storeInputs, addClient, removeClient, setPlayerReady } from './game';
+import { GameInstanceManager } from './game-instance-manager';
 import type { ClientMessage } from '../../../website/srcs/src/lib/game/both/interfaces';
+import type { AIDifficulty, MatchMode } from './pongVariables';
 
 const server = Fastify({logger: true});
+const gameInstances = new GameInstanceManager();
+
+function parseMode(value: unknown): MatchMode
+{
+  return (value === 'pve' ? 'pve' : 'pvp');
+}
+
+function parseAIDifficulty(value: unknown): AIDifficulty | undefined
+{
+  if (value === 'easy' || value === 'normal' || value === 'hard' || value === 'impossible')
+    return value;
+
+  return undefined;
+}
 
 const start = async () => {
   server.register(fastifyWebsocket);
@@ -11,9 +26,15 @@ const start = async () => {
   {
     server.get('/api/game_server', { websocket:true }, (socket: any, req: any) => {
       console.log("Client connecté");
-      const side = addClient(socket);
+      const mode = parseMode(req.query?.mode);
+      const aiDifficulty = parseAIDifficulty(req.query?.aiDifficulty);
+      const instanceIdParam = typeof req.query?.instanceId === 'string' ? req.query.instanceId : undefined;
+      const joinResult = gameInstances.join(socket, { mode, aiDifficulty, instanceId: instanceIdParam });
+      const side = joinResult.side;
+
       if (side !== null)
-        socket.send(JSON.stringify({ type: "playerAssigned", side }));
+        socket.send(JSON.stringify({ type: 'playerAssigned', side, instanceId: joinResult.instanceId }));
+
       socket.on("message", async (data: any) =>
       {
         const message = JSON.parse(data.toString()) as ClientMessage;
@@ -23,14 +44,17 @@ const start = async () => {
             socket.send(JSON.stringify({ type: "pong" }));
             break;
           case "input":
-            storeInputs(socket, message);
+            gameInstances.storeInputs(joinResult.instanceId, socket, message);
             break;
           case "ready":
-            setPlayerReady(socket);
+            gameInstances.setReady(joinResult.instanceId, socket);
             break;
         }
       });
-      socket.on("close", () => { console.log("Client déconnecté"); removeClient(socket); });
+      socket.on("close", () => {
+        console.log("Client déconnecté");
+        gameInstances.leave(joinResult.instanceId, socket);
+      });
     })
   })
   try { await server.listen({ port: 3310, host: '0.0.0.0' }); }
@@ -39,7 +63,6 @@ const start = async () => {
     server.log.error(err);
     process.exit(1);
   }
-  gameLoop();
 };
 
 start();

@@ -1,6 +1,15 @@
 import type { Ball, GameRules, GameState, Player, AILevel } from "../../../website/srcs/src/lib/game/both/interfaces";
 
-export function serverVariable()
+export type MatchMode = "pvp" | "pve";
+export type AIDifficulty = "easy" | "normal" | "hard" | "impossible";
+
+export interface MatchConfig
+{
+  mode: MatchMode;
+  aiDifficulty?: AIDifficulty;
+}
+
+export function serverVariable(config: MatchConfig)
 {
   const GAME_WIDTH = 650;
   const GAME_HEIGHT = 730;
@@ -93,7 +102,7 @@ export function serverVariable()
       size:	{ w: 80, h: 10 },
       vel:	{ x: 0, y: 0 }
     },
-    ai: { level: aiLevels.easy, lastDecisionTime: 0 }
+    ai: { level: aiLevels[config.aiDifficulty ?? "easy"], lastDecisionTime: 0 }
   };
 
   const power =
@@ -109,7 +118,7 @@ export function serverVariable()
   const ready =
   {
     p1: false,
-    p2: true
+    p2: config.mode === "pve"
   };
 
   const player2WasHuman = false;
@@ -140,6 +149,7 @@ export function serverVariable()
     rules,
     power,
     ready,
-    player2WasHuman
+    player2WasHuman,
+    mode: config.mode
   };
 }

@@ -4,12 +4,16 @@
   import { initGameClient } from '$lib/game/frontend/pongVariables'
   import { connection, sendInput, sendReady } from '$lib/game/backend/network'
   import { handleKeyDown, handleKeyUp, updateScale, updateInput, renderGameState } from '$lib/game/frontend/front1';
+  import type { AIDifficulty, MatchMode } from '$lib/game/both/interfaces';
 
   let socket: WebSocket;
   let connected = $state(false);
   let localSide = $state<1 | 2 | null>(null);
   let gameState = $state<ClientGameState | null>(null);
   let localReady = $state(false);
+  let matchMode = $state<MatchMode>('pvp');
+  let aiDifficulty = $state<AIDifficulty>('easy');
+  let reconnecting = $state(false);
 
   function updateLocalReadyFromState(state: ClientGameState)
   {
@@ -26,8 +30,62 @@
     sendReady(socket);
   }
 
+  function buildGameUrl()
+  {
+    const url = new URL('wss://localhost:8081/api/game_server');
+    url.searchParams.set('mode', matchMode);
+    if (matchMode === 'pve')
+      url.searchParams.set('aiDifficulty', aiDifficulty);
+    return url.toString();
+  }
+
+  function disconnectSocket()
+  {
+    if (socket && socket.readyState !== WebSocket.CLOSED)
+      socket.close();
+  }
+
+  function connectSocket(game: ReturnType<typeof initGameClient>)
+  {
+    reconnecting = true;
+    disconnectSocket();
+    localSide = null;
+    localReady = false;
+    gameState = null;
+    socket = new WebSocket(buildGameUrl());
+    socket.onopen = () =>
+    {
+      connected = true;
+      reconnecting = false;
+    };
+    socket.onclose = () =>
+    {
+      connected = false;
+      reconnecting = false;
+    };
+    bindSocketHandlers(game);
+  }
+
+  function bindSocketHandlers(game: ReturnType<typeof initGameClient>)
+  {
+    connection(
+      socket,
+      state =>
+      {
+        gameState = state;
+        updateLocalReadyFromState(state);
+        renderGameState(game, state);
+      },
+      side =>
+      {
+        localSide = side;
+      }
+    );
+  }
+
   const showReadyOverlay = $derived(!gameState || gameState.status === "waiting" || gameState.status === "ready_check");
   const isReadyPhase = $derived(!gameState || gameState.status === "waiting" || gameState.status === "ready_check");
+  const modeLabel = $derived(matchMode === 'pvp' ? 'PvP' : 'PvE');
 
   function setMove(move: -1 | 0 | 1)
   {
@@ -38,16 +96,20 @@
 
   onMount(() =>
   {// c2r7p6
-    socket = new WebSocket("wss://localhost:8081/api/game_server");// ws://localhost:3310
-    socket.onopen = () => { connected = true; };
-    socket.onclose = () => { connected = false; };
     const game = initGameClient();
     let keyboardState = { left: false, right: false, special: false };
 
+    const query = new URLSearchParams(window.location.search);
+    matchMode = query.get('mode') === 'pve' ? 'pve' : 'pvp';
+    const requestedDifficulty = query.get('aiDifficulty');
+    if (requestedDifficulty === 'easy' || requestedDifficulty === 'normal' || requestedDifficulty === 'hard' || requestedDifficulty === 'impossible')
+      aiDifficulty = requestedDifficulty;
+    else
+      aiDifficulty = 'easy';
+
     const cleanup = () =>
     {
-      if (socket && socket.readyState === WebSocket.OPEN)
-        socket.close();
+      disconnectSocket();
     };
 
     const KeyDown = (event: KeyboardEvent) =>
@@ -64,19 +126,7 @@
       if (!(gameState && (gameState.status === "waiting" || gameState.status === "ready_check")))
         sendInput(socket, game.input);
     }
-    connection(
-      socket,
-      state =>
-      {
-        gameState = state;
-        updateLocalReadyFromState(state);
-        renderGameState(game, state);
-      },
-      side =>
-      {
-        localSide = side;
-      }
-    );
+    connectSocket(game);
     const Resize = () => updateScale(game);
     window.addEventListener('keydown',	KeyDown);
     window.addEventListener('keyup',	KeyUp);
@@ -130,7 +180,10 @@
     <div class="portal-body">
       <aside class="side-panel left-panel">
         <span class="panel-title">GAME INFO</span>
-        <div class="info-row"><span>MODE</span><b>ARCADE</b></div>
+        <div class="info-row"><span>MODE</span><b>{modeLabel}</b></div>
+        {#if matchMode === 'pve'}
+          <div class="info-row"><span>IA</span><b>{aiDifficulty}</b></div>
+        {/if}
         <div class="info-row"><span>ROUND</span><b>01</b></div>
         <div class="pixel-divider"></div>
         <p class="tip">READY PLAYER ONE?</p>

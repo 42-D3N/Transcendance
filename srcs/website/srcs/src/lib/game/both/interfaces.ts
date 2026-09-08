@@ -75,6 +75,9 @@ export interface AILevel
   errorMargin:		number;
 }
 
+export type MatchMode = "pvp" | "pve";
+export type AIDifficulty = "easy" | "normal" | "hard" | "impossible";
+
 export interface AI
 {
   level: AILevel;
@@ -149,6 +152,7 @@ export interface ServerPlayerAssignedMessage
 {
   type: "playerAssigned";
   side: 1 | 2;
+  instanceId?: string;
 }
 
 export interface ServerErrorMessage

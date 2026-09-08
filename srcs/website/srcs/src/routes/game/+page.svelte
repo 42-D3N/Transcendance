@@ -1,9 +1,19 @@
 <script>
 	import { goto } from '$app/navigation';
 
+	const aiDifficultyOptions = ['easy', 'normal', 'hard', 'impossible'];
+
+	function matchmaking(mode, aiDifficulty)
+	{
+		const url = new URL('/game/matchmaking', window.location.origin);
+		url.searchParams.set('mode', mode);
+		if (aiDifficulty)
+			url.searchParams.set('aiDifficulty', aiDifficulty);
+		goto(`${url.pathname}${url.search}`);
+	}
+
 	function placeholder()	{ console.log(`Ceci est un placeholder.`) }
-	function play()			{ goto('/game/gameItself'); }
-	function matchmaking()	{ goto('/game/matchmaking'); }
+	function play() 			{ goto('/game/gameItself'); }
 	function loading()		{ goto('/game/loadingScreen'); }
 	function home()			{ goto('/'); }
 	function options()		{/*goto('/profile/gameOption')*/}
@@ -22,22 +32,15 @@
 		play:
 		[
 			{ label: '1 VS IA', action: () => currentMenu = 'difficulty' },
-			{ label: '1 VS 1', action: () => currentMenu = 'onevone' },
-			{ label: '1 VS 1 VS 1 VS 1', action: placeholder },
+			{ label: '1 VS 1', action: () => matchmaking('pvp') },
 			{ label: 'Retour', action: () => currentMenu = 'main' }
-		],
-		onevone:
-		[
-			{ label: 'Local', action: matchmaking },
-			{ label: 'Matchmaking', action: placeholder },
-			{ label: 'Retour', action: () => currentMenu = 'play' }
 		],
 		difficulty:
 		[
-			{ label: 'Easy', action: play },
-			{ label: 'Normal', action: placeholder },
-			{ label: 'Hard', action: placeholder },
-			{ label: 'Impossible?', action: placeholder },
+			{ label: 'Easy', action: () => matchmaking('pve', 'easy') },
+			{ label: 'Normal', action: () => matchmaking('pve', 'normal') },
+			{ label: 'Hard', action: () => matchmaking('pve', 'hard') },
+			{ label: 'Impossible?', action: () => matchmaking('pve', 'impossible') },
 			{ label: 'Retour', action: () => currentMenu = 'play' }
 		]
 	};
