@@ -15,9 +15,9 @@ function parseMode(value: unknown): MatchMode
 function parseAIDifficulty(value: unknown): AIDifficulty | undefined
 {
   if (value === 'easy' || value === 'normal' || value === 'hard' || value === 'impossible')
-    return value;
+    return (value);
 
-  return undefined;
+  return (undefined);
 }
 
 const start = async () => {

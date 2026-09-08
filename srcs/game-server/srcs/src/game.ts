@@ -71,7 +71,9 @@ function buildClientGameState(vars: Game): ClientGameState
 {
   const prediction = vars.state.status === 'round_end'
     ? predictLanding(vars)
-    : vars.state.status === 'power_pause' ? predictPoweredTrajectory(vars) : null;
+    : vars.state.status === 'power_pause'
+      ? predictPoweredTrajectory(vars)
+      : null;
   const countdown = vars.state.status === 'countdown'
     ? Math.max(1, Math.min(3, Math.ceil((vars.countdownEndTick - vars.state.tick) / vars.TICK_RATE)))
     : vars.state.status === 'round_end'
@@ -142,13 +144,13 @@ function predictPoweredTrajectory(vars: Game)
   const velocityY = vars.ball.vel.y / speed;
   const minX = vars.ball.size.w / 2;
   const maxX = vars.GAME_WIDTH - vars.ball.size.w / 2;
+
   const targetY = vars.power.boostedTarget === 1
     ? vars.player1.racket.pos.y - vars.ball.size.h / 2
     : vars.player2.racket.pos.y + vars.player2.racket.size.h + vars.ball.size.h / 2;
 
   if (velocityY === 0)
     return { start, end: start };
-
   for (let guard = 0; guard < 16; guard++)
   {
     const distanceToTarget = (targetY - y) / velocityY;
@@ -166,7 +168,6 @@ function predictPoweredTrajectory(vars: Game)
     y += velocityY * distanceToWall;
     velocityX *= -1;
   }
-
   return { start, end: { x, y } };
 }
 
@@ -185,25 +186,23 @@ function updateRackets(player: Player, vars: Game)
 
 function updateAI(vars: Game, connectedPlayers: ConnectedPlayer[])
 {
-  if (connectedPlayers.some(client => client.player === vars.player2) || vars.player2WasHuman)
+  if (vars.mode !== 'pve' || connectedPlayers.some(client => client.player === vars.player2) || vars.player2WasHuman)
     return;
 
   const racketCenter = vars.player2.racket.pos.x + vars.player2.racket.size.w / 2;
   const ballCenter = vars.ball.pos.x + vars.ball.size.w / 2;
-  vars.player2.input.move = ballCenter < racketCenter - 5 ? -1 : ballCenter > racketCenter + 5 ? 1 : 0;
+
+  if (ballCenter < racketCenter - 5)
+    vars.player2.input.move = -1;
+  else if (ballCenter > racketCenter + 5)
+    vars.player2.input.move = 1;
+  else
+	vars.player2.input.move = 0;
 }
 
 function getRemainingPowerUses(side: PlayerSide, vars: Game)
 {
   return (side === 1 ? vars.power.remainingUses.p1 : vars.power.remainingUses.p2);
-}
-
-function consumePowerUse(side: PlayerSide, vars: Game)
-{
-  if (side === 1)
-    vars.power.remainingUses.p1--;
-  else
-    vars.power.remainingUses.p2--;
 }
 
 function isBallMovingTowardOpponent(side: PlayerSide, vars: Game)
@@ -227,7 +226,10 @@ function armPowerIfPossible(side: PlayerSide, vars: Game)
     || !isBallOnOwnerHalf(side, vars))
     return;
 
-  consumePowerUse(side, vars);
+  if (side === 1)
+    vars.power.remainingUses.p1--;
+  else
+    vars.power.remainingUses.p2--;
   vars.power.pendingOwner = side;
 }
 
@@ -266,9 +268,7 @@ function applyPoweredDirectionShift(vars: Game)
   let nextX = Math.max(-maxHorizontalSpeed, Math.min(maxHorizontalSpeed, vars.ball.vel.x + horizontalOffset));
 
   if (leftGap < wallBuffer && rightGap < wallBuffer)
-  {
     nextX = Math.sign(vars.ball.vel.x) === 0 ? minHorizontalSpeed : Math.sign(vars.ball.vel.x) * minHorizontalSpeed;
-  }
   else if (leftGap < wallBuffer && nextX <= minHorizontalSpeed)
   {
     vars.ball.pos.x = wallBuffer;
@@ -281,7 +281,6 @@ function applyPoweredDirectionShift(vars: Game)
   }
 
   const nextY = previousVerticalDirection * Math.sqrt(boostedSpeed * boostedSpeed - nextX * nextX);
-
   vars.ball.vel.x = nextX;
   vars.ball.vel.y = nextY;
 }
@@ -300,7 +299,7 @@ function triggerPowerPause(owner: PlayerSide, vars: Game)
 function maybeTriggerPowerAtMidline(previousCenterY: number, vars: Game)
 {
   if (vars.power.pendingOwner === null)
-    return false;
+    return (false);
 
   const currentCenterY = getBallCenter(vars).y;
   const crossedMidline = vars.power.pendingOwner === 1
@@ -353,9 +352,7 @@ function bounceOnRacket(player: Player, vars: Game, verticalDirection: 1 | -1)
   const racket = player.racket;
   const racketCenter = racket.pos.x + racket.size.w / 2;
   const ballCenter = ball.pos.x + ball.size.w / 2;
-  const impact = Math.max(-1, Math.min(1,
-    (ballCenter - racketCenter) / (racket.size.w / 2)
-  ));
+  const impact = Math.max( -1, Math.min(1, (ballCenter - racketCenter) / (racket.size.w / 2)) );
   const maxAngle = Math.PI / 3;
   const angle = impact * maxAngle;
   ball.speed = Math.min(
@@ -451,15 +448,8 @@ export function createGameSession(id: string, config: GameSessionConfig): GameSe
   const maxPlayers = config.mode === 'pve' ? 1 : 2;
   let tickInterval: any = null;
 
-  function playerCount()
-  {
-    return connectedPlayers.length;
-  }
-
-  function isFull()
-  {
-    return connectedPlayers.length >= maxPlayers;
-  }
+  function playerCount() { return (connectedPlayers.length); }
+  function isFull() { return (connectedPlayers.length >= maxPlayers); }
 
   function updatePlayersForSession()
   {
@@ -472,10 +462,8 @@ export function createGameSession(id: string, config: GameSessionConfig): GameSe
   {
     const packet = JSON.stringify(message);
     for (const cli of clients)
-    {
       if (cli.readyState === WebSocket.OPEN)
         cli.send(packet);
-    }
   }
 
   function gameTick()
@@ -511,9 +499,7 @@ export function createGameSession(id: string, config: GameSessionConfig): GameSe
           vars.ready.p2 = connectedPlayers.some(client => client.player === vars.player2);
         }
         else
-        {
           vars.state.status = 'playing';
-        }
       }
     }
     else if (vars.state.status === 'countdown')
@@ -549,7 +535,6 @@ export function createGameSession(id: string, config: GameSessionConfig): GameSe
   {
     if (tickInterval)
       return;
-
     tickInterval = schedule(() => { gameTick(); }, vars.TICK_INTERVAL);
   }
 
@@ -557,7 +542,6 @@ export function createGameSession(id: string, config: GameSessionConfig): GameSe
   {
     if (!tickInterval)
       return;
-
     unschedule(tickInterval);
     tickInterval = null;
   }
@@ -567,7 +551,7 @@ export function createGameSession(id: string, config: GameSessionConfig): GameSe
     if (connectedPlayers.length >= maxPlayers)
     {
       socket.close(1013, 'Game is full');
-      return null;
+      return (null);
     }
 
     clients.add(socket);
@@ -587,7 +571,7 @@ export function createGameSession(id: string, config: GameSessionConfig): GameSe
       vars.ball.vel.y = 0;
       vars.countdownEndTick = vars.state.tick + vars.MATCH_START_COUNTDOWN_TICKS;
       vars.state.status = 'countdown';
-      return side;
+      return (side);
     }
 
     if (side === 1)
@@ -597,12 +581,10 @@ export function createGameSession(id: string, config: GameSessionConfig): GameSe
       vars.ready.p2 = false;
       vars.player2WasHuman = true;
     }
-
-    if (!vars.player2WasHuman && !connectedPlayers.some(client => client.player === vars.player2))
+    if (vars.mode === 'pve' && !vars.player2WasHuman && !connectedPlayers.some(client => client.player === vars.player2))
       vars.ready.p2 = true;
-
     maybeStartMatch(vars, connectedPlayers);
-    return side;
+    return (side);
   }
 
   function removeClient(socket: WebSocket)
@@ -614,7 +596,6 @@ export function createGameSession(id: string, config: GameSessionConfig): GameSe
 
     const removedSide = getPlayerSide(vars, connectedPlayers[playerIndex].player);
     connectedPlayers.splice(playerIndex, 1);
-
     if (connectedPlayers.length === 0)
     {
       vars.ready.p1 = false;
@@ -625,7 +606,6 @@ export function createGameSession(id: string, config: GameSessionConfig): GameSe
       vars.waitingForReconnectUntilTick = 0;
       return;
     }
-
     if (vars.state.status === 'playing' || vars.state.status === 'round_end' || vars.state.status === 'power_pause' || vars.state.status === 'countdown')
     {
       vars.waitingForReconnect = true;
@@ -633,7 +613,6 @@ export function createGameSession(id: string, config: GameSessionConfig): GameSe
       vars.waitingForReconnectUntilTick = vars.state.tick + vars.TICK_RATE * 30;
       return;
     }
-
     vars.state.status = 'waiting';
     vars.ready.p1 = connectedPlayers.some(client => client.player === vars.player1);
     vars.ready.p2 = connectedPlayers.some(client => client.player === vars.player2);
@@ -651,13 +630,11 @@ export function createGameSession(id: string, config: GameSessionConfig): GameSe
     const client = connectedPlayers.find(player => player.socket === socket);
     if (!client)
       return;
-
     const side = getPlayerSide(vars, client.player);
     if (side === 1)
       vars.ready.p1 = true;
     else
       vars.ready.p2 = true;
-
     maybeStartMatch(vars, connectedPlayers);
   }
 

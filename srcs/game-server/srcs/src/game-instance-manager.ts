@@ -30,7 +30,7 @@ export class GameInstanceManager
     this.sessions.set(instanceId, session);
     if (config.mode === 'pvp')
       this.waitingPvpInstanceId = instanceId;
-    return session;
+    return (session);
   }
 
   private getNormalizedConfig(request?: JoinGameRequest): GameSessionConfig
@@ -47,7 +47,7 @@ export class GameInstanceManager
     {
       const direct = this.sessions.get(request.instanceId);
       if (direct && direct.config.mode === config.mode && !direct.isFull())
-        return direct;
+        return (direct);
     }
 
     if (config.mode === 'pvp')
@@ -56,12 +56,12 @@ export class GameInstanceManager
       {
         const waiting = this.sessions.get(this.waitingPvpInstanceId);
         if (waiting && !waiting.isFull())
-          return waiting;
+          return (waiting);
       }
-      return this.createSession(config);
+      return (this.createSession(config));
     }
 
-    return this.createSession(config);
+    return (this.createSession(config));
   }
 
   private cleanupIfEmpty(session: GameSession)
