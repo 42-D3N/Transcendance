@@ -32,7 +32,6 @@
 
   function buildGameUrl()
   {
-    console.log(window.location.host);
     const url = new URL('wss://'+window.location.host+'/api/game_server');
     url.searchParams.set('mode', matchMode);
     if (matchMode === 'pve')
