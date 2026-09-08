@@ -8,7 +8,11 @@ import { validateJWT } from './jwt';
 
 const server = fastify({ logger: true })
 
-const connections = new Map<WebSocket, number>();
+interface UserData {
+	id: number,
+	name: string
+}
+const connections = new Map<WebSocket, UserData>();
 
 interface ChatContact {
 	id: number,
@@ -32,12 +36,12 @@ function newConn(sock: WebSocket, token: string) {
 		return 1;
 	}
 	// TODO: Check if jwt data is correct
-	connections.set(sock, userInfos.id);
+	connections.set(sock, {id:userInfos.id, name:userInfos.name});
 	return 0;
 }
 
 async function sendContacts(sock: WebSocket) {
-	const userId = connections.get(sock);
+	const userId = connections.get(sock)?.id;
 	try {
 		const authors:ChatContact[] = await db.select({id: chat.author, name: users.username, time: chat.timestamp, message: chat.content}).from(chat).where(eq(userId, chat.dest)).innerJoin(users, eq(chat.author, users.id));
 		const dests:ChatContact[] = await db.select({id: chat.dest, name: users.username, time: chat.timestamp, message: chat.content}).from(chat).where(eq(userId, chat.author)).innerJoin(users, eq(chat.dest, users.id));
@@ -50,8 +54,8 @@ async function sendContacts(sock: WebSocket) {
 
 async function broadcast(authorId: number | undefined, dest: number, packet: any, stamp: any) {
 	const author = await db.select({name: users.username}).from(users).where(eq(users.id, authorId));
-	connections.forEach((id, sock) => {
-		if (id === authorId || id === dest)
+	connections.forEach((userInfos, sock) => {
+		if (userInfos.id === authorId || userInfos.id === dest)
 			sock.send(JSON.stringify({type: "message", message: packet.message, author: author[0].name, dest: packet.dest, timestamp: stamp}));
 	});
 }
@@ -65,7 +69,7 @@ const start = async () => {
 					return ;
 				await sendContacts(socket);
 				socket.on('close', () => {
-					console.log("User "+connections.get(socket)+" disconnected.");
+					console.log("User "+connections.get(socket)?.name+" disconnected.");
 					connections.delete(socket);
 				});
 				socket.on('message', async (message: string) => {
@@ -78,8 +82,8 @@ const start = async () => {
 									socket.send(JSON.stringify({error: "User does not exist."}));
 									break ;
 								}
-								const stamp: any = await db.insert(chat).values({author: connections.get(socket), dest: targetId[0].id, content: packet.message}).returning({timestamp: chat.timestamp});
-								await broadcast(connections.get(socket), targetId[0].id, packet, stamp[0].timestamp);
+								const stamp: any = await db.insert(chat).values({author: connections.get(socket)?.id, dest: targetId[0].id, content: packet.message}).returning({timestamp: chat.timestamp});
+								await broadcast(connections.get(socket)?.id, targetId[0].id, packet, stamp[0].timestamp);
 							} catch (error) {
 								console.log(error);
 							}
@@ -104,7 +108,7 @@ const start = async () => {
 								const targetId = await db.select({id: users.id, name: users.username}).from(users).where(eq(users.username, packet.target));
 								if (targetId.length === 0)
 									socket.send(JSON.stringify({type:"newChat", isOk:false, reason: "User does not exist.", index: packet.index}));
-								else if (targetId[0].id === connections.get(socket))
+								else if (targetId[0].id === connections.get(socket)?.id)
 									socket.send(JSON.stringify({type:"newChat", isOk:false, reason: "Cannot chat with yourself.", index: packet.index}));
 								else
 									socket.send(JSON.stringify({type:"newChat", isOk:true, user: targetId[0], index: packet.index}));
