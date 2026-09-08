@@ -17,6 +17,7 @@ const connections = new Map<WebSocket, UserData>();
 interface ChatContact {
 	id: number,
 	name: string,
+	avatar: string,
 	message: string,
 	time: Date
 }
