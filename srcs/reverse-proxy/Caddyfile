@@ -1,9 +1,12 @@
 :5000 {
     tls /app/certs/nginx.crt /app/certs/nginx.key
+    handle /api/game_server* {
+        reverse_proxy game_server:3310
+    }
     handle /api* {
         reverse_proxy api:9090
     }
-	reverse_proxy /* website:5173 {
-		header_up Host website
-	}
+    reverse_proxy /* website:5173 {
+        header_up Host website
+    }
 }

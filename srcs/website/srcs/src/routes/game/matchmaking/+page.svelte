@@ -32,7 +32,8 @@
 
   function buildGameUrl()
   {
-    const url = new URL('wss://localhost:8081/api/game_server');
+    console.log(window.location.host);
+    const url = new URL('wss://'+window.location.host+'/api/game_server');
     url.searchParams.set('mode', matchMode);
     if (matchMode === 'pve')
       url.searchParams.set('aiDifficulty', aiDifficulty);
