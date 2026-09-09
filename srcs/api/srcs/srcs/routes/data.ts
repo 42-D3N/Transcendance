@@ -4,6 +4,7 @@ import * as u from "../handlers/user.ts"
 import { addfriends, getfriends, deletefriends } from "../handlers/friends.ts";
 import { register, login, deleteapiuser } from "../handlers/auth.ts";
 import { authMiddleware, roleMiddleware } from "../middleware/auth.ts";
+import { additem, removeitem } from "../handlers/inventory.ts";
 import * as v from "../lib/validator-functions.ts";
 const DataRouter = Router();
 
@@ -34,5 +35,10 @@ DataRouter.delete("/user/:id", v.validateIdParam(), authMiddleware, roleMiddlewa
 DataRouter.get("/friends/:id", v.validateIdParam(), authMiddleware, roleMiddleware("admin"), getfriends);
 DataRouter.post("/friends/", ...v.validateIdFriends(), authMiddleware, roleMiddleware("admin"), addfriends);
 DataRouter.delete("/friends/", ...v.validateDeleteFriends(), authMiddleware, roleMiddleware("admin"), deletefriends);
+
+//inventory
+
+DataRouter.patch("/inventory/add", v.validateInvUser(), v.validateInvItem(), authMiddleware, roleMiddleware("admin"), additem);
+DataRouter.patch("/inventory/remove", v.validateInvUser(), v.validateInvItem(), authMiddleware, roleMiddleware("admin"), removeitem);
 
 export default DataRouter;

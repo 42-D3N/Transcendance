@@ -161,8 +161,11 @@ export async function updateuser(req: Request, res: Response, next: NextFunction
     console.log("user updated",Data);
     res.status(200).json({ Data });
   } catch (error) {
+    let used = null;
     const { username } = req.body;
-    const used = await db.select({username: users.username}).from(users).where(eq(username, users.username));
+    if (username !== undefined){
+      used = await db.select({username: users.username}).from(users).where(eq(username, users.username));
+    }
     if (handleErrorCode(error, next, used))
       return;
     next(new CustomError("Error: Failed to update user", 500));
@@ -190,10 +193,13 @@ export async function P_updateuser(req: Request, res: Response,next: NextFunctio
     console.log("user updated",Data);
     res.status(201).json({ Data });
   } catch (error) {
+    let used = null;
     const { username } = req.body;
-    const used = await db.select({username: users.username}).from(users).where(eq(username, users.username));
+    if (username !== undefined && username !== null && username !== "") {
+      used = await db.select({username: users.username}).from(users).where(eq(users.username, username));
+    }
     if (handleErrorCode(error, next, used))
       return;
-    next(new CustomError("Error: Failed to update Data", 500));
+    next(new CustomError("Error: Failed to update user", 500));
   }
 }
