@@ -94,13 +94,13 @@ export const actions = {
 
         if (newName != userInfos.username)
         {
-            console.log("changing {user_id}",userInfos.id,"username: ",userInfos.username,"->",newName);
+            // console.log("changing {user_id}",userInfos.id,"username: ",userInfos.username,"->",newName);
             await db.update(users).set({username: newName}).where(eq(users.id, userInfos.id));
         }
         
         if (newMail != userInfos.email)
         {
-            console.log("changing {user_id}",userInfos.id,"email: ",userInfos.email,"->",newMail);
+            // console.log("changing {user_id}",userInfos.id,"email: ",userInfos.email,"->",newMail);
             await db.update(users).set({email: newMail}).where(eq(users.id, userInfos.id));
         }
 
@@ -117,17 +117,17 @@ export const actions = {
             const filePath = path.join(uploadDir, randomString.toString('hex')+"."+end[end.length - 1]);
             await db.update(users).set({icon: '/userIcons/'+randomString.toString('hex')+"."+end[end.length - 1]}).where(eq(users.id, userInfos.id));
             await writeFile(filePath, buffer);
-            console.log("Saving new icon as: "+filePath);
+            // console.log("Saving new icon as: "+filePath);
             
             if (userInfos.icon)
             {
                 const res = await event.fetch(`${userInfos.icon}`, {
                     method: 'DELETE'
                 });
-                console.log("deleting old icon");
+                // console.log("deleting old icon");
             }
             userInfos.icon = randomString.toString("hex")+"."+end[end.length - 1];
-            console.log("changing {user_id}",userInfos.id,"icon: ",userInfos.icon,"->\n",randomString.toString("hex")+"."+end[end.length - 1]);
+            // console.log("changing {user_id}",userInfos.id,"icon: ",userInfos.icon,"->\n",randomString.toString("hex")+"."+end[end.length - 1]);
         }
 
         const updatedJWT = await createJWT(userInfos);

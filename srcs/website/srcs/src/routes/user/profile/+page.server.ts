@@ -2,7 +2,7 @@ import { redirect, fail } from '@sveltejs/kit';
 import { validateJWT } from '$lib/server/user_management/jwt.js';
 import type { Actions } from './$types';
 import { db } from '$lib/server/db/index';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, or } from 'drizzle-orm';
 import { users, friends } from '$lib/server/db/schema';
 
 
@@ -18,6 +18,8 @@ export async function load ({ cookies }) {
     let icon = 'default.svg';
     let friendRequests = [];
     let requestsInfos: {id: number; username: string; icon: string | null}[] = [];
+    let copinous = [];
+    let actualFriends: {id: number; username: string; icon: string | null}[] = [];
 
     if (!JWTtoken || JWTtoken === '-1')
     {
@@ -49,7 +51,12 @@ export async function load ({ cookies }) {
             .from(friends)
             .where(and(eq(friends.user2, userInfos.id), eq(friends.isaccepted, false)))
             .limit(5)
-        )
+        );
+
+        copinous = (await db.select({ user1: friends.user1, user2: friends.user2, isaccepted: friends.isaccepted })
+            .from(friends)
+            .where(and(or(eq(friends.user2, userInfos.id), eq(friends.user1, userInfos.id)), eq(friends.isaccepted, true)))
+        );
 
         requestsInfos = await Promise.all(
             friendRequests.map(async (request) => {
@@ -60,9 +67,29 @@ export async function load ({ cookies }) {
                         icon: users.icon
                     })
                     .from(users)
-                    .where(eq(request.user1, users.id));
+                    .where(eq(users.id, request.user1));
                 user[0].user1 = request.user1;
                 user[0].user2 = request.user2;
+                return user[0];
+            })
+        );
+
+        actualFriends = await Promise.all(
+            copinous.map(async (request) => {
+                let toFetch: number;
+                if (request.user1 == userInfos.id)
+                    toFetch = request.user2;
+                else
+                    toFetch = request.user1;
+
+                let user: { id: number, username: string, icon: string | null, user1: number, user2: number}[] = await db
+                    .select({
+                        id: users.id,
+                        username: users.username,
+                        icon: users.icon
+                    })
+                    .from(users)
+                    .where(eq(users.id, toFetch));
                 return user[0];
             })
         );
@@ -89,7 +116,8 @@ export async function load ({ cookies }) {
         matches: matches,
         wallet: wallet,
         icon: icon,
-        friendRequests: requestsInfos
+        friendRequests: requestsInfos,
+        friends: actualFriends
     });
 };
 
@@ -153,7 +181,6 @@ export const actions = {
                 isaccepted: false
             }
         );
-        console.log("request sended");
     },
 
     acceptRequest: async (event) => {
