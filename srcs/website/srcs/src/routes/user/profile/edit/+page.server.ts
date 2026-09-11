@@ -18,6 +18,7 @@ export async function load ({ cookies }) {
     let matches = '0';
     let wallet = '0';
     let icon = 'default.svg';
+    let privateAcc = false;
 
     if (!JWTtoken || JWTtoken === '-1')
     {
@@ -52,6 +53,7 @@ export async function load ({ cookies }) {
         losses = userInfos.losses;
         matches = userInfos.matches;
         wallet = userInfos.wallets;
+        privateAcc = userInfos.privateAcc;
         if (userInfos.icon != '')
             icon = userInfos.icon
     }
@@ -65,7 +67,8 @@ export async function load ({ cookies }) {
         losses: losses,
         matches: matches,
         wallet: wallet,
-        icon: icon
+        icon: icon,
+        privateAcc: privateAcc
     });
 };
 
@@ -80,6 +83,8 @@ export const actions = {
         const icon = form.get('icon') as File;
         const newName = form.get('username') as string;
         const newMail = form.get('email') as string;
+        const isPrivate = form.get('agree') as boolean;
+        
         let userInfos = await validateJWT(event.cookies.get('JWTtoken'));
         if (!newName || !isUsername.test(newName))
             return (fail(400, {newName, invalidName: true }));
