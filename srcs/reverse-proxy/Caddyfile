@@ -2,14 +2,15 @@ http://localhost {
     redir https://{host}:8081{uri} permanent
 }
 
-localhost {
-	handle /api/chat {
+:5000 {
+    tls /app/certs/nginx.crt /app/certs/nginx.key
+    handle /api/chat {
         reverse_proxy chat-server:5786
     }
     handle /api* {
         reverse_proxy api:9090
     }
-	handle {
-		reverse_proxy website:5173
+	reverse_proxy /* website:5173 {
+		header_up Host website
 	}
 }

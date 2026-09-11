@@ -7,11 +7,20 @@ export function error(
   req: Request,
   res: Response,
   next: NextFunction
-) {
-  try {
-    const msg = JSON.parse(err.message);
-    res.status(err.status).json({ msg });
-  } catch (error) {
-    res.status(err.status).json({ msg: err.message });
+)
+  {
+  let debug:number = 0;
+  console.error(err?.message);
+  if (debug === 1)
+    {
+    console.error("==========DEBUG MODE API==========");
+    console.error(err);
+    console.error("Message:", err?.message);
+    console.error("Stack:", err?.stack);
+    console.error("Status:", err?.status);
+    console.error("==========DEBUG MODE API==========");
   }
-}
+  res.status(err?.status ?? 500).json({
+      msg: err?.message ?? "Internal server error"
+  });
+  }
