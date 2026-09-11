@@ -79,7 +79,7 @@
                 </div>
             </div>
             <div class="ml-4">
-                <input type="checkbox" id="agree" name="agree" checked={false} value="private"/>
+                <input type="checkbox" id="agree" name="agree" checked={data.privateAcc} value="private"/>
                 <span class="text-white">Make account private</span>
             </div>
             <button class="block ml-4 mt-4 w-fit p-2 bg-green-600 hover:bg-green-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.35),0_1px_2px_rgba(0,0,0,0.4)] rounded-md" type="submit">

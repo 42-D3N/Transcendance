@@ -77,7 +77,7 @@ export const actions = {
     default: async (event) => {
         const form = await event.request.formData();
 
-        const isUsername:RegExp = /^.{4,128}$/;
+        const isUsername:RegExp = /^[a-zA-Z0-9_-]{4,128}$/;
         const isEmail:RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
         const icon = form.get('icon') as File;
@@ -109,10 +109,9 @@ export const actions = {
             await db.update(users).set({email: newMail}).where(eq(users.id, userInfos.id));
         }
 
-
-        if (!userInfos.privateAcc && isPrivate.length > 0)
+        if (!userInfos.privateAcc && isPrivate != null)
             await db.update(users).set({privateAcc: true}).where(eq(users.id, userInfos.id));
-        else if (userInfos.privateAcc && isPrivate.length == 0)
+        else if (userInfos.privateAcc === true && isPrivate === null)
             await db.update(users).set({privateAcc: false}).where(eq(users.id, userInfos.id));
 
         if (icon && icon.size != 0)

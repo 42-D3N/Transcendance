@@ -53,20 +53,27 @@
             {/if}
             <div class="grid grid-cols-4 gap-4 mt-4 ml-8 lg:ml-4 w-[60%] lg:w-[40%]">
                 {#each data.friends as friend}
-                    <a href={"/user/member/"+friend.username+"_"+JSON.stringify(friend.id)}>
-                        <div class="bg-stone-700 size-fit p-2 rounded-md">
-                            {#if !friend.icon}
-                                <img class="block ml-4 lg:m-4 2xl:h-[6rem] 2xl:w-[6rem] xl:h-[5rem] xl:w-[5rem] h-[3rem] w-[3rem] border-solid rounded-md bg-amber-50" src={usericon} alt=""/>
-                            {:else}
-                                <img class="block ml-4 lg:m-4 2xl:h-[6rem] 2xl:w-[6rem] xl:h-[5rem] xl:w-[5rem] h-[3rem] w-[3rem] border-solid rounded-md bg-amber-50" src={friend.icon} alt=""/>
-                            {/if}
-                            {#if friend.username.length+JSON.stringify(friend.id).length+1 < 10}
-                                <span class="ml-2 text-lg xl:text-2xl lg:pl-2 lg:ml-2 lg:mt-1 font-md lg:mt-5">{friend.username}#{friend.id}</span>
-                            {:else}
-                                <span class="ml-2 text-lg xl:text-2xl lg:pl-2 lg:ml-2 lg:mt-1 font-md lg:mt-5">{friend.username.slice(0, 7)}...</span>
-                            {/if}
-                        </div>
-                    </a>
+                    <form method="POST" enctype="multipart/form-data" class="flex size-fit" action="?/rmFriend" use:enhance={({ formData }) => {
+                        formData.append('friend', JSON.stringify(friend.id));
+                        formData.append('user', JSON.stringify(data.id));
+                    }}
+                    >
+                        <a class="relative z-0" href={"/user/member/"+friend.username+"_"+JSON.stringify(friend.id)}>
+                            <button class="absolute z-10 h-[1rem] w-[1rem] lg:h-[2rem] lg:w-[2rem] right-0 bg-red-600 hover:bg-red-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.35),0_1px_2px_rgba(0,0,0,0.4)] rounded-md" onclick={(event) => {event.stopPropagation(); friendNb-- }} type="submit" title="endFriend"></button>
+                            <div class="bg-stone-700 size-fit p-2 rounded-md">
+                                {#if !friend.icon}
+                                    <img class="block ml-4 lg:m-4 2xl:h-[6rem] 2xl:w-[6rem] xl:h-[5rem] xl:w-[5rem] h-[3rem] w-[3rem] border-solid rounded-md bg-amber-50" src={usericon} alt=""/>
+                                {:else}
+                                    <img class="block ml-4 lg:m-4 2xl:h-[6rem] 2xl:w-[6rem] xl:h-[5rem] xl:w-[5rem] h-[3rem] w-[3rem] border-solid rounded-md bg-amber-50" src={friend.icon} alt=""/>
+                                {/if}
+                                {#if friend.username.length+JSON.stringify(friend.id).length+1 < 10}
+                                    <span class="ml-2 text-lg xl:text-2xl lg:pl-2 lg:ml-2 lg:mt-1 font-md lg:mt-5">{friend.username}#{friend.id}</span>
+                                {:else}
+                                    <span class="ml-2 text-lg xl:text-2xl lg:pl-2 lg:ml-2 lg:mt-1 font-md lg:mt-5">{friend.username.slice(0, 7)}...</span>
+                                {/if}
+                            </div>
+                        </a>
+                    </form>
                 {/each}
             </div>
         </div>
@@ -99,7 +106,6 @@
                     }}
                     >
                         {#if !frRequests.icon}
-                            <span>???</span>
                             <img class="upload block m-2 lg:h-[4rem] lg:w-[4rem] h-[2rem] w-[2rem] border-solid rounded-md bg-amber-50" src={usericon} alt=""/>
                         {:else}
                             <img class="upload block m-2 lg:h-[4rem] lg:w-[4rem] h-[2rem] w-[2rem] border-solid rounded-md bg-amber-50" src={frRequests.icon} alt=""/>
@@ -107,7 +113,7 @@
                         <span class="pl-2 mt-1 font-md lg:mt-5">{frRequests.username}#{frRequests.id}</span>
 
                         <div class="flex ml-auto gap-2">
-                            <button class="mt-2 h-[2rem] w-[2rem] lg:h-[4rem] lg:w-[4rem] bg-green-600 hover:bg-green-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.35),0_1px_2px_rgba(0,0,0,0.4)] rounded-md" type="submit" title="accept" formaction="?/acceptRequest"></button>
+                            <button class="mt-2 h-[2rem] w-[2rem] lg:h-[4rem] lg:w-[4rem] bg-green-600 hover:bg-green-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.35),0_1px_2px_rgba(0,0,0,0.4)] rounded-md" type="submit" title="accept" formaction="?/acceptRequest" onclick={() => { friendNb++ }}></button>
                             <button class="mt-2 mr-2 h-[2rem] w-[2rem] lg:h-[4rem] lg:w-[4rem] bg-red-600 hover:bg-red-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.35),0_1px_2px_rgba(0,0,0,0.4)] rounded-md" type="submit" title="refuse" formaction="?/refuseRequest"></button>
                         </div>
                     </form>

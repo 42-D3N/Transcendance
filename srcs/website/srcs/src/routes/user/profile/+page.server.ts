@@ -50,7 +50,7 @@ export async function load ({ cookies }) {
 
         friendRequests = (await db.select({ user1: friends.user1, user2: friends.user2, isaccepted: friends.isaccepted })
             .from(friends)
-            .where(and(eq(friends.user2, userInfos.id), eq(friends.isaccepted, false)))
+            .where(and(eq(friends.user2, userInfos.id) , eq(friends.isaccepted, false)))
             .limit(5)
         );
 
@@ -201,6 +201,41 @@ export const actions = {
         const user2 = form.get('user2');
 
         await db.delete(friends).where(and(eq(parseInt(user1), friends.user1), eq(parseInt(user2), friends.user2)));
-    }
+    },
     
+    rmFriend: async (event) => {
+        const form = await event.request.formData();
+        
+        const user = form.get('user');
+        const rmedfriend = form.get('friend');
+
+        let existing = await db.select({isaccepted: friends.isaccepted}).from(friends)
+        .where(
+            or(
+                and(
+                    eq(parseInt(user), friends.user1),
+                    eq(parseInt(rmedfriend), friends.user2)
+                ),
+                and(
+                    eq(parseInt(rmedfriend), friends.user1),
+                    eq(parseInt(user), friends.user2)
+                )
+            )
+        );
+        if (existing.length == 0)
+            return ;
+        await db.delete(friends)
+        .where(
+            or(
+                and(
+                    eq(parseInt(user), friends.user1),
+                    eq(parseInt(rmedfriend), friends.user2)
+                ),
+                and(
+                    eq(parseInt(rmedfriend), friends.user1),
+                    eq(parseInt(user), friends.user2)
+                )
+            )
+        );
+    }
 } satisfies Actions;

@@ -69,6 +69,7 @@ export async function validateJWT( Token:string ){
                 losses:users.losses,
                 matches:users.matches,
                 wallets:users.wallet,
+                privateAcc:users.privateAcc,
                 icon:users.icon,
                 code:users.code,
                 skin_rac:users.skin_rac,
@@ -102,6 +103,7 @@ async function checkPayload( payload:any ): Promise<number> {
         losses:users.losses,
         matches:users.matches,
         wallets:users.wallet,
+        privateAcc:users.privateAcc,
         icon:users.icon,
         code:users.code,
         skin_rac:users.skin_rac,
@@ -117,7 +119,8 @@ async function checkPayload( payload:any ): Promise<number> {
         userInfos["icon"] != payload["icon"] ||
         userInfos["code"] != payload["code"] ||
         userInfos["skin_rac"] != payload["skin_rac"] ||
-        userInfos["skin_ball"] != payload["skin_ball"]
+        userInfos["skin_ball"] != payload["skin_ball"] ||
+        userInfos["privateAcc"] != payload["privateAcc"]
     )
         return (1);
     return (0);
