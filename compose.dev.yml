@@ -7,9 +7,7 @@ services:
     networks:
       - transcendance
     ports:
-      - "8080:80"
-      - "8081:443"
-      - "8081:443/udp"
+      - "5000:5000"
   database:
     image: postgres:18-trixie
     restart: always

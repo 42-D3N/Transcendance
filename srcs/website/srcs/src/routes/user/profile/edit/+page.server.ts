@@ -84,7 +84,7 @@ export const actions = {
         const newName = form.get('username') as string;
         const newMail = form.get('email') as string;
         const isPrivate = form.get('agree') as boolean;
-        
+
         let userInfos = await validateJWT(event.cookies.get('JWTtoken'));
         if (!newName || !isUsername.test(newName))
             return (fail(400, {newName, invalidName: true }));

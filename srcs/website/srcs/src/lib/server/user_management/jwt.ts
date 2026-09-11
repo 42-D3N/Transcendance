@@ -61,7 +61,20 @@ export async function validateJWT( Token:string ){
             if (validToken === 2 || validToken === 3)
                 return ({ 'empty': 0 });
             if (validToken === 1)
-                userInfos["JWT"] = await createJWT((await db.select({ id:users.id, username:users.username, email:users.email, wins:users.wins, losses:users.losses, matches:users.matches, wallets:users.wallet, icon:users.icon}).from(users).where(eq(users.id, userInfos["id"])))[0]);
+                userInfos["JWT"] = await createJWT((await db.select({
+                id:users.id,
+                username:users.username,
+                email:users.email,
+                wins:users.wins,
+                losses:users.losses,
+                matches:users.matches,
+                wallets:users.wallet,
+                icon:users.icon,
+                code:users.code,
+                skin_rac:users.skin_rac,
+                skin_ball:users.skin_ball})
+                .from(users)
+                .where(eq(users.id, userInfos["id"])))[0]);
             return (userInfos);
         }
     }
@@ -81,7 +94,18 @@ async function checkPayload( payload:any ): Promise<number> {
     if (Date.now() > payload["created"] + 86_400_000)
         return (2);
 
-    let userInfos = (await db.select({ id:users.id, username:users.username, email:users.email, wins:users.wins, losses:users.losses, matches:users.matches, wallets:users.wallet, icon:users.icon}).from(users).where(eq(users.id, payload["id"])))[0];
+    let userInfos = (await db.select({
+        id:users.id,
+        username:users.username,
+        email:users.email,
+        wins:users.wins,
+        losses:users.losses,
+        matches:users.matches,
+        wallets:users.wallet,
+        icon:users.icon,
+        code:users.code,
+        skin_rac:users.skin_rac,
+        skin_ball:users.skin_ball}).from(users).where(eq(users.id, payload["id"])))[0];
     if (!userInfos)
         return (3);
     if (userInfos["username"] != payload["username"] ||
@@ -90,7 +114,10 @@ async function checkPayload( payload:any ): Promise<number> {
         userInfos["losses"] != payload["losses"] ||
         userInfos["matches"] != payload["matches"] ||
         userInfos["wallets"] != payload["wallets"] ||
-        userInfos["icon"] != payload["icon"]
+        userInfos["icon"] != payload["icon"] ||
+        userInfos["code"] != payload["code"] ||
+        userInfos["skin_rac"] != payload["skin_rac"] ||
+        userInfos["skin_ball"] != payload["skin_ball"]
     )
         return (1);
     return (0);

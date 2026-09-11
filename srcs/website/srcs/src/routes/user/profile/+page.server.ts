@@ -20,10 +20,13 @@ export async function load ({ cookies }) {
     let requestsInfos: {id: number; username: string; icon: string | null}[] = [];
     let copinous = [];
     let actualFriends: {id: number; username: string; icon: string | null}[] = [];
+    let friendRequests = [];
+    let requestsInfos: {id: number; username: string; icon: string | null}[] = [];
 
     if (!JWTtoken || JWTtoken === '-1')
     {
         cookies.set('JWTtoken', '-1', { path: '/' });
+        throw redirect(308, '/login');
         throw redirect(308, '/login');
     }
     else
@@ -104,7 +107,6 @@ export async function load ({ cookies }) {
         if (userInfos.icon != '')
             icon = userInfos.icon
     }
-
 
     return ({
         Token: JWTtoken,

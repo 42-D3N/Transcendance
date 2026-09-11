@@ -3,6 +3,8 @@
     import { redirect } from '@sveltejs/kit';
     import { enhance } from '$app/forms';
     import profileicon from '$lib/assets/profile_icon.svg';
+    import { enhance } from '$app/forms';
+    import profileicon from '$lib/assets/profile_icon.svg';
 
     import type { PageProps } from './$types';
     let { data, form }: PageProps = $props();
@@ -19,8 +21,10 @@
     {
         redirect(308, "./user/member/"+username);
     }
+    // console.log(data.friendRequests);
 </script>
 
+<div class="fixed inset-0 z-0 bg-[#333131FF] size-full"></div>
 <div class="fixed inset-0 z-0 bg-[#333131FF] size-full"></div>
 
 <div class="flex ml-[10%]">
@@ -66,6 +70,10 @@
                     </a>
                 {/each}
             </div>
+            <span class="pl-12 text-white text-lg lg:text-3xl lg:font-light">Friends: {0} | don't forget you can chat with your friends!</span>
+            <a class="block ml-4 mt-4 w-fit p-2 bg-[#333131FF] shadow-[inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.35),0_1px_2px_rgba(0,0,0,0.4)] rounded-md" href="./profile/edit">
+                <span class="text-white font-bold lg:text-3xl p-4">Edit Profile</span>
+            </a>
         </div>
 
         <div class="block mt-[5.5%] pb-8 bg-[#292626FF] border-solid rounded-lg z-10 pt-4">
@@ -112,6 +120,10 @@
             </div>
         </div> 
 
+        <div class="mt-16 pb-8 w-full h-[20%] bg-[#292626FF] border-solid rounded-lg z-10 p-4">
+                <span class="text-white text-4xl font-bold p-4">Match History</span>
+                <span class="text-zinc-400 text-4xl font-bold">({data.matches})</span>
+        </div>
         <div class="mt-16 pb-8 w-full h-[20%] bg-[#292626FF] border-solid rounded-lg z-10 p-4">
                 <span class="text-white text-4xl font-bold p-4">Match History</span>
                 <span class="text-zinc-400 text-4xl font-bold">({data.matches})</span>
