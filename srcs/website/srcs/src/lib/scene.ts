@@ -105,7 +105,6 @@ export const createScene = async (canvas:HTMLCanvasElement) => {
             middletext.rotation.y *= 1.1;
         else
             middletext.rotation.y += 0.20;
-        console.log("middle text ", middletext.rotation.y);
     });
 
     engine.runRenderLoop(() => {

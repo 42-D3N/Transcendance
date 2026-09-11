@@ -77,6 +77,8 @@
                     <span class="pl-12 text-zinc-400 text-lg">Winrate:</span>
                     <span class="text-white text-lg">{Winrate()}</span>
                 </div>
+                <input type="checkbox" id="agree" name="agree" checked={false} />
+                <label>Make account private</label>
             </div>
             <button class="block ml-4 mt-4 w-fit p-2 bg-green-600 hover:bg-green-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.35),0_1px_2px_rgba(0,0,0,0.4)] rounded-md" type="submit">
                 <span class="text-white font-bold p-4">Save Changes</span>

@@ -20,6 +20,7 @@ export async function load({ cookies }) {
     else
     {
         let userInfos = await validateJWT(JWTtoken);
+        // console.log(userInfos);
         if (!userInfos)
         {
             cookies.set('JWTtoken', "-1", { path: '/' });
@@ -52,6 +53,7 @@ export const actions = {
             const formData = await request.formData();
             const JWTtoken = cookies.get('JWTtoken');
             const userInfos = await validateJWT(JWTtoken);
+            // console.log(userInfos);
             if (!userInfos) {
                 throw redirect(308, '/login');
             }
@@ -77,6 +79,7 @@ export const actions = {
                     code: 10
                 }
             const price = await db.select({ price:shop.price }).from(shop).where(eq(product.id, shop.id));
+            // console.log("user ", userInfos.id, " product ", product.id);
             const own = await db.select({ own:inventory.own }).from(inventory).where(and(eq(userInfos.id, inventory.user), eq(product.id, inventory.product)))
             if (!price || !price[0] || !price[0].price || !check_price(userInfos, price[0].price) || !own || !own[0] || own[0].own === null || own[0].own === true)
             {
