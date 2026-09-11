@@ -10,7 +10,6 @@
     let { data, form }: PageProps = $props();
 
     afterNavigate ((navigation:any) => {
-        console.log(navigation);
         if (navigation.type === "goto" && navigation.from.route.id === "/user/profile/edit")
             chatClient.execProfileChange(data.username, data.icon);
     });

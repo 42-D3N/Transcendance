@@ -1,7 +1,6 @@
 <script lang="ts">
 	import "../app.css";
-	import { activeChats, openedChats } from '$lib/chat-client.svelte.ts';
-    import { chatClient } from "../lib/chat-client.svelte";
+	import { chatClient, activeChats, openedChats } from '$lib/chat-client.svelte.ts';
 	let { name } = $props();
     let show = $state(false);
 	let container:any;
