@@ -14,12 +14,6 @@ const DataRouter = Router();
 // DataRouter.put("/update-Data/:id", validateIdParam(), validateDataBody(), validateDataTitle(), updateData);
 // DataRouter.delete("/delete-Data/:id", validateIdParam(), deleteData);
 
-//auth
-
-DataRouter.post("/register", v.validateEmail(), v.validatePassword(), register);
-DataRouter.post("/login", v.validateEmail(), v.validatePassword(), login);
-DataRouter.delete("/quit", v.validateEmail(), v.validatePassword(), deleteapiuser);
-
 //users
 
 DataRouter.get("/get-all-users", authMiddleware, u.getalluser);

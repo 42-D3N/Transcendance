@@ -4,7 +4,6 @@ import type { NextFunction } from "express";
 export function HandleParsingError(result, next: NextFunction)
 {
   const errors = result.array();
-  console.log(errors);
   if (errors.length > 1){
     if (errors[0].path === errors[1].path) {
       switch (errors[0].path) {
