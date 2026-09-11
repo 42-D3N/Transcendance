@@ -70,6 +70,7 @@ const start = async () => {
 				});
 				socket.on('message', async (message: string) => {
 					let packet = JSON.parse(message);
+					console.log(packet);
 					switch (packet.type) {
 						case "message":
 							try {
@@ -96,11 +97,12 @@ const start = async () => {
 						case "history":
 							try {
 								const targetId = await db.select({id: users.id}).from(users).where(eq(users.id, packet.target));
+								const authId = connections.get(socket);
 								if (targetId.length === 0) {
 									socket.send(JSON.stringify({type: "history", valid:false, body:{cause: "User does not exist."}}));
 									break ;
 								}
-								const history = await db.select({author: chat.author, target: chat.dest, message: chat.content, timestamp: chat.timestamp}).from(chat).where(or(eq(packet.target, chat.dest), eq(packet.target, chat.author))).orderBy(chat.timestamp);
+								const history = await db.select({author: chat.author, target: chat.dest, message: chat.content, timestamp: chat.timestamp}).from(chat).where(or(and(eq(packet.target, chat.dest), eq(authId, chat.author)), and(eq(packet.target, chat.author), eq(authId, chat.dest)))).orderBy(chat.timestamp);
 								socket.send(JSON.stringify({type: "history", valid:true, body: {target: packet.target, history}}));
 							} catch (error) {
 								console.log(error);

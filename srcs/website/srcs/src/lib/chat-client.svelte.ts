@@ -19,7 +19,7 @@ interface OpenedChat {
 	id: number,
 	name: string,
 	avatar: string,
-	history: Message[] | null,
+	history: Message[],
 	hasError: boolean | null,
 	error: string | null
 }
@@ -35,7 +35,7 @@ class ChatClient {
 		if (this.ws) return;
 		this.userId = id;
 
-		this.ws = new WebSocket(`wss://localhost:8081/api/chat?token=${token}`);
+		this.ws = new WebSocket(`wss://`+window.location.host+`/api/chat?token=${token}`);
 
 		this.ws.onopen = () => {
 			console.log("Connected to chat server");
@@ -94,7 +94,7 @@ class ChatClient {
 					}
 					openedChats.forEach((chat, index, contacts) => {
 						if (chat.id === data.body.author || chat.id === data.body.target)
-							chat.history?.push({author: data.body.author, target: data.body.target, message: data.body.message, timestamp: new Date(data.body.timestamp)});
+							chat.history.push({author: data.body.author, target: data.body.target, message: data.body.message, timestamp: new Date(data.body.timestamp)});
 					});
 					break;
 
@@ -154,6 +154,10 @@ class ChatClient {
 
 	checkUserExists(target: string, index: number) {
 		this.ws?.send(JSON.stringify({ type: "newChat", target: target, index: index}));
+	}
+
+	execProfileChange(name: string, avatar:string | null) {
+		this.ws?.send(JSON.stringify({ type: "profileChange", name: name, avatar: avatar}));
 	}
 }
 

@@ -97,7 +97,7 @@
 		{/each}
 	</div>
 	<div id="mobile-shroud-sidebar" class="lg:hidden {(!displayNav)?"hidden":""} inset-0 fixed z-2 bg-black/30"></div>
-	<nav id="sidebar-main-menu" class="flex max-lg:fixed flex-col h-svh max-lg:h-[unset] max-lg:top-19 px-[0.8rem] pt-[0.8rem] pb-[1.2rem] max-lg:bottom-0 w-68 lg:max-xl:w-[5.6rem] bg-[#292626FF] max-lg:z-100 max-lg:{(!displayNav)?"hidden":""}" bind:this={sidebar} data-sveltekit-reload>
+	<nav id="sidebar-main-menu" class="flex max-lg:fixed flex-col h-svh max-lg:h-[unset] max-lg:top-19 px-[0.8rem] pt-[0.8rem] pb-[1.2rem] max-lg:bottom-0 w-68 lg:max-xl:w-[5.6rem] bg-[#292626FF] max-lg:z-100 max-lg:{(!displayNav)?"hidden":""}" bind:this={sidebar}>
 		<a href="/" class="items-center grid gap-[1.2rem] relative max-lg:hidden w-full">
 			<img alt="logo" class="col-span-full" src={favicon} height="120px" width="120px"/>
 		</a>
@@ -158,7 +158,7 @@
 			<SidebarTab name="chats"/>
 			<SidebarTab name="settings"/>
 			<div class="ft-sidebar-footing-icon">
-				<a class="ft-button ft-button-small sidebar-link hover:bg-white/30" href="/user/logout" aria-label="Log out">
+				<a class="ft-button ft-button-small sidebar-link hover:bg-white/30" href="/user/logout" aria-label="Log out" data-sveltekit-reload>
 					<span class="ft-icon-size-20 ft-icon-glyph">
 						<svg width="20" height="20" viewBox="0 0 24 24" data-glyph="local-door-left-exit" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M4.93,16.37 l-4.47,-3.93 c-0.33,-0.3,-0.33,-0.57,0,-0.87 l4.47,-3.93 c0.77,-0.7,1.07,-0.57,1.07,0.47 l0,7.8 c0,1.03,-0.3,1.17,-1.07,0.47 Z M15.13,13.5 l-10.77,-0.03 l0,-2.97 l10.77,0 c0.6,0,0.83,0.3,0.83,1.07 l0,0.87 c0,0.77,-0.23,1.07,-0.83,1.07 Z M10.0,15.43 l0.0,3.9 c0.0,0.67,0.0,0.67,0.67,0.67 l5.3,0.0 l0,2.0 l-5.3,0 c-2.0,0.0,-2.67,-0.67,-2.67,-2.67 l0,-3.9 Z M19.23,20.0 l2.07,-0.03 c0.7,-0.01,0.7,-0.01,0.7,-0.7 l0,-14.6 c-0.0,-0.67,-0.0,-0.67,-0.67,-0.67 l-10.67,-0.0 c-0.67,0.0,-0.67,0.0,-0.67,0.67 l-0.0,3.9 l-2.0,0 l0,-3.9 c0,-2.0,0.67,-2.67,2.67,-2.67 l10.67,0 c2.0,0,2.67,0.67,2.67,2.67 l0,14.6 c0,2.0,-0.67,2.67,-2.67,2.7 l-2.07,0.03 Z M22.67,22.53 l-3.33,1.27 c-0.97,0.4,-1.33,0.13,-1.33,-0.9 l0,-15.47 c0,-1.03,0.37,-1.57,1.33,-1.97 l2.17,-0.83 c1.87,-0.73,2.5,-0.3,2.5,1.7 l0,14.23 c0,1.03,-0.37,1.57,-1.33,1.97 Z M22.67,22.53"></path></svg>
 					</span>
@@ -215,7 +215,7 @@
 					</button>
 				</div>
 				<div class="mobile-toolbar-action">
-					<a id="logout-widget-button" aria-label="Log out" class="mobile-toolbar-action-button ft-button ft-button-small hover:bg-white/30" href="/user/logout">
+					<a id="logout-widget-button" aria-label="Log out" class="mobile-toolbar-action-button ft-button ft-button-small hover:bg-white/30" href="/user/logout" data-sveltekit-reload>
 						<span class="ft-icon-size-20 ft-icon-glyph">
 							<svg width="20" height="20" viewBox="0 0 24 24" data-glyph="local-door-left-exit" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M4.93,16.37 l-4.47,-3.93 c-0.33,-0.3,-0.33,-0.57,0,-0.87 l4.47,-3.93 c0.77,-0.7,1.07,-0.57,1.07,0.47 l0,7.8 c0,1.03,-0.3,1.17,-1.07,0.47 Z M15.13,13.5 l-10.77,-0.03 l0,-2.97 l10.77,0 c0.6,0,0.83,0.3,0.83,1.07 l0,0.87 c0,0.77,-0.23,1.07,-0.83,1.07 Z M10.0,15.43 l0.0,3.9 c0.0,0.67,0.0,0.67,0.67,0.67 l5.3,0.0 l0,2.0 l-5.3,0 c-2.0,0.0,-2.67,-0.67,-2.67,-2.67 l0,-3.9 Z M19.23,20.0 l2.07,-0.03 c0.7,-0.01,0.7,-0.01,0.7,-0.7 l0,-14.6 c-0.0,-0.67,-0.0,-0.67,-0.67,-0.67 l-10.67,-0.0 c-0.67,0.0,-0.67,0.0,-0.67,0.67 l-0.0,3.9 l-2.0,0 l0,-3.9 c0,-2.0,0.67,-2.67,2.67,-2.67 l10.67,0 c2.0,0,2.67,0.67,2.67,2.67 l0,14.6 c0,2.0,-0.67,2.67,-2.67,2.7 l-2.07,0.03 Z M22.67,22.53 l-3.33,1.27 c-0.97,0.4,-1.33,0.13,-1.33,-0.9 l0,-15.47 c0,-1.03,0.37,-1.57,1.33,-1.97 l2.17,-0.83 c1.87,-0.73,2.5,-0.3,2.5,1.7 l0,14.23 c0,1.03,-0.37,1.57,-1.33,1.97 Z M22.67,22.53"></path></svg>
 						</span>

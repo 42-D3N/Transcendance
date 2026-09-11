@@ -1,4 +1,5 @@
 import { createJWT, validateJWT } from '$lib/server/user_management/jwt.js';
+import { chatClient } from '$lib/chat-client.svelte.ts';
 import { redirect, fail } from '@sveltejs/kit';
 import { randomBytes } from 'crypto';
 import { db } from '$lib/server/db/index';
@@ -129,6 +130,8 @@ export const actions = {
             userInfos.icon = randomString.toString("hex")+"."+end[end.length - 1];
             console.log("changing {user_id}",userInfos.id,"icon: ",userInfos.icon,"->\n",randomString.toString("hex")+"."+end[end.length - 1]);
         }
+
+        chatClient.execProfileChange(userInfos.username, userInfos.icon);
 
         const updatedJWT = await createJWT(userInfos);
         event.cookies.set('JWTtoken', updatedJWT, { path: '/' });

@@ -1,7 +1,6 @@
 <script lang="ts">
 	import "../app.css";
 	import { activeChats, openedChats } from '$lib/chat-client.svelte.ts';
-	import usericon from '$lib/assets/user/default.svg';
     import { chatClient } from "../lib/chat-client.svelte";
 	let { name } = $props();
     let show = $state(false);
@@ -15,13 +14,13 @@
 	function addEmptyChat() {
 		if (openedChats.length === 4)
 			openedChats.pop();
-		openedChats.unshift({id: -1, name: "null", avatar: usericon, history: null, hasError: false, error: null});
+		openedChats.unshift({id: -1, name: "null", avatar: null, history: [], hasError: false, error: null});
 	}
 
 	function addChat(index: number) {
 		if (openedChats.length === 4)
 			openedChats.pop();
-		openedChats.unshift({id: activeChats[index].id, name: activeChats[index].name, avatar: activeChats[index].avatar, history: null, hasError: false, error: null});
+		openedChats.unshift({id: activeChats[index].id, name: activeChats[index].name, avatar: activeChats[index].avatar, history: [], hasError: false, error: null});
 		chatClient.sendRequest(activeChats[index].id);
 	}
 
