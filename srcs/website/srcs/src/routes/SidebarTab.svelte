@@ -1,7 +1,9 @@
 <script lang="ts">
 	import "../app.css";
-	import { activeChats } from '$lib/chat-client.svelte.ts';
-	let { name, openedChats } = $props();
+	import { activeChats, openedChats } from '$lib/chat-client.svelte.ts';
+	import usericon from '$lib/assets/user/default.svg';
+    import { chatClient } from "../lib/chat-client.svelte";
+	let { name } = $props();
     let show = $state(false);
 	let container:any;
 
@@ -13,7 +15,14 @@
 	function addEmptyChat() {
 		if (openedChats.length === 4)
 			openedChats.pop();
-		openedChats.unshift({id: -1, name: "null", hasError: false, error: null});
+		openedChats.unshift({id: -1, name: "null", avatar: usericon, history: null, hasError: false, error: null});
+	}
+
+	function addChat(index: number) {
+		if (openedChats.length === 4)
+			openedChats.pop();
+		openedChats.unshift({id: activeChats[index].id, name: activeChats[index].name, avatar: activeChats[index].avatar, history: null, hasError: false, error: null});
+		chatClient.sendRequest(activeChats[index].id);
 	}
 
 	function formatTime(e:Date):string {
@@ -67,8 +76,8 @@
 					{:else if name === "chats"}
 					<section class="h-full overflow-x-hidden overflow-y-auto overscroll-contain pt-[0.8rem] pr-[0.8rem] pl-[0.8rem] pb-0">
 						<div class="items-stretch flex flex-col h-full overscroll-contain">
-							{#each activeChats as contact}
-								<div class="chat-row-wrapper">
+							{#each activeChats as contact, index}
+								<div class="chat-row-wrapper" onclick={() => addChat(index)}>
 									<div class="ft-avatar-component ft-avatar-size-32">
 										<img class="h-full w-full object-cover overscroll-contain" src="https://www.chess.com/bundles/web/images/noavatar_l.84a92436.gif" alt="avatar de {contact.name}">
 									</div>

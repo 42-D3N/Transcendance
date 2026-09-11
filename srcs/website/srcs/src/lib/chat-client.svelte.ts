@@ -2,21 +2,38 @@ import { writable } from 'svelte/store';
 
 interface ChatContact {
 	id: number,
+	avatar: string,
 	name: string,
 	message: string,
 	time: Date
 }
 
-type OpenedChatsType = [ChatContact?, ChatContact?, ChatContact?, ChatContact?]
+interface Message {
+	author: number,
+	target: number,
+	message: string,
+	timestamp: Date
+}
 
-export let activeChats:ChatContact[] = [];
-export let openedChats = $state([]);
+interface OpenedChat {
+	id: number,
+	name: string,
+	avatar: string,
+	history: Message[] | null,
+	hasError: boolean | null,
+	error: string | null
+}
+
+export let activeChats:ChatContact[] = $state([]);
+export let openedChats:OpenedChat[] = $state([]);
 
 class ChatClient {
 	private ws: WebSocket | null = null;
+	private userId: number = -1;
 
-	connect(token: string){
+	connect(token: string, id: number){
 		if (this.ws) return;
+		this.userId = id;
 
 		this.ws = new WebSocket(`wss://localhost:8081/api/chat?token=${token}`);
 
@@ -31,29 +48,92 @@ class ChatClient {
 
 		this.ws.onmessage = event => {
 			let data = JSON.parse(event.data);
+			console.log(data);
 			switch (data.type) {
 				case "contacts":
-					activeChats = [];
-					data.res.forEach((element:any) => {
-						activeChats.push({id: element.id, name: element.name, message: element.message, time:new Date(element.time)});
+					activeChats.splice(0);
+					data.body.forEach((element:any) => {
+						activeChats.push({id: element.id, name: element.name, avatar:element.avatar, message: element.message, time:new Date(element.time)});
 					});
 					break ;
 
 				case "newChat":
-					openedChats[data.index].hasError = false;
-					openedChats[data.index].error = null;
-					if (data.isOk) {
-						openedChats[data.index].id = data.user.id;
-						openedChats[data.index].name = data.user.name;
+					openedChats[data.body.index].hasError = false;
+					openedChats[data.body.index].error = null;
+					if (data.valid) {
+						openedChats[data.body.index].id = data.body.id;
+						openedChats[data.body.index].name = data.body.name;
+						openedChats[data.body.index].avatar = data.body.avatar;
 					}
 					else {
-						openedChats[data.index].hasError = true;
-						openedChats[data.index].error = data.reason;
+						openedChats[data.body.index].hasError = true;
+						openedChats[data.body.index].error = data.body.cause;
 					}
 					break;
 
+				case "message":
+					if (!data.valid)
+						break;
+					let isIn = false;
+					activeChats.forEach((contact, index, contacts) => {
+						if (contact.id === data.body.author || contact.id === data.body.target) {
+							isIn = true;
+							contact.message = data.body.message;
+							contact.time = new Date(data.body.timestamp);
+						}
+					});
+					if (!isIn) {
+						if (data.body.author === this.userId) {
+							activeChats.push({id: data.body.target, name: "", avatar:"", message: data.body.message, time:new Date(data.body.timestamp)});
+							this.ws?.send(JSON.stringify({ type: "infos", target: data.body.target }));
+						}
+						else {
+							activeChats.push({id: data.body.author, name: "", avatar:"", message: data.body.message, time:new Date(data.body.timestamp)});
+							this.ws?.send(JSON.stringify({ type: "infos", target: data.body.author }));
+						}
+					}
+					openedChats.forEach((chat, index, contacts) => {
+						if (chat.id === data.body.author || chat.id === data.body.target)
+							chat.history?.push({author: data.body.author, target: data.body.target, message: data.body.message, timestamp: new Date(data.body.timestamp)});
+					});
+					break;
+
+				case "infos":
+					if (!data.valid)
+						break;
+					activeChats.forEach((contact, index, contacts) => {
+						if (contact.id === data.body.id) {
+							contact.name = data.body.name;
+							contact.avatar = data.body.avatar;
+						}
+					});
+					break;
+
+				case "profileChange":
+					activeChats.forEach((contact, index, contacts) => {
+						if (contact.id === data.body.id) {
+							contact.name = data.body.name;
+							contact.avatar = data.body.avatar;
+						}
+					});
+					openedChats.forEach((chat, index, contacts) => {
+						if (chat.id === data.body.id) {
+							chat.name = data.body.name;
+							chat.avatar = data.body.avatar;
+						}
+					});
+					break;
+
+				case "history":
+					if (!data.valid)
+						break;
+					openedChats.forEach((chat, index, contacts) => {
+						if (chat.id === data.body.target)
+							chat.history = data.body.history;
+					});
+					break;
+
 				default:
-					console.log(data);
 					break ;
 			}
 		};
@@ -64,11 +144,11 @@ class ChatClient {
 		this.ws = null;
 	}
 
-	sendMessage(message: string, target: string) {
+	sendMessage(message: string, target: number) {
 		this.ws?.send(JSON.stringify({ type: "message", target: target, message: message }));
 	}
 
-	sendRequest(target: string) {
+	sendRequest(target: number) {
 		this.ws?.send(JSON.stringify({ type: "history", target: target }));
 	}
 

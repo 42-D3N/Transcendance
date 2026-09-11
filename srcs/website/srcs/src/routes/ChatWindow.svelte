@@ -1,21 +1,21 @@
 <script lang="ts">
-    import { chatClient } from "$lib/chat-client.svelte.ts";
+    import { chatClient, openedChats } from "$lib/chat-client.svelte.ts";
+	import usericon from '$lib/assets/user/default.svg';
 
-	let { chat, index } = $props();
-	let avatar:string = "https://www.chess.com/bundles/web/images/noavatar_l.84a92436.gif";
+	let { index, userId } = $props();
 	let chatMessage:string = $state();
 	let userNewChat:string = $state();
 
 	function close() {
-		chat.splice(index, 1);
+		openedChats.splice(index, 1);
 	}
 	function handleUsernameInput(event: any) {
 		if (event.key === "Enter")
 			chatClient.checkUserExists(userNewChat, index);
 	}
 	function handleChatInput(event: any) {
-		if (event.key === "Enter" && chatMessage != "" && chat[index].id != -1) {
-			chatClient.sendMessage(chatMessage, chat[index].name);
+		if (event.key === "Enter" && chatMessage != "" && openedChats[index].id != -1) {
+			chatClient.sendMessage(chatMessage, openedChats[index].id);
 			chatMessage = "";
 		}
 	}
@@ -27,22 +27,22 @@
 <div class="h-[332px] w-[350px] ml-[0.5rem] flex flex-col relative bg-black/50">
 	<div class="items-start flex basis-[3rem] grow shrink-0 justify-between relative">
 		<div class="rounded-tl-sm items-center flex overflow-hidden text-ellipsis whitespace-nowrap">
-			{#if chat[index].id === -1}
+			{#if openedChats[index].id === -1}
 			<div>
-				<span></span>
+				<span>À: </span>
 				<span>
 					<input class="send-message-field send-message-editor" onkeydown={onKeyDown} onkeyup={handleUsernameInput} bind:value={userNewChat} data-no-scrollbar/>
 				</span>
 			</div>
-			{#if chat[index].hasError}
-			<p class="error">{chat[index].error}</p>
+			{#if openedChats[index].hasError}
+			<p class="error">{openedChats[index].error}</p>
 			{/if}
 			{:else}
 			<span class="flex shrink-0 text-[2.5rem] relative text-center">
-				<img class="h-[30px] w-[30px]" src={avatar}>
+				<img class="h-[30px] w-[30px]" src={openedChats[index].avatar != null?openedChats[index].avatar:usericon}>
 			</span>
 			<span class="ml-[1rem] items-center flex text-[1.4rem]">
-				<a class="text-white">{chat[index].name}</a>
+				<a class="text-white">{openedChats[index].name}</a>
 			</span>
 			{/if}
 		</div>
@@ -56,7 +56,15 @@
 			</button>
 		</div>
 	</div>
-	<div class="basis-full grow-2 shrink overflow-hidden relative"></div>
+	<div class="basis-full grow-2 shrink overflow-hidden relative">
+		<div class="h-full overflow-auto overscroll-y-contain">
+			{#each openedChats[index].history as message}
+				<div class="text-[1.3rem] relative {userId === message.author?'bg-green':'bg-yellow'}">
+					{message.message}
+				</div>
+			{/each}
+		</div>
+	</div>
 	<div>
 		<div class="border-t-[0.1rem] border-solid border-white flex max-w-full relative">
 			<div class="send-message-field send-message-editor" data-placeholder="Envoyer un message..." contenteditable="true" onkeydown={onKeyDown} onkeyup={handleChatInput} bind:innerText={chatMessage} data-no-scrollbar></div>

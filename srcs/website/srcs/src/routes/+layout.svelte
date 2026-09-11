@@ -23,7 +23,7 @@
         if (!browser) return;
 
         if (data.Token != -1)
-            chatClient.connect(data.Token);
+            chatClient.connect(data.Token, data.id);
         else
             chatClient.disconnect();
     });
@@ -93,7 +93,7 @@
 <div id="sidebar" class="lg:left-0 lg:fixed lg:z-100">
 	<div class="opened-chats-container">
 		{#each openedChats as chat, i}
-		<ChatWindow chat={openedChats} index={i}/>
+		<ChatWindow index={i} userId={data.id}/>
 		{/each}
 	</div>
 	<div id="mobile-shroud-sidebar" class="lg:hidden {(!displayNav)?"hidden":""} inset-0 fixed z-2 bg-black/30"></div>
@@ -123,16 +123,6 @@
 					<img class="ft-icon-img ft-icon-size-24" src={setticon} alt="icon"/>
 					<span class="ft-sidebar-link-text text-2xl/tight text-white">Settings</span>
 				</a>
-				{#if data.Token !== '-1'}
-				<button class="ft-button ft-button-medium sidebar-link hover:bg-[#333131FF]" onclick={() => chatClient.sendRequest("rapo")}>
-					<img class="ft-icon-img ft-icon-size-24" src={setticon} alt="icon"/>
-					<span class="ft-sidebar-link-text text-2xl/tight text-white">History</span>
-				</button>
-				<button class="ft-button ft-button-medium sidebar-link hover:bg-[#333131FF]" onclick={() => chatClient.sendMessage("noooooooo", "rapo")}>
-					<img class="ft-icon-img ft-icon-size-24" src={setticon} alt="icon"/>
-					<span class="ft-sidebar-link-text text-2xl/tight text-white">Message</span>
-				</button>
-				{/if}
 			</div>
 		</div>
 		<hr class="mt-auto border-none">
@@ -164,9 +154,9 @@
 			</div>
 		</a>
 		<div class="sidebar-footer-icons mobile-hidden">
-			<SidebarTab name="friends" openedChats={openedChats}/>
-			<SidebarTab name="chats" openedChats={openedChats}/>
-			<SidebarTab name="settings" openedChats={openedChats}/>
+			<SidebarTab name="friends"/>
+			<SidebarTab name="chats"/>
+			<SidebarTab name="settings"/>
 			<div class="ft-sidebar-footing-icon">
 				<a class="ft-button ft-button-small sidebar-link hover:bg-white/30" href="/user/logout" aria-label="Log out">
 					<span class="ft-icon-size-20 ft-icon-glyph">
