@@ -20,9 +20,7 @@ export async function load ({ cookies }) {
     let requestsInfos: {id: number; username: string; icon: string | null}[] = [];
     let copinous = [];
     let actualFriends: {id: number; username: string; icon: string | null}[] = [];
-    let friendRequests = [];
-    let requestsInfos: {id: number; username: string; icon: string | null}[] = [];
-
+    
     if (!JWTtoken || JWTtoken === '-1')
     {
         cookies.set('JWTtoken', '-1', { path: '/' });

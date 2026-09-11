@@ -70,15 +70,17 @@
                 <div>
                     <span class="inline pl-3 text-white">Username:</span><input name="username" value={data.username} type="username" class="inline pl-3 font-black text-white text-4xl w-[10ch]"><br>
                     {#if form?.invalidName}<p class="error ml-2">please enter a valid username</p>{/if}
-                    <span class="inline pl-3 text-white">Email:</span><input name="email" value={data.email} type="email" class="inline pl-3 font-black text-white text-4xl"><br>
+                    <span class="inline pl-3 text-white">Email:</span><input name="email" value={data.email} type="email" class="inline pl-3 font-black text-white text-4xl max-w-[12ch] lg:max-w-[30ch]"><br>
                     {#if form?.invalidMail}<p class="error max-w-[28ch] ml-2">please enter a valid email adress</p>{/if}
                     {#if form?.somethingExists}<p class="error max-w-[28ch] ml-2">username or mail already taken</p>{/if}
-                    <span class="inline pl-12 pt-6 font-semibold text-zinc-400 text-xl">Wallets:</span><input name="wallet" value={data.wallet} type="wallet" class="inline pl-3 font-black text-white text-xl size-fit"><br>
+                    <span class="inline pl-12 pt-6 font-semibold text-zinc-400 text-xl">Wallets:</span><input name="wallet" value={data.wallet} type="wallet" class="inline pl-3 font-black text-white text-xl size-fit max-w-[6ch]"><br>
                     <span class="pl-12 text-zinc-400 text-lg">Winrate:</span>
                     <span class="text-white text-lg">{Winrate()}</span>
                 </div>
-                <input type="checkbox" id="agree" name="agree" checked={false} />
-                <label>Make account private</label>
+            </div>
+            <div class="ml-4">
+                <input type="checkbox" id="agree" name="agree" checked={false} value="private"/>
+                <span class="text-white">Make account private</span>
             </div>
             <button class="block ml-4 mt-4 w-fit p-2 bg-green-600 hover:bg-green-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.35),0_1px_2px_rgba(0,0,0,0.4)] rounded-md" type="submit">
                 <span class="text-white font-bold p-4">Save Changes</span>

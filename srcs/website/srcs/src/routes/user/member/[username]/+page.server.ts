@@ -51,6 +51,10 @@ export async function load ({ cookies, params, fetch }) {
 
         if (TakenInfos.length == 0)
             throw redirect(308, "/user/profile");
+        if (TakenInfos.privateAcc)
+            return ({
+                accPrivate: true
+        });
 
         copinous = (await db.select({ user1: friends.user1, user2: friends.user2, isaccepted: friends.isaccepted })
             .from(friends)
@@ -99,6 +103,7 @@ export async function load ({ cookies, params, fetch }) {
         matches: matches,
         wallet: wallet,
         icon: icon,
-        friends: actualFriends
+        friends: actualFriends,
+        accPrivate: false
     });
 };

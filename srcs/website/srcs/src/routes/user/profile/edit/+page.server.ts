@@ -83,7 +83,7 @@ export const actions = {
         const icon = form.get('icon') as File;
         const newName = form.get('username') as string;
         const newMail = form.get('email') as string;
-        const isPrivate = form.get('agree') as boolean;
+        const isPrivate = form.get('agree') as string;
 
         let userInfos = await validateJWT(event.cookies.get('JWTtoken'));
         if (!newName || !isUsername.test(newName))
@@ -108,6 +108,12 @@ export const actions = {
             // console.log("changing {user_id}",userInfos.id,"email: ",userInfos.email,"->",newMail);
             await db.update(users).set({email: newMail}).where(eq(users.id, userInfos.id));
         }
+
+
+        if (!userInfos.privateAcc && isPrivate.length > 0)
+            await db.update(users).set({privateAcc: true}).where(eq(users.id, userInfos.id));
+        else if (userInfos.privateAcc && isPrivate.length == 0)
+            await db.update(users).set({privateAcc: false}).where(eq(users.id, userInfos.id));
 
         if (icon && icon.size != 0)
         {
