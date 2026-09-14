@@ -1,7 +1,6 @@
 <script lang="ts">
     import Popup from "$lib/Popup.svelte";
     import noise from "$lib/assets/noise.png";
-    import test from "$lib/assets/test.jpg";
 
     let { data } = $props();
     let shep = $derived(data.code === true ? 0.50 : 1);

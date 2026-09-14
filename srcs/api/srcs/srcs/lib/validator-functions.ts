@@ -19,7 +19,7 @@ function validateUpdateUsername() {
 }
 
 function validateUpdatePassword() {
-  return body("password").optional({ checkFalsy: true }).isString().trim();
+  return body("password").optional({ checkFalsy: true }).isString().trim().custom((password: string) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])[^\s]{12,67}$/.test(password));;
 }
 
 export function validateUpdateUser() {

@@ -3,8 +3,6 @@
     import { redirect } from '@sveltejs/kit';
     import { enhance } from '$app/forms';
     import profileicon from '$lib/assets/profile_icon.svg';
-    import { enhance } from '$app/forms';
-    import profileicon from '$lib/assets/profile_icon.svg';
 
     import type { PageProps } from './$types';
     let { data, form }: PageProps = $props();

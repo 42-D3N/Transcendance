@@ -5,7 +5,7 @@
 	import homeicon from '$lib/assets/home_icon.svg';
 	import gameicon from '$lib/assets/game_icon.svg';
 	import profileicon from '$lib/assets/profile_icon.svg';
-	import setticon from '$lib/assets/settings_icon.svg';
+	import api_down from '$lib/assets/api_download.svg';
 	import shopicon from '$lib/assets/shop_icon.svg';
 
 	let sidebar:any;
@@ -102,10 +102,6 @@
 					<img class="ft-icon-img ft-icon-size-24" src={shopicon} alt="icon"/>
 					<span class="ft-sidebar-link-text text-2xl/tight text-white">Shop</span>
 				</a>
-				<a class="ft-button ft-button-medium sidebar-link hover:bg-[#333131FF]" href="/settings">
-					<img class="ft-icon-img ft-icon-size-24" src={setticon} alt="icon"/>
-					<span class="ft-sidebar-link-text text-2xl/tight text-white">Settings</span>
-				</a>
 			</div>
 		</div>
 		<hr class="mt-auto border-none">
@@ -139,7 +135,13 @@
 		<div class="sidebar-footer-icons mobile-hidden">
 			<SidebarTab name="friends"/>
 			<SidebarTab name="chats"/>
-			<SidebarTab name="settings"/>
+			<div class="ft-sidebar-footing-icon">
+				<a class="ft-button ft-button-small sidebar-link hover:bg-white/30" href="/docs/api_doc.pdf" download="api_doc.pdf">
+					<span class="ft-icon-size-20 ft-icon-glyph">
+						<img src={api_down} alt="api download doc">
+					</span>
+				</a>
+			</div>
 			<div class="ft-sidebar-footing-icon">
 				<a class="ft-button ft-button-small sidebar-link hover:bg-white/30" href="/user/logout">
 					<span class="ft-icon-size-20 ft-icon-glyph">
