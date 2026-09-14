@@ -102,7 +102,13 @@ export function serverVariable(config: MatchConfig)
       size:	{ w: 80, h: 10 },
       vel:	{ x: 0, y: 0 }
     },
-    ai: { level: aiLevels[config.aiDifficulty ?? "easy"], lastDecisionTime: 0, targetX: null }
+    ai: {
+      level: aiLevels[config.aiDifficulty ?? "easy"],
+      lastDecisionTime: 0,
+      targetX: null,
+      powerUseThisRound: false,
+      powerUsedThisRound: false
+    }
   };
 
   const power =

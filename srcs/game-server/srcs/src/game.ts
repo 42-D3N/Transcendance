@@ -42,6 +42,8 @@ function resetPlayers(vars: Game)
   {
     vars.player2.ai.lastDecisionTime = 0;
     vars.player2.ai.targetX = null;
+    vars.player2.ai.powerUseThisRound = false;
+    vars.player2.ai.powerUsedThisRound = false;
   }
 }
 
@@ -197,6 +199,25 @@ function updateAI(vars: Game, connectedPlayers: ConnectedPlayer[])
   const ai = vars.player2.ai;
   if (!ai)
     return;
+
+  if (ai.powerUseThisRound && !ai.powerUsedThisRound)
+  {
+    const canUsePower = vars.state.status === 'playing'
+      && vars.power.pendingOwner === null
+      && vars.power.boostedTarget === null
+      && isBallMovingTowardOpponent(2, vars)
+      && isBallOnOwnerHalf(2, vars);
+
+    if (canUsePower)
+    {
+      armPowerIfPossible(2, vars);
+      if (vars.power.pendingOwner === 2)
+      {
+        ai.powerUseThisRound = false;
+        ai.powerUsedThisRound = true;
+      }
+    }
+  }
 
   const reactionTicks = Math.max(1, Math.ceil(ai.level.reactionTime / vars.TICK_INTERVAL));
   const racketCenter = vars.player2.racket.pos.x + vars.player2.racket.size.w / 2;
@@ -428,6 +449,11 @@ function bounceOnRacket(player: Player, vars: Game, verticalDirection: 1 | -1)
 function resetBall(vars: Game, direction: 1 | -1)
 {
   clearPowerState(vars);
+  if (vars.player2.ai)
+  {
+    vars.player2.ai.powerUseThisRound = Math.random() < (1 / 3);
+    vars.player2.ai.powerUsedThisRound = false;
+  }
   vars.ball.pos.x = vars.BALL_BASE_POSITION.x;
   vars.ball.pos.y = vars.BALL_BASE_POSITION.y;
   vars.ball.speed = vars.rules.baseSpeed;

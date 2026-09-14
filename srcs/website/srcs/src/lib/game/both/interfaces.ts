@@ -83,6 +83,8 @@ export interface AI
   level: AILevel;
   lastDecisionTime: number;
   targetX: number | null;
+  powerUseThisRound: boolean;
+  powerUsedThisRound: boolean;
 }
 
 export interface PlayerInput
