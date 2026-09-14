@@ -3,9 +3,12 @@
     import { redirect } from '@sveltejs/kit';
     import { enhance } from '$app/forms';
     import profileicon from '$lib/assets/profile_icon.svg';
+    import { enhance } from '$app/forms';
+    import profileicon from '$lib/assets/profile_icon.svg';
 
     import type { PageProps } from './$types';
     let { data, form }: PageProps = $props();
+    let friendNb = $state(data.friends.length);
 
     function    Winrate()
     {
@@ -13,17 +16,19 @@
             return (0);
         return (parseInt(data.wins) / parseInt(data.matches));
     }
-    function    EditProfile()
+
+    function redirectToProfiles(username: string)
     {
-        redirect(308, "./edit");
+        redirect(308, "./user/member/"+username);
     }
-    console.log(data.friendRequests);
+    // console.log(data.friendRequests);
 </script>
 
 <div class="fixed inset-0 z-0 bg-[#333131FF] size-full"></div>
+<div class="fixed inset-0 z-0 bg-[#333131FF] size-full"></div>
 
 <div class="flex ml-[10%]">
-    <div class="pb-8 z-1 lg:mt-[2%] lg:p-16 pl-6 pr-6 w-[90%] ">
+    <div class="pb-8 z-1 lg:mt-[2%] lg:p-16 pl-6 pr-6 w-[90%] h-fit">
         <div class="pb-8 w-full h-[80%] bg-[#292626FF] border-solid rounded-lg z-10">
             
             <div class="flex p-4">
@@ -41,6 +46,29 @@
                     <span class="pl-12 text-zinc-400 text-lg lg:text-xl">Winrate:</span>
                     <span class="text-white text-lg lg:text-xl">{Winrate()}</span>
                 </div>
+            </div>
+            <span class="pl-12 text-white text-lg lg:text-3xl lg:font-light">Friends: {friendNb} | don't forget you can chat with your friends!</span>
+            <a class="block ml-4 mt-4 w-fit p-2 bg-[#333131FF] shadow-[inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.35),0_1px_2px_rgba(0,0,0,0.4)] rounded-md" href="./profile/edit">
+                <span class="text-white font-bold lg:text-3xl p-4">Edit Profile</span>
+            </a>
+            <span class="block mt-4 pl-6 font-black text-white text-xl md:text-3xl">Friends:</span>
+            <div class="grid grid-cols-4 gap-4 mt-4 ml-8 lg:ml-4 w-[60%] lg:w-[40%]">
+                {#each data.friends as friend}
+                    <a href={"/user/member/"+friend.username+"_"+JSON.stringify(friend.id)}>
+                        <div class="bg-stone-700 size-fit p-2 rounded-md">
+                            {#if !friend.icon}
+                                <img class="block ml-4 lg:m-4 2xl:h-[6rem] 2xl:w-[6rem] xl:h-[5rem] xl:w-[5rem] h-[3rem] w-[3rem] border-solid rounded-md bg-amber-50" src={usericon} alt=""/>
+                            {:else}
+                                <img class="block ml-4 lg:m-4 2xl:h-[6rem] 2xl:w-[6rem] xl:h-[5rem] xl:w-[5rem] h-[3rem] w-[3rem] border-solid rounded-md bg-amber-50" src={friend.icon} alt=""/>
+                            {/if}
+                            {#if friend.username.length+JSON.stringify(friend.id).length+1 < 10}
+                                <span class="ml-2 text-lg xl:text-2xl lg:pl-2 lg:ml-2 lg:mt-1 font-md lg:mt-5">{friend.username}#{friend.id}</span>
+                            {:else}
+                                <span class="ml-2 text-lg xl:text-2xl lg:pl-2 lg:ml-2 lg:mt-1 font-md lg:mt-5">{friend.username.slice(0, 7)}...</span>
+                            {/if}
+                        </div>
+                    </a>
+                {/each}
             </div>
             <span class="pl-12 text-white text-lg lg:text-3xl lg:font-light">Friends: {0} | don't forget you can chat with your friends!</span>
             <a class="block ml-4 mt-4 w-fit p-2 bg-[#333131FF] shadow-[inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.35),0_1px_2px_rgba(0,0,0,0.4)] rounded-md" href="./profile/edit">
@@ -76,9 +104,10 @@
                     }}
                     >
                         {#if !frRequests.icon}
+                            <span>???</span>
                             <img class="upload block m-2 lg:h-[4rem] lg:w-[4rem] h-[2rem] w-[2rem] border-solid rounded-md bg-amber-50" src={usericon} alt=""/>
                         {:else}
-                            <img class="upload block m-2 lg:h-[4rem] lg:w-[4rem] h-[2rem] w-[2rem] border-solid rounded-md bg-amber-50" src={data.icon} alt=""/>
+                            <img class="upload block m-2 lg:h-[4rem] lg:w-[4rem] h-[2rem] w-[2rem] border-solid rounded-md bg-amber-50" src={frRequests.icon} alt=""/>
                         {/if}
                         <span class="pl-2 mt-1 font-md lg:mt-5">{frRequests.username}#{frRequests.id}</span>
 
@@ -91,6 +120,10 @@
             </div>
         </div> 
 
+        <div class="mt-16 pb-8 w-full h-[20%] bg-[#292626FF] border-solid rounded-lg z-10 p-4">
+                <span class="text-white text-4xl font-bold p-4">Match History</span>
+                <span class="text-zinc-400 text-4xl font-bold">({data.matches})</span>
+        </div>
         <div class="mt-16 pb-8 w-full h-[20%] bg-[#292626FF] border-solid rounded-lg z-10 p-4">
                 <span class="text-white text-4xl font-bold p-4">Match History</span>
                 <span class="text-zinc-400 text-4xl font-bold">({data.matches})</span>
