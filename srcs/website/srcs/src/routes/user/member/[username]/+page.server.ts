@@ -47,7 +47,7 @@ export async function load ({ cookies, params, fetch }) {
 		}
 
         let checkName = params.username.split("_");
-        if (checkName[0] == userInfos.username && checkName[1] == userInfos.id)
+        if (checkName[0] == userInfos.username || checkName[1] == userInfos.id)
             throw redirect(308, "/user/profile");
 
         let fetchedUser = await fetch(`/user/member/${params.username}`);

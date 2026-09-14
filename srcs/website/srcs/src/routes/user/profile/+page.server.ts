@@ -3,7 +3,7 @@ import { validateJWT } from '$lib/server/user_management/jwt.js';
 import type { Actions } from './$types';
 import { db } from '$lib/server/db/index';
 import { eq, and, or } from 'drizzle-orm';
-import { users, friends } from '$lib/server/db/schema';
+import { users, friends, matches } from '$lib/server/db/schema';
 
 
 export async function load ({ cookies }) {
@@ -13,13 +13,14 @@ export async function load ({ cookies }) {
     let email = '';
     let wins = '0';
     let losses = '0';
-    let matches = '0';
+    let playedMatches = '0';
     let wallet = '0';
     let icon = 'default.svg';
     let friendRequests = [];
     let requestsInfos: {id: number; username: string; icon: string | null}[] = [];
     let copinous = [];
     let actualFriends: {id: number; username: string; icon: string | null}[] = [];
+    let userHistory: [];
     
     if (!JWTtoken || JWTtoken === '-1')
     {
@@ -57,6 +58,7 @@ export async function load ({ cookies }) {
         copinous = (await db.select({ user1: friends.user1, user2: friends.user2, isaccepted: friends.isaccepted })
             .from(friends)
             .where(and(or(eq(friends.user2, userInfos.id), eq(friends.user1, userInfos.id)), eq(friends.isaccepted, true)))
+            .limit(12)
         );
 
         requestsInfos = await Promise.all(
@@ -95,12 +97,18 @@ export async function load ({ cookies }) {
             })
         );
 
+        if (userInfos.matches > 0)
+            userHistory = await db.select()
+            .from(matches)
+            .where(or(eq(matches.user1, userInfos.id), eq(matches.user2, userInfos.id)))
+            .limit(5);
+
         id = userInfos.id;
         username = userInfos.username;
         email = userInfos.email;
         wins = userInfos.wins;
         losses = userInfos.losses;
-        matches = userInfos.matches;
+        playedMatches = userInfos.matches;
         wallet = userInfos.wallets;
         if (userInfos.icon != '')
             icon = userInfos.icon
@@ -113,11 +121,12 @@ export async function load ({ cookies }) {
         email: email,
         wins: wins,
         losses: losses,
-        matches: matches,
+        playedMatches: playedMatches,
         wallet: wallet,
         icon: icon,
         friendRequests: requestsInfos,
-        friends: actualFriends
+        friends: actualFriends,
+        matchHistory: userHistory
     });
 };
 
