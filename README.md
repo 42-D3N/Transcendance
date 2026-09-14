@@ -494,3 +494,36 @@ Explain:
 ---
 
 # Credits
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2 : 3D (immsersive ??? | advanced ???) --> Redirect 1 point : 3D fun simple
+
+1 : Game Stats & match history (missing stats, history, mmr for achievement and progression, leaderboard)
+
+1 : File upload and management system (multiple-file type ? | missing delete uploaded files)
+2 : Standard user management (missing online status)
+2 : AI Opponent (not perfect play + explain)
+2 : remote player (missing reconnection logic (use user profile and lock slot to this user))
+1 : Game custom (power-up__s__ ? | skins)
+
+2 : Fullstack
+2 : Real-time websocket
+2 : Chat + profile + friend
+2 : Public API (GET POST PUT DELETE)
+1 : ORM for the database
+1 : Support for additionnal browsers
+2 : GAME
+2 : Backend as microservices
+1 : SSR

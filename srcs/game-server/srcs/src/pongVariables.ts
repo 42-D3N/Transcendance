@@ -39,7 +39,7 @@ export function serverVariable(config: MatchConfig)
 
   let rules: GameRules = 
   {
-    acceleration:	60,
+    acceleration:	6,
     racketSpeed:	600,
     scoreToWin:		15,
     maxSpeed:		720,
@@ -59,26 +59,26 @@ export function serverVariable(config: MatchConfig)
   {
     easy:
     {
-      reactionTime:	500,
-      errorMargin:	150
+      reactionTime:	780,
+      errorMargin:	230
     },
 
     normal:
     {
-      reactionTime:	250,
-      errorMargin:	150
+      reactionTime:	780,
+      errorMargin:	200
     },
 
     hard:
     {
-      reactionTime:	100,
+      reactionTime:	300,
       errorMargin:	150
     },
 
     impossible:
     {
-      reactionTime:	16,
-      errorMargin:	0.0001
+      reactionTime:	1,
+      errorMargin:	1
     }
   } satisfies Record<string, AILevel>;
 
@@ -102,7 +102,7 @@ export function serverVariable(config: MatchConfig)
       size:	{ w: 80, h: 10 },
       vel:	{ x: 0, y: 0 }
     },
-    ai: { level: aiLevels[config.aiDifficulty ?? "easy"], lastDecisionTime: 0 }
+    ai: { level: aiLevels[config.aiDifficulty ?? "easy"], lastDecisionTime: 0, targetX: null }
   };
 
   const power =

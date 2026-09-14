@@ -38,6 +38,11 @@ function resetPlayers(vars: Game)
   vars.player2.racket.pos.x = vars.GAME_WIDTH / 2;
   vars.player1.racket.vel.x = 0;
   vars.player2.racket.vel.x = 0;
+  if (vars.player2.ai)
+  {
+    vars.player2.ai.lastDecisionTime = 0;
+    vars.player2.ai.targetX = null;
+  }
 }
 
 function startMatch(vars: Game)
@@ -189,15 +194,70 @@ function updateAI(vars: Game, connectedPlayers: ConnectedPlayer[])
   if (vars.mode !== 'pve' || connectedPlayers.some(client => client.player === vars.player2) || vars.player2WasHuman)
     return;
 
-  const racketCenter = vars.player2.racket.pos.x + vars.player2.racket.size.w / 2;
-  const ballCenter = vars.ball.pos.x + vars.ball.size.w / 2;
+  const ai = vars.player2.ai;
+  if (!ai)
+    return;
 
-  if (ballCenter < racketCenter - 5)
+  const reactionTicks = Math.max(1, Math.ceil(ai.level.reactionTime / vars.TICK_INTERVAL));
+  const racketCenter = vars.player2.racket.pos.x + vars.player2.racket.size.w / 2;
+
+  if (ai.targetX !== null)
+  {
+    if (Math.abs(ai.targetX - racketCenter) <= 5)
+    {
+      ai.targetX = null;
+      vars.player2.input.move = 0;
+    }
+    else if (ai.targetX < racketCenter)
+      vars.player2.input.move = -1;
+    else
+      vars.player2.input.move = 1;
+
+    return;
+  }
+
+  if (vars.state.tick - ai.lastDecisionTime < reactionTicks)
+  {
+    vars.player2.input.move = 0;
+    return;
+  }
+
+  let targetX;
+  if (vars.ball.vel.y < 0)
+  {
+    const timeToReach = (vars.player2.racket.pos.y - vars.ball.pos.y) / vars.ball.vel.y;
+    targetX = vars.ball.pos.x + vars.ball.vel.x * timeToReach;
+
+    targetX += ((Math.random() - 0.2) * ai.level.errorMargin) / 2;
+    while (targetX < 0 || targetX > vars.GAME_WIDTH)
+    {
+      if (targetX < 0)
+        targetX = -targetX;
+      if (targetX > vars.GAME_WIDTH)
+        targetX = vars.GAME_WIDTH - (targetX - vars.GAME_WIDTH);
+    }
+    targetX += vars.ball.size.w / 2;
+  }
+  else
+    targetX = vars.GAME_WIDTH / 2;
+
+  targetX = Math.max(
+    vars.player2.racket.size.w / 2,
+    Math.min(vars.GAME_WIDTH - vars.player2.racket.size.w / 2, targetX)
+  );
+
+  ai.targetX = targetX;
+  ai.lastDecisionTime = vars.state.tick;
+
+  if (targetX < racketCenter - 5)
     vars.player2.input.move = -1;
-  else if (ballCenter > racketCenter + 5)
+  else if (targetX > racketCenter + 5)
     vars.player2.input.move = 1;
   else
-	vars.player2.input.move = 0;
+  {
+    ai.targetX = null;
+    vars.player2.input.move = 0;
+  }
 }
 
 function getRemainingPowerUses(side: PlayerSide, vars: Game)

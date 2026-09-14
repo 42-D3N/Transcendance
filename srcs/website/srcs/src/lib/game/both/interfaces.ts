@@ -82,6 +82,7 @@ export interface AI
 {
   level: AILevel;
   lastDecisionTime: number;
+  targetX: number | null;
 }
 
 export interface PlayerInput

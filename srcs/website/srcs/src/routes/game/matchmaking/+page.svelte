@@ -53,16 +53,8 @@
     localReady = false;
     gameState = null;
     socket = new WebSocket(buildGameUrl());
-    socket.onopen = () =>
-    {
-      connected = true;
-      reconnecting = false;
-    };
-    socket.onclose = () =>
-    {
-      connected = false;
-      reconnecting = false;
-    };
+    socket.onopen  = () => { connected = true;  reconnecting = false; };
+    socket.onclose = () => { connected = false; reconnecting = false; };
     bindSocketHandlers(game);
   }
 
@@ -76,17 +68,13 @@
         updateLocalReadyFromState(state);
         renderGameState(game, state);
       },
-      side =>
-      {
-        localSide = side;
-      }
+      side => { localSide = side; }
     );
   }
 
   const showReadyOverlay = $derived(!gameState || gameState.status === "waiting" || gameState.status === "ready_check");
   const isReadyPhase = $derived(!gameState || gameState.status === "waiting" || gameState.status === "ready_check");
   const modeLabel = $derived(matchMode === 'pvp' ? 'PvP' : 'PvE');
-
   function setMove(move: -1 | 0 | 1)
   {
     if (socket?.readyState !== WebSocket.OPEN)
@@ -95,23 +83,19 @@
   }
 
   onMount(() =>
-  {// c2r7p6
+  {
     const game = initGameClient();
     let keyboardState = { left: false, right: false, special: false };
-
     const query = new URLSearchParams(window.location.search);
-    matchMode = query.get('mode') === 'pve' ? 'pve' : 'pvp';
     const requestedDifficulty = query.get('aiDifficulty');
+
+    matchMode = query.get('mode') === 'pve' ? 'pve' : 'pvp';
     if (requestedDifficulty === 'easy' || requestedDifficulty === 'normal' || requestedDifficulty === 'hard' || requestedDifficulty === 'impossible')
       aiDifficulty = requestedDifficulty;
     else
       aiDifficulty = 'easy';
 
-    const cleanup = () =>
-    {
-      disconnectSocket();
-    };
-
+    const cleanup = () => { disconnectSocket(); };
     const KeyDown = (event: KeyboardEvent) =>
     {
       handleKeyDown(event, keyboardState);
