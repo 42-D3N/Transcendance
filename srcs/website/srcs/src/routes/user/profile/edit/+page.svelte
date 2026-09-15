@@ -2,7 +2,7 @@
     let { data, form } = $props();
     import { enhance } from '$app/forms';
     import Popup from "$lib/Popup.svelte";
-
+    import { redirect } from '@sveltejs/kit';
     import usericon from '$lib/assets/user/default.svg';
     let fileinput: HTMLInputElement;
     let avatar: string | undefined = $state();
@@ -49,6 +49,10 @@
         data.fileError = 0;
         };
     };
+    
+    function NoNoYourPreviewSuckPlsDeleteItDaddy() {
+        window.location.reload()
+    }
 
 </script>
 
@@ -58,12 +62,22 @@
         <div class="pb-8 w-full h-[80%] bg-[#292626FF] border-solid rounded-lg z-10">
             <div class="flex p-4">
                 {#if avatar}
-                    <img class="upload block hover:opacity-60 lg:h-[12rem] lg:w-[12rem] h-[8rem] w-[8rem] border-solid rounded-md bg-amber-50" src={avatar} alt="" onclick={() => fileinput.click()} />
+                    <div class="relative">
+                        <img class="upload block hover:opacity-60 lg:h-[12rem] lg:w-[12rem] h-[8rem] w-[8rem] border-solid rounded-md bg-amber-50" src={avatar} alt="" onclick={() => fileinput.click()} />
+                        <button class="absolute size-fit bg-red-600 hover:bg-red-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.35),0_1px_2px_rgba(0,0,0,0.4)] rounded-md right-0 top-0" onclick={NoNoYourPreviewSuckPlsDeleteItDaddy}>
+                            <span class="text-white font-bold p-4">✕</span>
+                        </button>
+                    </div>
                 {:else}
                     {#if !data.icon}
                         <img class="upload block hover:opacity-60 lg:h-[12rem] lg:w-[12rem] h-[8rem] w-[8rem] border-solid rounded-md bg-amber-50" src={usericon} alt="" onclick={() => fileinput.click()} />
                     {:else}
-                        <img class="upload block hover:opacity-60 lg:h-[12rem] lg:w-[12rem] h-[8rem] w-[8rem] border-solid rounded-md bg-amber-50" src={data.icon} alt={data.icon} onclick={() => fileinput.click()}/>
+                        <div class="relative">
+                            <img class="upload block hover:opacity-60 lg:h-[12rem] lg:w-[12rem] h-[8rem] w-[8rem] border-solid rounded-md bg-amber-50" src={data.icon} alt={data.icon} onclick={() => fileinput.click()} />
+                            <button class="absolute size-fit bg-red-600 hover:bg-red-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.35),0_1px_2px_rgba(0,0,0,0.4)] rounded-md right-0 top-0" type="submit" formaction="?/delIcon">
+                                <span class="text-white font-bold pl-2 pr-2 ">✕</span>
+                            </button>
+                        </div>
                     {/if}
                 {/if}
                 <input name="icon" style="display:none" type="file" accept=".jpg, .jpeg, .png, .webp" onchange={onFileSelected} bind:this={fileinput} >
@@ -82,7 +96,7 @@
                 <input type="checkbox" id="agree" name="agree" checked={data.privateAcc} value="private"/>
                 <span class="text-white">Make account private</span>
             </div>
-            <button class="block ml-4 mt-4 w-fit p-2 bg-green-600 hover:bg-green-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.35),0_1px_2px_rgba(0,0,0,0.4)] rounded-md" type="submit">
+            <button class="block ml-4 mt-4 w-fit p-2 bg-green-600 hover:bg-green-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.35),0_1px_2px_rgba(0,0,0,0.4)] rounded-md" type="submit" formaction="?/saveMods">
                 <span class="text-white font-bold p-4">Save Changes</span>
             </button>
         </div>

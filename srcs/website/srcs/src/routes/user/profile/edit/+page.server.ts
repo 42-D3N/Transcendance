@@ -74,7 +74,7 @@ export async function load ({ cookies }) {
 
 
 export const actions = {
-    default: async (event) => {
+    saveMods: async (event) => {
         const form = await event.request.formData();
 
         const isUsername:RegExp = /^[a-zA-Z0-9_-]{4,128}$/;
@@ -143,5 +143,28 @@ export const actions = {
         const updatedJWT = await createJWT(userInfos);
         event.cookies.set('JWTtoken', updatedJWT, { path: '/' });
         throw redirect(303, "../profile");
+    },
+
+    delIcon: async (event) => {
+        let userInfos = await validateJWT(event.cookies.get('JWTtoken'));
+
+        if (!userInfos)
+        {
+            event.cookies.set('JWTtoken', "-1", { path: '/' });
+            throw redirect(303, '/sign_in');
+        }
+
+        if (userInfos.icon)
+        {
+            const res = await event.fetch(`${userInfos.icon}`, {
+                method: 'DELETE'
+            });
+            console.log("deleting old icon");
+        }
+        
+        await db.update(users).set({icon: null}).where(eq(users.id, userInfos.id));
+        
+        throw redirect(303, "./edit");
     }
+
 } satisfies Actions;
