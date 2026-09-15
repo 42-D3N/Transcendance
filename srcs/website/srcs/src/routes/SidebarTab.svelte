@@ -1,6 +1,7 @@
 <script lang="ts">
 	import "../app.css";
-	import { chatClient, activeChats, openedChats } from '$lib/chat-client.svelte.ts';
+	import { activeChats, addEmptyChat, addChat } from '$lib/chat-client.svelte.ts';
+	import { formatTime } from "$lib/common";
 	let { name } = $props();
     let show = $state(false);
 	let container:any;
@@ -8,43 +9,6 @@
 	function onTabClick(e:any) {
 		if (container.contains(e.target) == false)
 			show = false;
-	}
-
-	function addEmptyChat() {
-		if (openedChats.length === 4)
-			openedChats.pop();
-		openedChats.unshift({id: -1, name: "null", avatar: null, history: [], hasError: false, error: null});
-	}
-
-	function addChat(index: number) {
-		let isIn = false;
-		openedChats.forEach((chat) => {
-			if (chat.id === activeChats[index].id)
-				isIn = true;
-		});
-		if (isIn)
-			return ;
-		if (openedChats.length === 4)
-			openedChats.pop();
-		openedChats.unshift({id: activeChats[index].id, name: activeChats[index].name, avatar: activeChats[index].avatar, history: [], hasError: false, error: null});
-		chatClient.sendRequest(activeChats[index].id);
-	}
-
-	function formatTime(e:Date):string {
-		const interval = (Date.now() - e.getTime()) / 1000;
-		if (interval < 5)
-			return ("À l'instant.");
-		if (interval < 60)
-			return "Il y a "+interval+" secondes.";
-		if (interval < 90)
-			return "Il y a 1 minute.";
-		if (interval < 3600)
-			return "Il y a "+Math.round(interval/60)+" minutes.";
-		if (interval < 5400)
-			return "Il y a 1 heure.";
-		if (interval < 86400)
-			return "Il y a "+Math.round(interval/3600)+" heures.";
-		return e.toDateString();
 	}
 </script>
 

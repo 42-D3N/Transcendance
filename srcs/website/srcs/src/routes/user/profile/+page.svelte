@@ -5,8 +5,6 @@
     import profileicon from '$lib/assets/profile_icon.svg';
     import { afterNavigate } from '$app/navigation'
     import { chatClient } from '$lib/chat-client.svelte.ts';
-    import { enhance } from '$app/forms';
-    import profileicon from '$lib/assets/profile_icon.svg';
 
     import type { PageProps } from './$types';
     let { data, form }: PageProps = $props();
@@ -127,10 +125,6 @@
             </div>
         </div> 
 
-        <div class="mt-16 pb-8 w-full h-[20%] bg-[#292626FF] border-solid rounded-lg z-10 p-4">
-                <span class="text-white text-4xl font-bold p-4">Match History</span>
-                <span class="text-zinc-400 text-4xl font-bold">({data.matches})</span>
-        </div>
         <div class="mt-16 pb-8 w-full h-[20%] bg-[#292626FF] border-solid rounded-lg z-10 p-4">
                 <span class="text-white text-4xl font-bold p-4">Match History</span>
                 <span class="text-zinc-400 text-4xl font-bold">({data.matches})</span>

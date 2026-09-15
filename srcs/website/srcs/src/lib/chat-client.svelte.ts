@@ -26,6 +26,7 @@ interface OpenedChat {
 
 export let activeChats:ChatContact[] = $state([]);
 export let openedChats:OpenedChat[] = $state([]);
+let chatLimit:number = $state(4);
 
 class ChatClient {
 	private ws: WebSocket | null = null;
@@ -42,8 +43,9 @@ class ChatClient {
 		};
 
 		this.ws.onclose = () => {
-			console.log("Disconnected from chat server");
+			console.log("Disconnected from chat server, attempting reconnection in 5s.");
 			this.ws = null;
+			setTimeout(this.connect, 5000, [token, this.userId]);
 		};
 
 		this.ws.onmessage = event => {
@@ -162,3 +164,29 @@ class ChatClient {
 }
 
 export const chatClient = new ChatClient();
+
+export function updateChatLimit(newLimit:number) {
+	chatLimit = newLimit;
+	while (openedChats.length > newLimit)
+		openedChats.pop();
+}
+
+export function addEmptyChat() {
+	while (openedChats.length >= chatLimit)
+		openedChats.pop();
+	openedChats.unshift({id: -1, name: "null", avatar: null, history: [], hasError: false, error: null});
+}
+
+export function addChat(index: number) {
+	let isIn = false;
+	openedChats.forEach((chat) => {
+		if (chat.id === activeChats[index].id)
+			isIn = true;
+	});
+	if (isIn)
+		return ;
+	while (openedChats.length >= chatLimit)
+		openedChats.pop();
+	openedChats.unshift({id: activeChats[index].id, name: activeChats[index].name, avatar: activeChats[index].avatar, history: [], hasError: false, error: null});
+	chatClient.sendRequest(activeChats[index].id);
+}
