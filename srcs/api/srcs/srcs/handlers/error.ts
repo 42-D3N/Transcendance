@@ -4,7 +4,6 @@ import type { NextFunction } from "express";
 export function HandleParsingError(result, next: NextFunction)
 {
   const errors = result.array();
-  console.log(errors);
   if (errors.length > 1){
     if (errors[0].path === errors[1].path) {
       switch (errors[0].path) {
@@ -30,6 +29,12 @@ export function HandleParsingError(result, next: NextFunction)
 
 export function handleErrorCode(error, next: NextFunction, used)
 {
+  if (!used) {
+    next(new CustomError("Error: user not existing in database", 400));
+    return 1;
+  }
+  if (!error || !error.cause || !error.cause.error)
+    return 0;
   if (error.cause.code == "42601") {
     next(new CustomError("Error: No valid field in request", 400));
     return 1;

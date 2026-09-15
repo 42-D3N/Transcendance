@@ -72,3 +72,15 @@ export function validateEmail() {
 export function validatePassword() {
   return body("password").notEmpty().isString().trim().custom((password: string) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])[^\s]{12,67}$/.test(password));
 }
+
+export function validateInvUser() {
+  return body("user").toInt().isInt();
+}
+
+export function validateInvItem() {
+  return body("item").toInt().isInt();
+}
+
+export function validateInvOwn() {
+  return body("own").isBoolean().toBoolean();
+}
