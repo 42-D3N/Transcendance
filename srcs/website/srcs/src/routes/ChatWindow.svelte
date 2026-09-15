@@ -10,11 +10,29 @@
 		openedChats.splice(index, 1);
 	}
 	function handleUsernameInput(event: any) {
-		if (event.key === "Enter")
-			chatClient.checkUserExists(userNewChat, index);
+		if (event.key === "Enter") {
+			let isIn = false;
+			openedChats.forEach((chat) => {
+				if (chat.name === userNewChat)
+					isIn = true;
+			});
+			if (isIn)
+			{
+				userNewChat = "";
+				close();
+			}
+			else
+				chatClient.checkUserExists(userNewChat, index);
+		}
 	}
 	function handleChatInput(event: any) {
-		if (event.key === "Enter" && chatMessage != "" && openedChats[index].id != -1) {
+		chatMessage = chatMessage.trim();
+		if (event.key === "Enter" && !event.shiftKey && chatMessage != "" && openedChats[index].id != -1) {
+			if (chatMessage.length > 2048)
+			{
+				chatMessage = "No.";
+				return ;
+			}
 			chatClient.sendMessage(chatMessage, openedChats[index].id);
 			chatMessage = "";
 		}
@@ -28,10 +46,10 @@
 	<div class="items-start flex basis-[3rem] grow shrink-0 justify-between relative">
 		<div class="rounded-tl-sm items-center flex overflow-hidden text-ellipsis whitespace-nowrap">
 			{#if openedChats[index].id === -1}
-			<div>
-				<span>À: </span>
-				<span>
-					<input class="send-message-field send-message-editor" onkeydown={onKeyDown} onkeyup={handleUsernameInput} bind:value={userNewChat} data-no-scrollbar/>
+			<div class="text-white">
+				<span class="ml-[0.8rem] mr-[0.2rem]">À: </span>
+				<span class="border-white border-[0.1rem] border-solid">
+					<input class="send-message-field send-message-editor min-w-[9rem]" onkeydown={onKeyDown} onkeyup={handleUsernameInput} bind:value={userNewChat} data-no-scrollbar/>
 				</span>
 			</div>
 			{#if openedChats[index].hasError}
@@ -59,15 +77,15 @@
 	<div class="basis-full grow-2 shrink overflow-hidden relative">
 		<div class="h-full overflow-auto overscroll-y-contain">
 			{#each openedChats[index].history as message}
-				<div class="text-[1.3rem] relative {userId === message.author?'bg-green':'bg-yellow'}">
+				<div class="text-[1.3rem] relative rounded-lg m-[0.6rem] p-[0.5rem] break-all text-wrap whitespace-pre-wrap {userId === message.author?'bg-green-500 ml-[4rem]':'bg-yellow-400 mr-[4rem]'}">
 					{message.message}
 				</div>
 			{/each}
 		</div>
 	</div>
 	<div>
-		<div class="border-t-[0.1rem] border-solid border-white flex max-w-full relative">
-			<div class="send-message-field send-message-editor" data-placeholder="Envoyer un message..." contenteditable="true" onkeydown={onKeyDown} onkeyup={handleChatInput} bind:innerText={chatMessage} data-no-scrollbar></div>
+		<div class="border-t-[0.1rem] border-solid border-white flex max-w-full relative text-white">
+			<textarea class="send-message-field send-message-editor" disabled={openedChats[index].id === -1} placeholder="Envoyer un message..." onkeydown={onKeyDown} onkeyup={handleChatInput} bind:value={chatMessage}/>
 		</div>
 	</div>
 </div>

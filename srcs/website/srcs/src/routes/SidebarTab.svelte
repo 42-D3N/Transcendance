@@ -17,6 +17,13 @@
 	}
 
 	function addChat(index: number) {
+		let isIn = false;
+		openedChats.forEach((chat) => {
+			if (chat.id === activeChats[index].id)
+				isIn = true;
+		});
+		if (isIn)
+			return ;
 		if (openedChats.length === 4)
 			openedChats.pop();
 		openedChats.unshift({id: activeChats[index].id, name: activeChats[index].name, avatar: activeChats[index].avatar, history: [], hasError: false, error: null});
