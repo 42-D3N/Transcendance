@@ -129,7 +129,7 @@
 			{/if}
 			<div id="user-info-container">	
 				<span class="lg:max-xl:hidden text-white">{data.username}</span><br>
-				<span class="content-center w-5 text-lg hidden xl:block text-white">wallet: {data.wallet}</span>
+				<span class="content-center w-5 text-lg hidden xl:block text-white">wallet: {data.wallet}$</span>
 			</div>
 		</a>
 		<div class="sidebar-footer-icons mobile-hidden">

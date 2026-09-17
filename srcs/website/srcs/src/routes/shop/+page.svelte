@@ -1,10 +1,13 @@
 <script lang="ts">
     import Popup from "$lib/Popup.svelte";
     import item1 from "$lib/assets/item1.png";
+    import item2 from "$lib/assets/item2.png";
+    import item3 from "$lib/assets/item3.png";
+    import item4 from "$lib/assets/item4.png";
+    import item5 from "$lib/assets/item5.png";
     import item6 from "$lib/assets/item6.png";
     import item7 from "$lib/assets/item7.png";
     import item8 from "$lib/assets/item8.png";
-    import noise from "$lib/assets/noise.png";
 
     let { data } = $props();
     let shep = $derived(data.code === true ? 0.50 : 1);
@@ -12,20 +15,20 @@
     let showmodal:boolean = $state(false);
     let code:string = $state("");
     let products = $state([
-        { id: 1, name: "Dev's fav color: ", price: 10, src: item1},
-        { id: 2, name: "Product", price: 20, src: noise},
-        { id: 3, name: "Product", price: 30, src: noise},
-        { id: 4, name: "Product", price: 40, src: noise},
-        { id: 5, name: "Product", price: 50, src: noise},
+        { id: 1, name: "Old placeholder: ", price: 10, src: item1},
+        { id: 2, name: "Game dev's fav colors: ", price: 20, src: item2},
+        { id: 3, name: "Dev's fav color: ", price: 30, src: item3},
+        { id: 4, name: "Ugly color: ", price: 40, src: item4},
+        { id: 5, name: "TV snow: ", price: 50, src: item5},
         { id: 6, name: "Light: ", price: 60, src: item6},
         { id: 7, name: "Perturabo's love: ", price: 70, src: item7},
-        { id: 8, name: "GOLD GOLD GOLD: ", price: 80, src: item8},
+        { id: 8, name: "WE ARE RICH: ", price: 670, src: item8},
     ]);
 
     async function sendData(product) {
         const formData = new FormData();
         formData.append('product', JSON.stringify(product));
-        const response = await fetch('/shop', {
+        const response = await fetch('/shop', { 
             method: 'POST',
             body: formData
         })
