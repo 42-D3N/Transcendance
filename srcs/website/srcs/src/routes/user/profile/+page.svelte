@@ -1,4 +1,4 @@
-\\\\\\\\\\\\\<script lang="ts">
+<script lang="ts">
     import usericon from '$lib/assets/user/default.svg';
     import { redirect } from '@sveltejs/kit';
     import { enhance } from '$app/forms';
