@@ -26,7 +26,6 @@ export async function load ({ cookies }) {
     {
         cookies.set('JWTtoken', '-1', { path: '/' });
         throw redirect(308, '/login');
-        throw redirect(308, '/login');
     }
     else
     {

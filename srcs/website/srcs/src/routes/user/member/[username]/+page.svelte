@@ -20,6 +20,24 @@
     {
         redirect(308, "./edit");
     }
+
+    function formatTime(e:Date):string {
+        const interval = (Date.now() - e.getTime()) / 1000;
+        if (interval < 5)
+            return ("À l'instant.");
+        if (interval < 60)
+            return "Il y a "+interval+" secondes.";
+        if (interval < 90)
+            return "Il y a 1 minute.";
+        if (interval < 3600)
+            return "Il y a "+Math.round(interval/60)+" minutes.";
+        if (interval < 5400)
+            return "Il y a 1 heure.";
+        if (interval < 86400)
+            return "Il y a "+Math.round(interval/3600)+" heures.";
+        return e.toDateString();
+    }
+
 </script>
 
 <div class="fixed inset-0 z-0 bg-[#333131FF] size-full"></div>
@@ -87,6 +105,65 @@
                     <span class="text-white text-4xl font-bold p-4">Match History</span>
                     <span class="text-zinc-400 text-4xl font-bold">({data.matches})</span>
             </div>
+
+            {#each data.matchHistory as match}
+                <div class="block mt-[1%] w-full h-[20%] bg-[#292626FF] border-solid rounded-lg z-10 p-4">
+                    <div class="flex">
+
+                        {#if match.winner === data.id}
+                            <span class="text-green-600 text-lg lg:text-2xl font-bold">Win</span>
+                        {:else}
+                            <span class="text-red-600 text-lg lg:text-2xl font-bold">Lose</span>
+                        {/if}
+                        <div class="mx-[1%] self-stretch pb-1 w-px shrink-0 bg-black"></div>
+                        
+                        <span class="ml-auto text-white text-lg lg:text-xl">{formatTime(new Date(match.date))}</span>
+                    </div>
+                    <hr class="w-[20%] lg:w-[8%]">
+                    <div class="h-[20%] p-4">
+
+                        <div class="flex">
+        
+                            <div class="flex-1 flex items-center">
+                                <a class="w-fit" href={"/user/member/"+match.user1Pseudo+"_"+JSON.stringify(match.user1)}>
+                                    <span class="text-lg lg:text-3xl text-white font-semibold">{match.user1Pseudo}#{match.user1}</span>
+                                </a>
+                            </div>
+                            
+                            {#if match.user1Score > match.user2Score}
+                                <span class="ml-auto text-lg lg:text-2xl not-lg:mt-2 font-bold text-green-800">{match.user1Score}</span>
+                            {:else}
+                                <span class="ml-auto text-lg lg:text-2xl not-lg:mt-2 font-bold text-red-800">{match.user1Score}</span>
+                            {/if}
+        
+                            <div class="not-lg:hidden mx-[2%] self-stretch items-center w-px shrink-0 bg-black"></div>
+                            <div class="lg:hidden ml-1 mr-1">-</div>
+                            
+                            {#if match.user1Score > match.user2Score}
+                                <span class="ml-auto text-lg lg:text-2xl not-lg:mt-2 font-bold text-red-800">{match.user2Score}</span>
+                            {:else}
+                                <span class="ml-auto text-lg lg:text-2xl not-lg:mt-2 font-bold text-green-800">{match.user2Score}</span>
+                            {/if}
+        
+                            <div class="flex-1 flex items-center justify-end">
+                                <a class="w-fit" href={"/user/member/"+match.user2Pseudo+"_"+JSON.stringify(match.user2)}>
+                                    <span class="text-lg lg:text-3xl text-white font-semibold">{match.user2Pseudo}#{match.user2}</span>
+                                </a>
+                            </div>
+                            
+                        </div>
+                        <div class="flex w-full">
+                            {#if match.user1EloChange > 0}
+                                <span class="flex-1 flex items-center text-lg lg:text-2xl text-green-600 font-bold">+{match.user1EloChange}</span>
+                                <span class="flex-1 flex items-center text-lg lg:text-2xl justify-end text-red-600 font-bold">{match.user2EloChange}</span>
+                            {:else}
+                                <span class="flex-1 flex items-center text-lg lg:text-2xl text-red-600 font-bold">{match.user1EloChange}</span>
+                                <span class="flex-1 flex items-center text-lg lg:text-2xl justify-end text-green-600 font-bold">+{match.user2EloChange}</span>
+                            {/if}
+                        </div>
+                    </div>
+                </div>
+            {/each}
         </div>
     </div>
 {/if}

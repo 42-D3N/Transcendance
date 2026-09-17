@@ -2,8 +2,8 @@ import { createJWT, validateJWT } from '$lib/server/user_management/jwt.js';
 import { redirect, fail } from '@sveltejs/kit';
 import { randomBytes } from 'crypto';
 import { db } from '$lib/server/db/index';
-import { users } from '$lib/server/db/schema';
-import { eq, or } from 'drizzle-orm';
+import { eq, and, or } from 'drizzle-orm';
+import { users, matches } from '$lib/server/db/schema';
 import type { Actions } from './$types';
 import { writeFile, readdir, mkdir } from 'fs/promises';
 import path from 'path';
@@ -15,10 +15,11 @@ export async function load ({ cookies }) {
     let email = '';
     let wins = '0';
     let losses = '0';
-    let matches = '0';
+    let matchesP = '0';
     let wallet = '0';
     let icon = 'default.svg';
     let privateAcc = false;
+    let userHistory: [];
 
     if (!JWTtoken || JWTtoken === '-1')
     {
@@ -46,12 +47,18 @@ export async function load ({ cookies }) {
 			throw redirect(303, '/login');
 		}
 
+        if (userInfos.matches > 0)
+            userHistory = await db.select()
+            .from(matches)
+            .where(or(eq(matches.user1, userInfos.id), eq(matches.user2, userInfos.id)))
+            .limit(5);
+
         id = userInfos.id;
         username = userInfos.username;
         email = userInfos.email;
         wins = userInfos.wins;
         losses = userInfos.losses;
-        matches = userInfos.matches;
+        matchesP = userInfos.matches;
         wallet = userInfos.wallets;
         privateAcc = userInfos.privateAcc;
         if (userInfos.icon != '')
@@ -65,10 +72,11 @@ export async function load ({ cookies }) {
         email: email,
         wins: wins,
         losses: losses,
-        matches: matches,
+        matches: matchesP,
         wallet: wallet,
         icon: icon,
-        privateAcc: privateAcc
+        privateAcc: privateAcc,
+        matchHistory: userHistory
     });
 };
 

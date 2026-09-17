@@ -2,8 +2,8 @@ import { redirect, fail } from '@sveltejs/kit';
 import { validateJWT } from '$lib/server/user_management/jwt.js';
 import type { Actions } from './$types';
 import { db } from '$lib/server/db/index';
-import { eq, ne, or, and, count } from 'drizzle-orm';
-import { users, friends } from '$lib/server/db/schema';
+import { eq, and, or } from 'drizzle-orm';
+import { users, friends, matches } from '$lib/server/db/schema';
 
 
 export async function load ({ cookies, params, fetch }) {
@@ -13,11 +13,12 @@ export async function load ({ cookies, params, fetch }) {
     let email = '';
     let wins = '0';
     let losses = '0';
-    let matches = '0';
+    let matchesP = '0';
     let wallet = '0';
     let icon = 'default.svg';
     let copinous = [];
     let actualFriends: {id: number; username: string; icon: string | null}[] = [];
+    let userHistory: [];
 
 
     if (!JWTtoken || JWTtoken === '-1')
@@ -85,12 +86,18 @@ export async function load ({ cookies, params, fetch }) {
             })
         );
 
+        if (userInfos.matches > 0)
+            userHistory = await db.select()
+            .from(matches)
+            .where(or(eq(matches.user1, userInfos.id), eq(matches.user2, userInfos.id)))
+            .limit(5);
+
         id = TakenInfos.id;
         username = TakenInfos.username;
         email = TakenInfos.email;
         wins = TakenInfos.wins;
         losses = TakenInfos.losses;
-        matches = TakenInfos.matches;
+        matchesP = TakenInfos.matches;
         wallet = TakenInfos.wallet;
         if (TakenInfos.icon != '')
             icon = TakenInfos.icon
@@ -104,10 +111,11 @@ export async function load ({ cookies, params, fetch }) {
         email: email,
         wins: wins,
         losses: losses,
-        matches: matches,
+        matches: matchesP,
         wallet: wallet,
         icon: icon,
         friends: actualFriends,
-        accPrivate: false
+        accPrivate: false,
+        matchHistory: userHistory
     });
 };

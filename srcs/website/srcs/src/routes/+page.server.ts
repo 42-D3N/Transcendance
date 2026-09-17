@@ -15,7 +15,7 @@ export async function load ({ cookies }) {
 	if (!JWTtoken || JWTtoken === '-1')
 	{
 		cookies.set('JWTtoken', '-1', { path: '/' });
-		throw redirect(303, '/sign_in');
+		throw redirect(303, '/login');
 	}
 	else
 	{
@@ -24,7 +24,7 @@ export async function load ({ cookies }) {
 		if (!userInfos)
 		{
 			cookies.set('JWTtoken', "-1", { path: '/' });
-			throw redirect(303, '/sign_in');
+			throw redirect(303, '/login');
 		}
 		if (userInfos["JWT"] != undefined)
 		{
