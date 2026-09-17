@@ -15,7 +15,7 @@ function validateUpdateEmail() {
 }
 
 function validateUpdateUsername() {
-  return body("username").optional({ checkFalsy: true }).isString().trim().escape().custom((username: string) => /^.{4,128}$/.test(username));;
+  return body("username").optional({ checkFalsy: true }).isString().trim().escape().custom((username: string) => /^[a-zA-Z0-9_-]{4,128}$/.test(username));;
 }
 
 function validateUpdatePassword() {
@@ -62,7 +62,7 @@ export function validateIdParam() {
 }
 
 export function validateUsername() {
-  return body("username").notEmpty().isString().trim().custom((username: string) => /^.{4,128}$/.test(username));
+  return body("username").notEmpty().isString().trim().custom((username: string) => /^[a-zA-Z0-9_-]{4,128}$/.test(username));
 }
 
 export function validateEmail() {
