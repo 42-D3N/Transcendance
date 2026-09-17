@@ -2,11 +2,26 @@ import { createGameSession } from './game';
 import type { GameSession, GameSessionConfig } from './game';
 import type { AIDifficulty, MatchMode } from './pongVariables';
 
+export interface GameUserData
+{
+  id: number | string;
+  username: string;
+  wins: number;
+  losses: number;
+  matches: number;
+  wallet: number;
+  icon?: string | null;
+  skin_rac?: number | null;
+  skin_ball?: number | null;
+}
+
 export interface JoinGameRequest
 {
   mode?: MatchMode;
   aiDifficulty?: AIDifficulty;
   instanceId?: string;
+  userId?: string;
+  user?: GameUserData;
 }
 
 export interface JoinGameResult
@@ -80,11 +95,10 @@ export class GameInstanceManager
   {
     const config = this.getNormalizedConfig(request);
     const session = this.pickSession(config, request);
-    const side = session.addClient(socket);
+    const side = session.addClient(socket, request?.userId, request?.user);
 
     if (session.config.mode === 'pvp' && session.isFull() && this.waitingPvpInstanceId === session.id)
       this.waitingPvpInstanceId = null;
-
     return {
       instanceId: session.id,
       side,
@@ -122,5 +136,14 @@ export class GameInstanceManager
       return;
 
     session.setPlayerReady(socket);
+  }
+
+  public getOpponentUsername(instanceId: string, side: 1 | 2): string | null
+  {
+    const session = this.sessions.get(instanceId);
+    if (!session)
+      return null;
+
+    return session.getOpponentUsername(side);
   }
 }

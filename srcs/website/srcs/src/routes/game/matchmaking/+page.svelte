@@ -5,15 +5,40 @@
   import { connection, sendInput, sendReady } from '$lib/game/backend/network'
   import { handleKeyDown, handleKeyUp, updateScale, updateInput, renderGameState } from '$lib/game/frontend/front1';
   import type { AIDifficulty, MatchMode } from '$lib/game/both/interfaces';
+  import { afterNavigate, goto } from '$app/navigation'
 
-  let socket: WebSocket;
-  let connected = $state(false);
-  let localSide = $state<1 | 2 | null>(null);
-  let gameState = $state<ClientGameState | null>(null);
-  let localReady = $state(false);
-  let matchMode = $state<MatchMode>('pvp');
-  let aiDifficulty = $state<AIDifficulty>('easy');
-  let reconnecting = $state(false);
+  let resolveNavReady: (() => void) | undefined;
+  const navReady = new Promise<void>((resolve) => {
+    resolveNavReady = resolve;
+  });
+
+  afterNavigate ((navigation: any) =>
+  {
+    if (navigation.from === null || (navigation.from.route.id !== "/game" && navigation.from.route.id !== "/game/matchmaking"))
+    {
+      goto('/game');
+      return;
+    }
+    resolveNavReady?.();
+    resolveNavReady = undefined;
+  });
+
+  let socket			: WebSocket;
+  let connected			= $state(false);
+  let localSide			= $state<1 | 2 | null>(null);
+  let gameState			= $state<ClientGameState | null>(null);
+  let localReady		= $state(false);
+  let matchMode			= $state<MatchMode>('pvp');
+  let aiDifficulty		= $state<AIDifficulty>('easy');
+  let reconnecting		= $state(false);
+  let activeMove		= $state<-1 | 0 | 1>(0);
+  let activeSpecial		= $state(false);
+  let currentInstanceId	= $state<string | null>(null);
+  let opponentUsername	= $state<string | null>(null);
+  let { data }			= $props();
+
+  const leftPlayerLabel = $derived(localSide === 1 ? data.username : (opponentUsername ?? 'PLAYER 1'));
+  const rightPlayerLabel = $derived(localSide === 1 ? (opponentUsername ?? 'PLAYER 2') : data.username);
 
   function updateLocalReadyFromState(state: ClientGameState)
   {
@@ -32,10 +57,25 @@
 
   function buildGameUrl()
   {
+    const userPayload = {
+      id: data.id,
+      username: data.username,
+      wins: data.wins,
+      losses: data.losses,
+      matches: data.matches,
+      wallet: data.wallet,
+      icon: data.icon,
+      skin_rac: data.skin_rac,
+      skin_ball: data.skin_ball
+    };
     const url = new URL('wss://'+window.location.host+'/api/game_server');
     url.searchParams.set('mode', matchMode);
+    url.searchParams.set('userId', String(data.id));
+    url.searchParams.set('user', JSON.stringify(userPayload));
     if (matchMode === 'pve')
       url.searchParams.set('aiDifficulty', aiDifficulty);
+    if (currentInstanceId)
+      url.searchParams.set('instanceId', currentInstanceId);
     return url.toString();
   }
 
@@ -52,6 +92,8 @@
     localSide = null;
     localReady = false;
     gameState = null;
+    activeMove = 0;
+    activeSpecial = false;
     socket = new WebSocket(buildGameUrl());
     socket.onopen  = () => { connected = true;  reconnecting = false; };
     socket.onclose = () => { connected = false; reconnecting = false; };
@@ -68,21 +110,68 @@
         updateLocalReadyFromState(state);
         renderGameState(game, state);
       },
-      side => { localSide = side; }
+      (side, instanceId, nextOpponentUsername) =>
+      {
+        localSide = side;
+        opponentUsername = nextOpponentUsername ?? null;
+        if (instanceId)
+          currentInstanceId = instanceId;
+      }
     );
   }
 
   const showReadyOverlay = $derived(!gameState || gameState.status === "waiting" || gameState.status === "ready_check");
   const isReadyPhase = $derived(!gameState || gameState.status === "waiting" || gameState.status === "ready_check");
   const modeLabel = $derived(matchMode === 'pvp' ? 'PvP' : 'PvE');
-  function setMove(move: -1 | 0 | 1)
+
+  function sendMobileInput(nextMove: -1 | 0 | 1, nextSpecial: boolean)
   {
     if (socket?.readyState !== WebSocket.OPEN)
       return;
-    socket.send(JSON.stringify({ type: "input", input: { move, special: false } }));
+    activeMove = nextMove;
+    activeSpecial = nextSpecial;
+    sendInput(socket, { move: nextMove, special: nextSpecial });
   }
 
-  onMount(() =>
+  function setMove(move: -1 | 0 | 1)
+  {
+    sendMobileInput(move, activeSpecial);
+  }
+
+  function setSpecial(special: boolean)
+  {
+    sendMobileInput(activeMove, special);
+  }
+
+  function onTouchMoveStart(event: PointerEvent, move: -1 | 1)
+  {
+    if (!event.isPrimary)
+      return;
+    setMove(move);
+  }
+
+  function onTouchMoveStop(event: PointerEvent)
+  {
+    if (!event.isPrimary)
+      return;
+    setMove(0);
+  }
+
+  function onPowerDown(event: PointerEvent)
+  {
+    if (!event.isPrimary)
+      return;
+    setSpecial(true);
+  }
+
+  function onPowerUp(event: PointerEvent)
+  {
+    if (!event.isPrimary)
+      return;
+    setSpecial(false);
+  }
+
+  onMount(async () =>
   {
     const game = initGameClient();
     let keyboardState = { left: false, right: false, special: false };
@@ -110,6 +199,7 @@
       if (!(gameState && (gameState.status === "waiting" || gameState.status === "ready_check")))
         sendInput(socket, game.input);
     }
+    await navReady;
     connectSocket(game);
     const Resize = () => updateScale(game);
     window.addEventListener('keydown',	KeyDown);
@@ -155,9 +245,9 @@
         </div>
       </div>
       <div class="scoreboard" aria-label="Score">
-        <span class="player-label">PLAYER 1</span>
+        <span class="player-label">{leftPlayerLabel}</span>
         <strong id="score">0  -  0</strong>
-        <span class="player-label">PLAYER 2</span>
+        <span class="player-label">{rightPlayerLabel}</span>
       </div>
     </header>
 
@@ -205,10 +295,10 @@
                   <button
                     type="button"
                     class="ready-button"
-                    onclick={clickReady}
+                    on:click={clickReady}
                     disabled={!connected || localReady}
                   >
-                    {localReady ? 'PRET' : 'READY'}
+                    {localReady ? 'My body is ready!' : 'Let\'s Get Ready To Rumble!'}
                   </button>
                 {/if}
                 {#if gameState}
@@ -222,9 +312,31 @@
         </div>
 
         <div class="touch-controls" aria-label="Commandes tactiles">
-          <button type="button" aria-label="Deplacer a gauche" onpointerdown={() => setMove(-1)} onpointerup={() => setMove(0)} onpointerleave={() => setMove(0)}>&lt; LEFT</button>
-          <span>MOVE PADDLE</span>
-          <button type="button" aria-label="Deplacer a droite" onpointerdown={() => setMove(1)} onpointerup={() => setMove(0)} onpointerleave={() => setMove(0)}>RIGHT &gt;</button>
+          <button
+            type="button"
+            aria-label="Deplacer a gauche"
+            on:pointerdown|preventDefault={(event) => onTouchMoveStart(event, -1)}
+            on:pointerup|preventDefault={onTouchMoveStop}
+            on:pointercancel|preventDefault={onTouchMoveStop}
+            on:pointerleave|preventDefault={onTouchMoveStop}
+          >&lt; LEFT</button>
+          <button
+            type="button"
+            class="power-button"
+            aria-label="Activer le power-up"
+            on:pointerdown|preventDefault={onPowerDown}
+            on:pointerup|preventDefault={onPowerUp}
+            on:pointercancel|preventDefault={onPowerUp}
+            on:pointerleave|preventDefault={onPowerUp}
+          >POWER-UP</button>
+          <button
+            type="button"
+            aria-label="Deplacer a droite"
+            on:pointerdown|preventDefault={(event) => onTouchMoveStart(event, 1)}
+            on:pointerup|preventDefault={onTouchMoveStop}
+            on:pointercancel|preventDefault={onTouchMoveStop}
+            on:pointerleave|preventDefault={onTouchMoveStop}
+          >RIGHT &gt;</button>
         </div>
       </div>
 
@@ -377,8 +489,36 @@
   .racket-down { bottom: 1.7%; }
   .ball { width: 2.3%; aspect-ratio: 1; background: #ff668d; border: 2px solid #8d3156; border-radius: 2px; box-shadow: 3px 3px 0 #172b36; }
   .trajectory { height: 3px; transform-origin: left center; background: #ffdf4b; box-shadow: 0 0 .8rem #ffdf4b; border-radius: 0; }
-  .touch-controls { display: flex; align-items: center; justify-content: center; gap: 1rem; margin-top: .9rem; color: #aaa8ef; font: 1.3rem/1 monospace; }
-  .touch-controls button { min-height: 3.2rem; padding: 0 1rem; border: 3px solid #111131; background: #ff668d; color: #211f5a; box-shadow: 3px 3px 0 #111131; font: 900 1.4rem/1 monospace; touch-action: none; }
+  .touch-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: .9rem;
+    color: #aaa8ef;
+    font: 1.3rem/1 monospace;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .touch-controls button {
+    min-height: 3.2rem;
+    padding: 0 1rem;
+    border: 3px solid #111131;
+    background: #ff668d;
+    color: #211f5a;
+    box-shadow: 3px 3px 0 #111131;
+    font: 900 1.4rem/1 monospace;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  .power-button {
+    background: #62e6a8;
+    color: #111131;
+  }
   .touch-controls button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 #111131; }
 
   .ready-overlay {

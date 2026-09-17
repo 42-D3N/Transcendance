@@ -41,7 +41,7 @@ export function serverVariable(config: MatchConfig)
   {
     acceleration:	6,
     racketSpeed:	600,
-    scoreToWin:		15,
+    scoreToWin:		3,
     maxSpeed:		720,
     baseSpeed:		360
   }
@@ -127,6 +127,16 @@ export function serverVariable(config: MatchConfig)
     p2: config.mode === "pve"
   };
 
+  const playerUserIds = {
+    p1: null as string | null,
+    p2: null as string | null
+  };
+
+  const playerUserData = {
+    p1: null as { id: number | string; username: string; wins: number; losses: number; matches: number; wallet: number; icon?: string | null; skin_rac?: number | null; skin_ball?: number | null } | null,
+    p2: null as { id: number | string; username: string; wins: number; losses: number; matches: number; wallet: number; icon?: string | null; skin_rac?: number | null; skin_ball?: number | null } | null
+  };
+
   const player2WasHuman = false;
 
   return {
@@ -155,6 +165,8 @@ export function serverVariable(config: MatchConfig)
     rules,
     power,
     ready,
+    playerUserIds,
+    playerUserData,
     player2WasHuman,
     mode: config.mode
   };

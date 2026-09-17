@@ -20,7 +20,6 @@
 
 	let mobToolbarEnabled = $state("none");
 	import "../app.css";
-    import { GridBlock } from '@babylonjs/core';
 	import SidebarTab from './SidebarTab.svelte';
 	function disableScroll() {
 		document.querySelector('body')?.classList.add('overflow-hidden');

@@ -1,62 +1,23 @@
-<script>
-	import { goto } from '$app/navigation';
-
-	const aiDifficultyOptions = ['easy', 'normal', 'hard', 'impossible'];
-
-	function matchmaking(mode, aiDifficulty)
-	{
-		const url = new URL('/game/matchmaking', window.location.origin);
-		url.searchParams.set('mode', mode);
-		if (aiDifficulty)
-			url.searchParams.set('aiDifficulty', aiDifficulty);
-		goto(`${url.pathname}${url.search}`);
-	}
-
-	function placeholder()	{ console.log(`Ceci est un placeholder.`) }
-	function play() 			{ goto('/game/gameItself'); }
-	function loading()		{ goto('/game/loadingScreen'); }
-	function home()			{ goto('/'); }
-	function options()		{/*goto('/profile/gameOption')*/}
-
-	let currentMenu = $state('main');
-	const menus =
-	{
-		main:
-		[
-			{ label: 'Jouer', action: () => currentMenu = 'play' },
-			{ label: 'Regarder', action: placeholder },
-			{ label: 'Preview du Loading screen', action: loading },
-			{ label: 'Options', action: options },
-			{ label: 'Accueil', action: home }
-		],
-		play:
-		[
-			{ label: '1 VS IA', action: () => currentMenu = 'difficulty' },
-			{ label: '1 VS 1', action: () => matchmaking('pvp') },
-			{ label: 'Retour', action: () => currentMenu = 'main' }
-		],
-		difficulty:
-		[
-			{ label: 'Easy', action: () => matchmaking('pve', 'easy') },
-			{ label: 'Normal', action: () => matchmaking('pve', 'normal') },
-			{ label: 'Hard', action: () => matchmaking('pve', 'hard') },
-			{ label: 'Impossible?', action: () => matchmaking('pve', 'impossible') },
-			{ label: 'Retour', action: () => currentMenu = 'play' }
-		]
-	};
-</script>
-
 <div class="menu-container">
 	<div class="overlay">
 		<h1 class="game-title">Pong</h1>
 		<div class="menu-buttons">
-			{#each menus[currentMenu] as button}
-				<button onclick={button.action}>
-					{button.label}
-				</button>
-			{/each}
+			<div class="pvp-group">
+				<p class="pvp-group-title">PVP</p>
+				<a class="menu-button" href="/game/matchmaking?mode=pvp">Matchmaking</a>
+			</div>
+			<div class="ai-group">
+				<p class="ai-group-title">Affrontements IA</p>
+				<div class="ai-grid">
+					<a class="menu-button ai-button" href="/game/matchmaking?mode=pve&aiDifficulty=easy">IA Easy</a>
+					<a class="menu-button ai-button" href="/game/matchmaking?mode=pve&aiDifficulty=normal">IA Normal</a>
+					<a class="menu-button ai-button" href="/game/matchmaking?mode=pve&aiDifficulty=hard">IA Hard</a>
+					<a class="menu-button ai-button" href="/game/matchmaking?mode=pve&aiDifficulty=impossible">IA Impossible</a>
+				</div>
+			</div>
+			<a class="menu-button" href="/game/loadingScreen">Preview du Loading screen</a>
 		</div>
-		<p class="version">Version 0.1.1</p>
+		<p class="version">Version 0.6.7.?</p>
 	</div>
 </div>
 
@@ -95,11 +56,14 @@
 		flex-direction: column;
 		gap: 1rem;
 		width: 280px;
-		margin: 0 auto;
+		margin: 0;
 	}
 
-	button
+	.menu-button
 	{
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
 		padding: 1rem;
 		font-size: 1.2rem;
 		font-weight: bold;
@@ -107,17 +71,40 @@
 		border-radius: 12px;
 		background: rgb(0, 89, 253, 0.7);
 		color: white;
-		cursor: pointer;
-		backdrop-filter: blur(8px);
-		transition:
-			transform 0.2s ease,
-			background 0.2s ease;
+		text-decoration: none;
 	}
 
-	button:hover
+	.pvp-group,
+	.ai-group
 	{
-		transform: translateY(3px) scale(1.2);
-		background: rgba(59, 130, 246, 0.4);
+		padding: 0.8rem;
+		border: 2px solid rgba(255, 251, 0, 0.6);
+		border-radius: 12px;
+		background: rgba(6, 15, 44, 0.35);
+	}
+
+	.pvp-group-title,
+	.ai-group-title
+	{
+		margin: 0 0 0.7rem;
+		font-size: 0.95rem;
+		font-weight: 700;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: rgba(255, 251, 0, 0.9);
+	}
+
+	.ai-grid
+	{
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 0.6rem;
+	}
+
+	.ai-button
+	{
+		padding: 0.8rem 0.5rem;
+		font-size: 1rem;
 	}
 
 	.version

@@ -156,6 +156,7 @@ export interface ServerPlayerAssignedMessage
   type: "playerAssigned";
   side: 1 | 2;
   instanceId?: string;
+  opponentUsername?: string | null;
 }
 
 export interface ServerErrorMessage

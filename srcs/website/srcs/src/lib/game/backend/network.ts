@@ -3,7 +3,7 @@ import type { ClientGameState, PlayerInput, ServerMessage } from "../both/interf
 export function connection(
   socket: WebSocket,
   onGameState: (state: ClientGameState) => void,
-  onPlayerAssigned?: (side: 1 | 2) => void
+  onPlayerAssigned?: (side: 1 | 2, instanceId?: string, opponentUsername?: string | null) => void
 )
 {
   socket.addEventListener("open", () => { console.log("Connected"); });
@@ -19,7 +19,7 @@ export function connection(
         onGameState(message.state);
         break;
       case "playerAssigned":
-        onPlayerAssigned?.(message.side);
+        onPlayerAssigned?.(message.side, message.instanceId, message.opponentUsername ?? null);
         break;
     }
   });

@@ -1,9 +1,23 @@
 import { serverVariable } from './pongVariables';
+import { eq, lt, gte, ne, and } from 'drizzle-orm';
+import { db } from './db/db.ts';
+import { users, matches} from './db/schema.ts';
+
 import type { ClientInputMessage, ConnectedPlayer, ClientGameState, Player } from '../../../website/srcs/src/lib/game/both/interfaces';
 import type { AIDifficulty, MatchConfig, MatchMode } from './pongVariables';
 
 type Game = ReturnType<typeof serverVariable>;
 export type PlayerSide = 1 | 2;
+
+export interface GameUserData
+{
+  id: number | string;
+  username: string;
+  wins: number;
+  losses: number;
+  matches: number;
+  wallet: number;
+}
 
 export interface GameSessionConfig
 {
@@ -17,10 +31,11 @@ export interface GameSession
   config: GameSessionConfig;
   start: () => void;
   stop: () => void;
-  addClient: (socket: WebSocket) => PlayerSide | null;
+  addClient: (socket: WebSocket, userId?: string, user?: GameUserData) => PlayerSide | null;
   removeClient: (socket: WebSocket) => void;
   storeInputs: (socket: WebSocket, message: ClientInputMessage) => void;
   setPlayerReady: (socket: WebSocket) => void;
+  getOpponentUsername: (side: PlayerSide) => string | null;
   playerCount: () => number;
   isFull: () => boolean;
 }
@@ -513,7 +528,11 @@ function updateBall(vars: Game)
   }
 
   if (vars.state.score.p1 >= vars.rules.scoreToWin || vars.state.score.p2 >= vars.rules.scoreToWin)
+  {
     vars.state.status = 'game_end';
+    if (vars.player2WasHuman)
+      void updatebdd(vars);
+  }
   else if (vars.roundEndTick > vars.state.tick)
     vars.state.status = 'round_end';
 
@@ -522,6 +541,58 @@ function updateBall(vars: Game)
       vars.ball.speed + vars.rules.acceleration * vars.DT,
       vars.rules.maxSpeed
     );
+}
+
+export async function updatebdd(vars: Game)
+{
+  const infoplayer1 = vars.playerUserData.p1;
+  const infoplayer2 = vars.playerUserData.p2;
+
+  if (!infoplayer1 || !infoplayer2)
+    return;
+
+  try
+  {
+    const winner = vars.state.score.p1 > vars.state.score.p2 ? 1 : 2;
+    await db.insert(matches).values({
+      user1: Number(infoplayer1.id),
+      user1Pseudo: infoplayer1.username,
+      user1EloChange: winner === 1 ? 10 : -10,
+      user2: Number(infoplayer2.id),
+      user2Pseudo: infoplayer2.username,
+      user2EloChange: winner === 2 ? 10 : -10,
+      user1Score: vars.state.score.p1,
+      user2Score: vars.state.score.p2,
+      idBall1: infoplayer1.skin_ball ?? null,
+      idBall2: infoplayer2.skin_ball ?? null,
+      skinRac1: infoplayer1.skin_rac ?? null,
+      skinRac2: infoplayer2.skin_rac ?? null,
+      winner: winner === 1 ? Number(infoplayer1.id) : Number(infoplayer2.id),
+    });
+
+    await db.update(users)
+      .set({
+		wins: Number(infoplayer1.wins) + (winner === 1 ? 1 : 0),
+		losses: Number(infoplayer1.losses) + (winner === 2 ? 1 : 0),
+		matches: Number(infoplayer1.matches) + 1,
+		wallet: Number(infoplayer1.wallet,) + (winner === 1 ? 20 : 10)
+	})
+      .where(eq(users.id, Number(infoplayer1.id)));
+
+    await db.update(users)
+      .set({
+		wins: Number(infoplayer2.wins) + (winner === 2 ? 1 : 0),
+		losses: Number(infoplayer2.losses) + (winner === 1 ? 1 : 0),
+		matches: Number(infoplayer2.matches) + 1,
+		wallet: Number(infoplayer2.wallet) + (winner === 2 ? 20 : 10),
+	})
+      .where(eq(users.id, Number(infoplayer2.id)));
+	await db
+  }
+  catch (error)
+  {
+    console.error('updatebdd failed', error);
+  }
 }
 
 export function createGameSession(id: string, config: GameSessionConfig): GameSession
@@ -632,7 +703,71 @@ export function createGameSession(id: string, config: GameSessionConfig): GameSe
     tickInterval = null;
   }
 
-  function addClient(socket: WebSocket): PlayerSide | null
+  function getAvailableSide()
+  {
+    const hasP1 = connectedPlayers.some(client => client.player === vars.player1);
+    const hasP2 = connectedPlayers.some(client => client.player === vars.player2);
+
+    if (!hasP1)
+      return ({ side: 1 as const, player: vars.player1 });
+    if (!hasP2)
+      return ({ side: 2 as const, player: vars.player2 });
+    return (null);
+  }
+
+  function isAuthorizedForSide(side: PlayerSide, userId?: string)
+  {
+    if (vars.mode !== 'pvp')
+      return (true);
+    if (!userId)
+      return (false);
+
+    const storedUserId = side === 1 ? vars.playerUserIds.p1 : vars.playerUserIds.p2;
+    return (storedUserId === null || storedUserId === userId);
+  }
+
+  function rememberUserForSide(side: PlayerSide, userId?: string, user?: GameUserData)
+  {
+    if (vars.mode !== 'pvp')
+      return;
+
+    if (user && side === 1 && vars.playerUserData.p1 === null)
+      vars.playerUserData.p1 = user;
+    else if (user && side === 2 && vars.playerUserData.p2 === null)
+      vars.playerUserData.p2 = user;
+
+    if (!userId)
+      return;
+
+    if (side === 1 && vars.playerUserIds.p1 === null)
+      vars.playerUserIds.p1 = userId;
+    else if (side === 2 && vars.playerUserIds.p2 === null)
+      vars.playerUserIds.p2 = userId;
+  }
+
+  function broadcastPlayerAssignments()
+  {
+    for (const cli of clients)
+    {
+      if (cli.readyState !== WebSocket.OPEN)
+        continue;
+
+      const player = connectedPlayers.find(client => client.socket === cli)?.player;
+      if (!player)
+        continue;
+
+      const side = getPlayerSide(vars, player);
+      const payload = JSON.stringify({
+        type: 'playerAssigned',
+        side,
+        instanceId: id,
+        opponentUsername: getOpponentUsername(side)
+      });
+      cli.send(payload);
+    }
+  }
+
+  function addClient(socket: WebSocket, userId?: string, user?: GameUserData): PlayerSide | null
   {
     if (connectedPlayers.length >= maxPlayers)
     {
@@ -640,10 +775,24 @@ export function createGameSession(id: string, config: GameSessionConfig): GameSe
       return (null);
     }
 
+    const availableSlot = getAvailableSide();
+    if (!availableSlot)
+    {
+      socket.close(1013, 'Game is full');
+      return (null);
+    }
+
+    if (!isAuthorizedForSide(availableSlot.side, userId))
+    {
+      socket.close(1008, 'Unauthorized player for this slot');
+      return (null);
+    }
+
     clients.add(socket);
-    const player = connectedPlayers.length === 0 ? vars.player1 : vars.player2;
+    const player = availableSlot.player;
     connectedPlayers.push({ socket, player });
     const side = getPlayerSide(vars, player);
+    rememberUserForSide(side, userId, user);
 
     if (vars.waitingForReconnect && side === vars.waitingForReconnectSide)
     {
@@ -657,7 +806,15 @@ export function createGameSession(id: string, config: GameSessionConfig): GameSe
       vars.ball.vel.y = 0;
       vars.countdownEndTick = vars.state.tick + vars.MATCH_START_COUNTDOWN_TICKS;
       vars.state.status = 'countdown';
+      broadcastPlayerAssignments();
       return (side);
+    }
+    if (vars.waitingForReconnect && side !== vars.waitingForReconnectSide)
+    {
+      connectedPlayers.pop();
+      clients.delete(socket);
+      socket.close(1008, 'Wrong player slot for reconnect');
+      return (null);
     }
 
     if (side === 1)
@@ -670,6 +827,7 @@ export function createGameSession(id: string, config: GameSessionConfig): GameSe
     if (vars.mode === 'pve' && !vars.player2WasHuman && !connectedPlayers.some(client => client.player === vars.player2))
       vars.ready.p2 = true;
     maybeStartMatch(vars, connectedPlayers);
+    broadcastPlayerAssignments();
     return (side);
   }
 
@@ -684,6 +842,8 @@ export function createGameSession(id: string, config: GameSessionConfig): GameSe
     connectedPlayers.splice(playerIndex, 1);
     if (connectedPlayers.length === 0)
     {
+      vars.playerUserIds.p1 = null;
+      vars.playerUserIds.p2 = null;
       vars.ready.p1 = false;
       vars.ready.p2 = false;
       vars.state.status = 'waiting';
@@ -699,6 +859,12 @@ export function createGameSession(id: string, config: GameSessionConfig): GameSe
       vars.waitingForReconnectUntilTick = vars.state.tick + vars.TICK_RATE * 30;
       return;
     }
+
+    if (removedSide === 1)
+      vars.playerUserIds.p1 = null;
+    else
+      vars.playerUserIds.p2 = null;
+
     vars.state.status = 'waiting';
     vars.ready.p1 = connectedPlayers.some(client => client.player === vars.player1);
     vars.ready.p2 = connectedPlayers.some(client => client.player === vars.player2);
@@ -724,6 +890,12 @@ export function createGameSession(id: string, config: GameSessionConfig): GameSe
     maybeStartMatch(vars, connectedPlayers);
   }
 
+  function getOpponentUsername(side: PlayerSide): string | null
+  {
+    const opponent = side === 1 ? vars.playerUserData.p2 : vars.playerUserData.p1;
+    return opponent?.username ?? null;
+  }
+
   return {
     id,
     config,
@@ -733,6 +905,7 @@ export function createGameSession(id: string, config: GameSessionConfig): GameSe
     removeClient,
     storeInputs,
     setPlayerReady,
+    getOpponentUsername,
     playerCount,
     isFull
   };

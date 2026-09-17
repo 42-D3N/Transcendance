@@ -39,7 +39,7 @@ export const matches = pgTable('matches', {
 	skinRac1: integer().default(null).references(() => shop.id),
 	skinRac2: integer().default(null).references(() => shop.id),
 	date: timestamp().defaultNow(),
-	winner: integer().notNull()
+	winner: integer().notNull().references(() => users.id),
 	}, (table) => [
     check("winner_check", sql`${table.winner} = ${table.user1} or ${table.winner} = ${table.user2}`)
 ]);

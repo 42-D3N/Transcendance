@@ -16,7 +16,6 @@ function parseAIDifficulty(value: unknown): AIDifficulty | undefined
 {
   if (value === 'easy' || value === 'normal' || value === 'hard' || value === 'impossible')
     return (value);
-
   return (undefined);
 }
 
@@ -29,11 +28,36 @@ const start = async () => {
       const mode = parseMode(req.query?.mode);
       const aiDifficulty = parseAIDifficulty(req.query?.aiDifficulty);
       const instanceIdParam = typeof req.query?.instanceId === 'string' ? req.query.instanceId : undefined;
-      const joinResult = gameInstances.join(socket, { mode, aiDifficulty, instanceId: instanceIdParam });
+      const userIdParam = typeof req.query?.userId === 'string' ? req.query.userId : undefined;
+      const userParam = typeof req.query?.user === 'string' ? req.query.user : undefined;
+      let parsedUser: any = undefined;
+      if (userParam)
+      {
+        try         { parsedUser = JSON.parse(userParam); }
+        catch (err) { console.warn('Invalid user payload in websocket query', err); }
+      }
+      const joinResult = gameInstances.join(socket, {
+        mode,
+        aiDifficulty,
+        instanceId: instanceIdParam,
+        userId: userIdParam,
+        user: parsedUser
+      });
       const side = joinResult.side;
 
       if (side !== null)
-        socket.send(JSON.stringify({ type: 'playerAssigned', side, instanceId: joinResult.instanceId }));
+      {
+        const opponentUser = side === 1
+          ? gameInstances.getOpponentUsername(joinResult.instanceId, 1)
+          : gameInstances.getOpponentUsername(joinResult.instanceId, 2);
+
+        socket.send(JSON.stringify({
+          type: 'playerAssigned',
+          side,
+          instanceId: joinResult.instanceId,
+          opponentUsername: opponentUser ?? null
+        }));
+      }
 
       socket.on("message", async (data: any) =>
       {
