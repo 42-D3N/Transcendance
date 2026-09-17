@@ -20,7 +20,8 @@ export const GET: RequestHandler = async ({ params }) => {
             losses:users.losses,
             matches:users.matches,
             wallet:users.wallet,
-            icon:users.icon
+            icon:users.icon,
+            privateAcc:users.privateAcc
         })
         .from(users)
         .where(eq(users.id, parseInt(username[1])))

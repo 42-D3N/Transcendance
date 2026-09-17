@@ -23,7 +23,7 @@ export const actions = {
         {
             const isEmail:RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             const isPass:RegExp = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])[^\s]{12,67}$/;
-            const isUsername:RegExp = /^.{4,128}$/;
+            const isUsername:RegExp = /^[a-zA-Z0-9_-]{4,128}$/;
 
             const form = await event.request.formData();
             const email = form.get('email');
@@ -57,7 +57,21 @@ export const actions = {
                 }
             );
             
-            const userInfos = await db.select({ id:users.id, username:users.username, email:users.email, wins:users.wins, losses:users.losses, matches:users.matches, wallets:users.wallet, code:users.code, skin_rac:users.skin_rac, skin_ball:users.skin_ball}).from(users).where(eq(users.username, username as string));
+            const userInfos = await db.select({
+                id:users.id,
+                username:users.username,
+                email:users.email,
+                wins:users.wins,
+                losses:users.losses,
+                matches:users.matches,
+                wallets:users.wallet,
+                code:users.code,
+                skin_rac:users.skin_rac,
+                skin_ball:users.skin_ball,
+                privateAcc:users.privateAcc
+            })
+            .from(users)
+            .where(eq(users.username, username as string));
             const products = await db.select().from(shop);
             await db.insert(inventory).values(
             products.map((product) => ({

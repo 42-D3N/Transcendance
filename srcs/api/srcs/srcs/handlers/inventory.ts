@@ -76,6 +76,6 @@ export async function removeitem(req: Request, res: Response, next: NextFunction
         }
         if (handleErrorCode(error, next, used))
               return;
-        next (new CustomError("Error: failed to add the item", 500));
+        next (new CustomError("Error: failed to remove the item", 500));
     }
 }
