@@ -60,7 +60,7 @@
 <div class="h-[332px] w-[350px] ml-[0.5rem] flex flex-col relative bg-black/50">
 	<div class="items-start flex basis-[3rem] grow shrink-0 justify-between relative">
 		<div class="rounded-tl-sm items-center flex overflow-hidden text-ellipsis whitespace-nowrap">
-			{#if openedChats[index].id === -1}
+			{#if openedChats[index].id < 0}
 			<div class="text-white">
 				<span class="ml-[0.8rem] mr-[0.2rem]">À: </span>
 				<span class="border-white border-[0.1rem] border-solid">

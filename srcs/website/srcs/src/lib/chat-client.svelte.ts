@@ -28,6 +28,7 @@ interface OpenedChat {
 export let activeChats:ChatContact[] = $state([]);
 export let openedChats:OpenedChat[] = $state([]);
 let chatLimit:number = $state(4);
+let	emptyChatId:number = -1;
 
 class ChatClient {
 	private ws: WebSocket | null = null;
@@ -51,7 +52,7 @@ class ChatClient {
 
 		this.ws.onmessage = event => {
 			let data = JSON.parse(event.data);
-			console.log(data);
+			// console.log(data);
 			switch (data.type) {
 				case "contacts":
 					activeChats.splice(0);
@@ -181,7 +182,11 @@ export function updateChatLimit(newLimit:number) {
 export function addEmptyChat() {
 	while (openedChats.length >= chatLimit)
 		openedChats.pop();
-	openedChats.unshift({id: -1, name: "null", avatar: null, history: [], hasError: false, error: null, update: false});
+	openedChats.unshift({id: emptyChatId, name: "null", avatar: null, history: [], hasError: false, error: null, update: false});
+	if (emptyChatId < -10)
+		emptyChatId = -1;
+	else
+		emptyChatId--;
 }
 
 export function addChat(index: number) {

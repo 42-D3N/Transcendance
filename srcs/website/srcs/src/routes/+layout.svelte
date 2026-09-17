@@ -94,7 +94,7 @@
 
 <div id="sidebar" class="lg:left-0 lg:fixed lg:z-100">
 	<div class="opened-chats-container">
-		{#each openedChats as chat, i}
+		{#each openedChats as chat, i (chat.id)}
 		<ChatWindow index={i} userId={data.id}/>
 		{/each}
 	</div>
