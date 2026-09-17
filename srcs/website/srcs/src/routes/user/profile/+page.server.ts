@@ -2,8 +2,8 @@ import { redirect, fail } from '@sveltejs/kit';
 import { validateJWT } from '$lib/server/user_management/jwt.js';
 import type { Actions } from './$types';
 import { db } from '$lib/server/db/index';
-import { eq, and } from 'drizzle-orm';
-import { users, friends } from '$lib/server/db/schema';
+import { eq, and, or } from 'drizzle-orm';
+import { users, friends, matches } from '$lib/server/db/schema';
 
 
 export async function load ({ cookies }) {
@@ -13,12 +13,15 @@ export async function load ({ cookies }) {
     let email = '';
     let wins = '0';
     let losses = '0';
-    let matches = '0';
+    let playedMatches = '0';
     let wallet = '0';
     let icon = 'default.svg';
     let friendRequests = [];
     let requestsInfos: {id: number; username: string; icon: string | null}[] = [];
-
+    let copinous = [];
+    let actualFriends: {id: number; username: string; icon: string | null}[] = [];
+    let userHistory: [];
+    
     if (!JWTtoken || JWTtoken === '-1')
     {
         cookies.set('JWTtoken', '-1', { path: '/' });
@@ -47,9 +50,15 @@ export async function load ({ cookies }) {
 
         friendRequests = (await db.select({ user1: friends.user1, user2: friends.user2, isaccepted: friends.isaccepted })
             .from(friends)
-            .where(and(eq(friends.user2, userInfos.id), eq(friends.isaccepted, false)))
+            .where(and(eq(friends.user2, userInfos.id) , eq(friends.isaccepted, false)))
             .limit(5)
-        )
+        );
+
+        copinous = (await db.select({ user1: friends.user1, user2: friends.user2, isaccepted: friends.isaccepted })
+            .from(friends)
+            .where(and(or(eq(friends.user2, userInfos.id), eq(friends.user1, userInfos.id)), eq(friends.isaccepted, true)))
+            .limit(12)
+        );
 
         requestsInfos = await Promise.all(
             friendRequests.map(async (request) => {
@@ -60,24 +69,49 @@ export async function load ({ cookies }) {
                         icon: users.icon
                     })
                     .from(users)
-                    .where(eq(request.user1, users.id));
+                    .where(eq(users.id, request.user1));
                 user[0].user1 = request.user1;
                 user[0].user2 = request.user2;
                 return user[0];
             })
         );
 
+        actualFriends = await Promise.all(
+            copinous.map(async (request) => {
+                let toFetch: number;
+                if (request.user1 == userInfos.id)
+                    toFetch = request.user2;
+                else
+                    toFetch = request.user1;
+
+                let user: { id: number, username: string, icon: string | null, user1: number, user2: number}[] = await db
+                    .select({
+                        id: users.id,
+                        username: users.username,
+                        icon: users.icon
+                    })
+                    .from(users)
+                    .where(eq(users.id, toFetch));
+                return user[0];
+            })
+        );
+
+        if (userInfos.matches > 0)
+            userHistory = await db.select()
+            .from(matches)
+            .where(or(eq(matches.user1, userInfos.id), eq(matches.user2, userInfos.id)))
+            .limit(5);
+
         id = userInfos.id;
         username = userInfos.username;
         email = userInfos.email;
         wins = userInfos.wins;
         losses = userInfos.losses;
-        matches = userInfos.matches;
+        playedMatches = userInfos.matches;
         wallet = userInfos.wallets;
         if (userInfos.icon != '')
             icon = userInfos.icon
     }
-
 
     return ({
         Token: JWTtoken,
@@ -86,10 +120,12 @@ export async function load ({ cookies }) {
         email: email,
         wins: wins,
         losses: losses,
-        matches: matches,
+        playedMatches: playedMatches,
         wallet: wallet,
         icon: icon,
-        friendRequests: requestsInfos
+        friendRequests: requestsInfos,
+        friends: actualFriends,
+        matchHistory: userHistory
     });
 };
 
@@ -153,7 +189,6 @@ export const actions = {
                 isaccepted: false
             }
         );
-        console.log("request sended");
     },
 
     acceptRequest: async (event) => {
@@ -174,6 +209,41 @@ export const actions = {
         const user2 = form.get('user2');
 
         await db.delete(friends).where(and(eq(parseInt(user1), friends.user1), eq(parseInt(user2), friends.user2)));
-    }
+    },
     
+    rmFriend: async (event) => {
+        const form = await event.request.formData();
+        
+        const user = form.get('user');
+        const rmedfriend = form.get('friend');
+
+        let existing = await db.select({isaccepted: friends.isaccepted}).from(friends)
+        .where(
+            or(
+                and(
+                    eq(parseInt(user), friends.user1),
+                    eq(parseInt(rmedfriend), friends.user2)
+                ),
+                and(
+                    eq(parseInt(rmedfriend), friends.user1),
+                    eq(parseInt(user), friends.user2)
+                )
+            )
+        );
+        if (existing.length == 0)
+            return ;
+        await db.delete(friends)
+        .where(
+            or(
+                and(
+                    eq(parseInt(user), friends.user1),
+                    eq(parseInt(rmedfriend), friends.user2)
+                ),
+                and(
+                    eq(parseInt(rmedfriend), friends.user1),
+                    eq(parseInt(user), friends.user2)
+                )
+            )
+        );
+    }
 } satisfies Actions;

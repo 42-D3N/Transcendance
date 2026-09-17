@@ -15,11 +15,11 @@ function validateUpdateEmail() {
 }
 
 function validateUpdateUsername() {
-  return body("username").optional({ checkFalsy: true }).isString().trim().escape().custom((username: string) => /^.{4,128}$/.test(username));;
+  return body("username").optional({ checkFalsy: true }).isString().trim().escape().custom((username: string) => /^[a-zA-Z0-9_-]{4,128}$/.test(username));;
 }
 
 function validateUpdatePassword() {
-  return body("password").optional({ checkFalsy: true }).isString().trim();
+  return body("password").optional({ checkFalsy: true }).isString().trim().custom((password: string) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])[^\s]{12,67}$/.test(password));;
 }
 
 export function validateUpdateUser() {
@@ -62,7 +62,7 @@ export function validateIdParam() {
 }
 
 export function validateUsername() {
-  return body("username").notEmpty().isString().trim().custom((username: string) => /^.{4,128}$/.test(username));
+  return body("username").notEmpty().isString().trim().custom((username: string) => /^[a-zA-Z0-9_-]{4,128}$/.test(username));
 }
 
 export function validateEmail() {
@@ -71,4 +71,16 @@ export function validateEmail() {
 
 export function validatePassword() {
   return body("password").notEmpty().isString().trim().custom((password: string) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])[^\s]{12,67}$/.test(password));
+}
+
+export function validateInvUser() {
+  return body("user").toInt().isInt();
+}
+
+export function validateInvItem() {
+  return body("item").toInt().isInt();
+}
+
+export function validateInvOwn() {
+  return body("own").isBoolean().toBoolean();
 }

@@ -2,8 +2,8 @@ import { createJWT, validateJWT } from '$lib/server/user_management/jwt.js';
 import { redirect, fail } from '@sveltejs/kit';
 import { randomBytes } from 'crypto';
 import { db } from '$lib/server/db/index';
-import { users } from '$lib/server/db/schema';
-import { eq, or } from 'drizzle-orm';
+import { eq, and, or } from 'drizzle-orm';
+import { users, matches } from '$lib/server/db/schema';
 import type { Actions } from './$types';
 import { writeFile, readdir, mkdir } from 'fs/promises';
 import path from 'path';
@@ -15,9 +15,11 @@ export async function load ({ cookies }) {
     let email = '';
     let wins = '0';
     let losses = '0';
-    let matches = '0';
+    let matchesP = '0';
     let wallet = '0';
     let icon = 'default.svg';
+    let privateAcc = false;
+    let userHistory: [];
 
     if (!JWTtoken || JWTtoken === '-1')
     {
@@ -45,13 +47,20 @@ export async function load ({ cookies }) {
 			throw redirect(303, '/login');
 		}
 
+        if (userInfos.matches > 0)
+            userHistory = await db.select()
+            .from(matches)
+            .where(or(eq(matches.user1, userInfos.id), eq(matches.user2, userInfos.id)))
+            .limit(5);
+
         id = userInfos.id;
         username = userInfos.username;
         email = userInfos.email;
         wins = userInfos.wins;
         losses = userInfos.losses;
-        matches = userInfos.matches;
+        matchesP = userInfos.matches;
         wallet = userInfos.wallets;
+        privateAcc = userInfos.privateAcc;
         if (userInfos.icon != '')
             icon = userInfos.icon
     }
@@ -63,23 +72,27 @@ export async function load ({ cookies }) {
         email: email,
         wins: wins,
         losses: losses,
-        matches: matches,
+        matches: matchesP,
         wallet: wallet,
-        icon: icon
+        icon: icon,
+        privateAcc: privateAcc,
+        matchHistory: userHistory
     });
 };
 
 
 export const actions = {
-    default: async (event) => {
+    saveMods: async (event) => {
         const form = await event.request.formData();
 
-        const isUsername:RegExp = /^.{4,128}$/;
+        const isUsername:RegExp = /^[a-zA-Z0-9_-]{4,128}$/;
         const isEmail:RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
         const icon = form.get('icon') as File;
         const newName = form.get('username') as string;
         const newMail = form.get('email') as string;
+        const isPrivate = form.get('agree') as string;
+
         let userInfos = await validateJWT(event.cookies.get('JWTtoken'));
         if (!newName || !isUsername.test(newName))
             return (fail(400, {newName, invalidName: true }));
@@ -94,15 +107,20 @@ export const actions = {
 
         if (newName != userInfos.username)
         {
-            console.log("changing {user_id}",userInfos.id,"username: ",userInfos.username,"->",newName);
+            // console.log("changing {user_id}",userInfos.id,"username: ",userInfos.username,"->",newName);
             await db.update(users).set({username: newName}).where(eq(users.id, userInfos.id));
         }
         
         if (newMail != userInfos.email)
         {
-            console.log("changing {user_id}",userInfos.id,"email: ",userInfos.email,"->",newMail);
+            // console.log("changing {user_id}",userInfos.id,"email: ",userInfos.email,"->",newMail);
             await db.update(users).set({email: newMail}).where(eq(users.id, userInfos.id));
         }
+
+        if (!userInfos.privateAcc && isPrivate != null)
+            await db.update(users).set({privateAcc: true}).where(eq(users.id, userInfos.id));
+        else if (userInfos.privateAcc === true && isPrivate === null)
+            await db.update(users).set({privateAcc: false}).where(eq(users.id, userInfos.id));
 
         if (icon && icon.size != 0)
         {
@@ -117,21 +135,44 @@ export const actions = {
             const filePath = path.join(uploadDir, randomString.toString('hex')+"."+end[end.length - 1]);
             await db.update(users).set({icon: '/userIcons/'+randomString.toString('hex')+"."+end[end.length - 1]}).where(eq(users.id, userInfos.id));
             await writeFile(filePath, buffer);
-            console.log("Saving new icon as: "+filePath);
+            // console.log("Saving new icon as: "+filePath);
             
             if (userInfos.icon)
             {
                 const res = await event.fetch(`${userInfos.icon}`, {
                     method: 'DELETE'
                 });
-                console.log("deleting old icon");
+                // console.log("deleting old icon");
             }
             userInfos.icon = randomString.toString("hex")+"."+end[end.length - 1];
-            console.log("changing {user_id}",userInfos.id,"icon: ",userInfos.icon,"->\n",randomString.toString("hex")+"."+end[end.length - 1]);
+            // console.log("changing {user_id}",userInfos.id,"icon: ",userInfos.icon,"->\n",randomString.toString("hex")+"."+end[end.length - 1]);
         }
 
         const updatedJWT = await createJWT(userInfos);
         event.cookies.set('JWTtoken', updatedJWT, { path: '/' });
         throw redirect(303, "../profile");
+    },
+
+    delIcon: async (event) => {
+        let userInfos = await validateJWT(event.cookies.get('JWTtoken'));
+
+        if (!userInfos)
+        {
+            event.cookies.set('JWTtoken', "-1", { path: '/' });
+            throw redirect(303, '/sign_in');
+        }
+
+        if (userInfos.icon)
+        {
+            const res = await event.fetch(`${userInfos.icon}`, {
+                method: 'DELETE'
+            });
+            console.log("deleting old icon");
+        }
+        
+        await db.update(users).set({icon: null}).where(eq(users.id, userInfos.id));
+        
+        throw redirect(303, "./edit");
     }
+
 } satisfies Actions;

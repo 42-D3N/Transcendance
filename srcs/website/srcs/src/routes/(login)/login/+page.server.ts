@@ -6,7 +6,6 @@ import { eq } from 'drizzle-orm';
 import { users } from '$lib/server/db/schema';
 import { createJWT } from '$lib/server/user_management/jwt.js';
 import bcrypt from 'bcryptjs';
-import { inventory } from '../../../lib/server/db/schema';
 
 export const load = async ({ cookies }) => {
 	const JWT = cookies.get('JWTtoken');
@@ -20,7 +19,7 @@ export const actions = {
 	login: async (event) => {
 		try
 		{
-			const isUsername:RegExp = /^.{4,128}$/;
+			const isUsername:RegExp = /^[a-zA-Z0-9_-]{4,128}$/;
 			const isEmail:RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 			const form = await event.request.formData();

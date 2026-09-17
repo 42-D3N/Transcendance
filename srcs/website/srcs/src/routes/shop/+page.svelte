@@ -1,7 +1,13 @@
 <script lang="ts">
     import Popup from "$lib/Popup.svelte";
-    import noise from "$lib/assets/noise.png";
-    import test from "$lib/assets/test.jpg";
+    import item1 from "$lib/assets/item1.png";
+    import item2 from "$lib/assets/item2.png";
+    import item3 from "$lib/assets/item3.png";
+    import item4 from "$lib/assets/item4.png";
+    import item5 from "$lib/assets/item5.png";
+    import item6 from "$lib/assets/item6.png";
+    import item7 from "$lib/assets/item7.png";
+    import item8 from "$lib/assets/item8.png";
 
     let { data } = $props();
     let shep = $derived(data.code === true ? 0.50 : 1);
@@ -9,20 +15,20 @@
     let showmodal:boolean = $state(false);
     let code:string = $state("");
     let products = $state([
-        { id: 1, name: "Product", price: 10, src: noise},
-        { id: 2, name: "Product", price: 20, src: noise},
-        { id: 3, name: "Product", price: 30, src: noise},
-        { id: 4, name: "Product", price: 40, src: noise},
-        { id: 5, name: "Product", price: 50, src: noise},
-        { id: 6, name: "Product", price: 60, src: noise},
-        { id: 7, name: "Product", price: 70, src: noise},
-        { id: 8, name: "Product", price: 80, src: noise},
+        { id: 1, name: "Old placeholder: ", price: 10, src: item1},
+        { id: 2, name: "Game dev's fav colors: ", price: 20, src: item2},
+        { id: 3, name: "Dev's fav color: ", price: 30, src: item3},
+        { id: 4, name: "Ugly color: ", price: 40, src: item4},
+        { id: 5, name: "TV snow: ", price: 50, src: item5},
+        { id: 6, name: "Light: ", price: 60, src: item6},
+        { id: 7, name: "Perturabo's love: ", price: 70, src: item7},
+        { id: 8, name: "WE ARE RICH: ", price: 670, src: item8},
     ]);
 
     async function sendData(product) {
         const formData = new FormData();
         formData.append('product', JSON.stringify(product));
-        const response = await fetch('/shop', {
+        const response = await fetch('/shop', { 
             method: 'POST',
             body: formData
         })
@@ -57,7 +63,7 @@
 </script>
 <div class="fixed inset-0 z-0 bg-[#333131FF]"></div>
 
-<div class="flex w-full flex-col items-center">
+<div class="flex w-full flex-col items-center z-10">
   <button onclick={secret} class="z-100 w-fit text-7xl text-[#C41E3AFF] lg:mt-[5%] lg:text-9xl">Shop </button>
     {#if showmodal}
     <div class="fixed inset-0 z-[1000] flex items-center justify-center bg-[#00000080]" role="presentation" onclick={(e) => {
@@ -90,7 +96,7 @@
                 <img src={product.src} class="scale-80 mx-auto" alt=""/>
                     <button onclick={() => sendData({id: product.id})} title="shop item" type="button" class="text-wrap inline-block rounded-xl bg-[#C41E3AFF] z-10 w-[90%] min-h-[15%] max-h-[50%] text-center">
                         <span class="break-words text-l sm:text-xl md:text-3xl lg:text-4xl">
-                            {product.name} {product.price * shep}
+                            {product.name} {product.price * shep}$
                         </span>
                     </button>
             </div>

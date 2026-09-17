@@ -3,6 +3,9 @@
     handle /api/game_server* {
         reverse_proxy game_server:3310
     }
+    handle /api/chat {
+        reverse_proxy chat-server:5786
+    }
     handle /api* {
         reverse_proxy api:9090
     }

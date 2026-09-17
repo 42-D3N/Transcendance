@@ -25,25 +25,6 @@ async function addadmin():Promise<number> {
       role: "admin",
 	  secret_key: secret_key
     }).returning();
-	// a delete uniquement pout des test a pas mettre en prod
-	const tmp =  await db.select({ id:shop.id}).from(shop).where(eq(shop.id, 1));
-	for (let i:number = 0; i !== 10; i++)
-		console.log('DELETE ELEMENTS ICI SHOP INSERT1')
-    if(!tmp[0])
-    {
-        await db.insert(shop).values([
-        { name: 'Product 1', price: 10, },
-        { name: 'Product 2', price: 20, },
-        { name: 'Product 3', price: 30, },
-        { name: 'Product 4', price: 40, },
-        { name: 'Product 5', price: 50, },
-        { name: 'Product 6', price: 60, },
-        { name: 'Product 7', price: 70, },
-        { name: 'Product 8', price: 80, },
-        ]);
-        console.log('Products inserted!');
-    }
-	// a delete uniquement pout des test a pas mettre en prod
     console.log("Successfully added admin user to api.");
 	} catch (error) {
 	console.log("Failed to add user ", error.cause.code);
