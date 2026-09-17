@@ -27,7 +27,7 @@
     import type { PageProps } from './$types';
     let { data, form }: PageProps = $props();
     let friendNb = $state(data.friends.length);
-
+    console.log(data.userSkins);
     function    Winrate()
     {
         if (parseInt(data.matches) === 0)
@@ -115,60 +115,91 @@
         </div>
 
         <div class="mt-[4%] w-full h-[20%] bg-[#292626FF] border-solid rounded-lg z-10 p-4">
-            <span class="text-white text-xl lg:text-4xl font-bold">Racket skins:</span>
-            <div class="flex overflow-x-scroll m-4">
-                {#each data.skins as Skin}
-                    <form method="POST" enctype="multipart/form-data" class="flex flex-shrink-0 flex-col items-center bg-stone-700 rounded-xl border m-4" use:enhance={({ formData }) => {
-                            formData.append('userId', JSON.stringify(data.id));
-                            formData.append('product', JSON.stringify(Skin.product));
-                            formData.append('owned', JSON.stringify(Skin.own));
-                        }}
-                        >
-                        <button type="submit" class="flex flex-shrink-0 flex-col items-center" formaction="?/changeSkinRac">
-                            {#if !Skin.own}
-                                <div class="flex flex-col m-2 lg:h-[18rem] lg:w-[18rem] h-[8rem] w-[8rem] border-solid border border-white bg-[#161825FF] justify-center items-center">
-                                    <img class="lg:h-[2rem] lg:w-[2rem] h-[1rem] w-[1rem]" src={lock} alt=""/>
-                                </div>
-                                <span class="italic text-xs lg:text-lg">Go to shop to buy it now</span>
-                            {:else}
-                                <img class="block m-2 lg:h-[18rem] lg:w-[18rem] h-[8rem] w-[8rem] border-solid border" src={products[Skin.product].src} alt=""/>
-                                <span class="text-xs lg:text-lg text-[#161825FF] font-bold self-start text-left ml-2">{products[Skin.product].name}</span>
-                            {/if}
-                        </button>
-                    </form>
-                {/each}
+            <div class="w-full h-[20%] bg-[#292626FF] border-solid rounded-lg border z-10 p-4">
+                <span class="text-white text-xl lg:text-4xl font-bold">Racket skins:</span>
+                <div class="flex overflow-x-scroll m-4">
+                    {#each data.skins as Skin}
+                        {#if data.userSkins.skinRac === Skin.product}
+                            <form method="POST" enctype="multipart/form-data" class="flex shrink-0 flex-col items-center bg-[#3f2056FF] rounded-xl border border-[#724197FF] m-4" use:enhance={({ formData }) => {
+                                    formData.append('userId', JSON.stringify(data.id));
+                                    formData.append('owned', JSON.stringify(Skin.own));
+                                }}>
+                                <button type="submit" class="flex shrink-0 flex-col items-center" formaction="?/unequipRac">
+                                    <div class="relative m-2 lg:h-[18rem] lg:w-[18rem] h-[8rem] w-[8rem]">
+                                        <img class="block h-full w-full border-solid" src={products[Skin.product - 1].src} alt=""/>
+                                        <span class="absolute top-0 right-0 text-xs lg:text-lg italic px-1">equipped✓</span>
+                                    </div>
+                                    <span class="text-xs lg:text-lg text-[#930f86FF] font-bold self-start text-left ml-2">{products[Skin.product - 1].name}</span>
+                                </button>
+                            </form>
+                        {:else}
+                            <form method="POST" enctype="multipart/form-data" class="flex flex-shrink-0 flex-col items-center bg-stone-700 rounded-xl border m-4" use:enhance={({ formData }) => {
+                                    formData.append('userId', JSON.stringify(data.id));
+                                    formData.append('product', JSON.stringify(Skin.product));
+                                    formData.append('owned', JSON.stringify(Skin.own));
+                                }}
+                                >
+                                <button type="submit" class="flex flex-shrink-0 flex-col items-center" formaction="?/changeSkinRac">
+                                    {#if !Skin.own}
+                                        <div class="flex flex-col m-2 lg:h-[18rem] lg:w-[18rem] h-[8rem] w-[8rem] border-solid border border-white bg-[#161825FF] justify-center items-center">
+                                            <img class="lg:h-[2rem] lg:w-[2rem] h-[1rem] w-[1rem]" src={lock} alt=""/>
+                                        </div>
+                                        <span class="italic text-xs lg:text-lg">Go to shop to buy it now</span>
+                                    {:else}
+                                        <img class="block m-2 lg:h-[18rem] lg:w-[18rem] h-[8rem] w-[8rem] border-solid border" src={products[Skin.product - 1].src} alt=""/>
+                                        <span class="text-xs lg:text-lg text-[#161825FF] font-bold self-start text-left ml-2">{products[Skin.product - 1].name}</span>
+                                    {/if}
+                                </button>
+                            </form>
+                        {/if}
+                    {/each}
+                </div>
             </div>
-        </div>
-
-        <div class="mt-[4%] w-full h-[20%] bg-[#292626FF] border-solid rounded-lg z-10 p-4">
-            <span class="text-white text-xl lg:text-4xl font-bold">Ball skins:</span>
-            <div class="flex overflow-x-scroll m-4">
-                {#each data.skins as Skin}
-                    <form method="POST" enctype="multipart/form-data" class="flex flex-shrink-0 flex-col items-center bg-stone-700 rounded-xl border m-4" use:enhance={({ formData }) => {
-                            formData.append('userId', JSON.stringify(data.id));
-                            formData.append('product', JSON.stringify(Skin.product));
-                            formData.append('owned', JSON.stringify(Skin.own));
-                        }}
-                        >
-                        <button type="submit" class="flex flex-shrink-0 flex-col items-center" formaction="?/changeSkinBall">
-                            {#if !Skin.own}
-                                <div class="flex flex-col m-2 lg:h-[18rem] lg:w-[18rem] h-[8rem] w-[8rem] border-solid border border-white bg-[#161825FF] justify-center items-center">
-                                    <img class="lg:h-[2rem] lg:w-[2rem] h-[1rem] w-[1rem]" src={lock} alt=""/>
-                                </div>
-                                <span class="italic text-xs lg:text-lg">Go to shop to buy it now</span>
-                            {:else}
-                                <img class="block m-2 lg:h-[18rem] lg:w-[18rem] h-[8rem] w-[8rem] border-solid border" src={products[Skin.product].src} alt=""/>
-                                <span class="text-xs lg:text-lg text-[#161825FF] font-bold self-start text-left ml-2">{products[Skin.product].name}</span>
-                            {/if}
-                        </button>
-                    </form>
-                {/each}
+    
+            <div class="mt-[1%] w-full h-[20%] bg-[#292626FF] border-solid border rounded-lg z-10 p-4">
+                <span class="text-white text-xl lg:text-4xl font-bold">Ball skins:</span>
+                <div class="flex overflow-x-scroll m-4">
+                    {#each data.skins.reverse() as Skin}
+                        {#if data.userSkins.skinBall === Skin.product}
+                            <form method="POST" enctype="multipart/form-data" class="flex shrink-0 flex-col items-center bg-[#3f2056FF] rounded-xl border border-[#724197FF] m-4" use:enhance={({ formData }) => {
+                                    formData.append('userId', JSON.stringify(data.id));
+                                    formData.append('owned', JSON.stringify(Skin.own));
+                                }}>
+                                <button type="submit" class="flex shrink-0 flex-col items-center" formaction="?/unequipBall">
+                                    <div class="relative m-2 lg:h-[18rem] lg:w-[18rem] h-[8rem] w-[8rem]">
+                                        <img class="block h-full w-full border-solid" src={products[Skin.product - 1].src} alt=""/>
+                                        <span class="absolute top-0 right-0 text-xs lg:text-lg italic px-1">equipped✓</span>
+                                    </div>
+                                    <span class="text-xs lg:text-lg text-[#930f86FF] font-bold self-start text-left ml-2">{products[Skin.product - 1].name}</span>
+                                </button>
+                            </form>
+                        {:else}
+                            <form method="POST" enctype="multipart/form-data" class="flex shrink-0 flex-col items-center bg-stone-700 rounded-xl border m-4" use:enhance={({ formData }) => {
+                                    formData.append('userId', JSON.stringify(data.id));
+                                    formData.append('product', JSON.stringify(Skin.product));
+                                    formData.append('owned', JSON.stringify(Skin.own));
+                                }}>
+                                <button type="submit" class="flex shrink-0 flex-col items-center" formaction="?/changeSkinBall">
+                                    {#if !Skin.own}
+                                        <div class="flex flex-col m-2 lg:h-[18rem] lg:w-[18rem] h-[8rem] w-[8rem] border-solid border border-white bg-[#161825FF] justify-center items-center">
+                                            <img class="lg:h-[2rem] lg:w-[2rem] h-[1rem] w-[1rem]" src={lock} alt=""/>
+                                        </div>
+                                        <span class="italic text-xs lg:text-lg">Go to shop to buy it now</span>
+                                    {:else}
+                                        <img class="block m-2 lg:h-[18rem] lg:w-[18rem] h-[8rem] w-[8rem] border-solid border" src={products[Skin.product - 1].src} alt=""/>
+                                        <span class="text-xs lg:text-lg text-[#161825FF] font-bold self-start text-left ml-2">{products[Skin.product - 1].name}</span>
+                                    {/if}
+                                </button>
+                            </form>
+                        {/if}
+                    {/each}
+                </div>
             </div>
         </div>
 
         <div class="block mt-[4%] pb-8 bg-[#292626FF] border-solid rounded-lg z-10 pt-4">
             <div class="flex">
-                <span class="text-white text-xl lg:text-4xl font-bold p-4 pt-1">Friends</span>
+                <span class="text-white text-xl lg:text-4xl font-bold p-4 pt-1">Add friends:</span>
                 <div>
                     <form method="POST" enctype="multipart/form-data" class="flex size-fit" action="?/sendRequest">
                     <input name="username" type="username" class="inline font-normal size-fit bg-[#333131FF] text-white text- lg:text-4xl w-[80%]" placeholder="<username>#<tag>">
@@ -209,10 +240,12 @@
             </div>
         </div> 
 
+        {#if data.matches > 0}
         <div class="mt-[4%] w-fit h-[20%] bg-[#292626FF] border-solid rounded-lg z-10 p-4">
                 <span class="text-white text-xl lg:text-4xl font-bold">Match History:</span>
                 <span class="text-zinc-400 text-xl lg:text-4xl font-bold">({data.matches})</span>
         </div>
+        {/if}
 
         {#each data.matchHistory as match}
             <div class="block mt-[1%] w-full h-[20%] bg-[#292626FF] border-solid rounded-lg z-10 p-4">

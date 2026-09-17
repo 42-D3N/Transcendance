@@ -288,5 +288,33 @@ export const actions = {
         await db.update(users).set({ skin_ball: parseInt(product) }).where(eq(parseInt(userId), users.id));
 
         throw redirect(308, "/user/profile");
+    },
+
+    unequipRac: async (event) => {
+        const form = await event.request.formData();
+        
+        const userId = form.get('userId') as string;
+        const owned = form.get('owned') as string;
+
+        if (owned === "false")
+            throw redirect(308, "/shop");
+
+        await db.update(users).set({ skin_rac: null }).where(eq(parseInt(userId), users.id));
+
+        throw redirect(308, "/user/profile");
+    },
+
+    unequipBall: async (event) => {
+        const form = await event.request.formData();
+        
+        const userId = form.get('userId') as string;
+        const owned = form.get('owned') as string;
+
+        if (owned === "false")
+            throw redirect(308, "/shop");
+
+        await db.update(users).set({ skin_ball: null }).where(eq(parseInt(userId), users.id));
+
+        throw redirect(308, "/user/profile");
     }
 } satisfies Actions;
