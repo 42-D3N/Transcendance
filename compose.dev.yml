@@ -62,6 +62,11 @@ services:
     image: game_serv
     build: ./srcs/game-server
     pull_policy: never
+    env_file:
+      - ./srcs/game-server/srcs/.env
+    networks:
+      - transcendance
+    restart: always
   chat-server:
     command: npm run dev
     image: transcendance-chat-server

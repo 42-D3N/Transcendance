@@ -21,7 +21,15 @@ export async function load ({ cookies }) {
     else
     {
         let userInfos = await validateJWT(JWTtoken);
-		if (!userInfos)
+
+        if (userInfos["JWT"] != undefined)
+        {
+            JWTtoken = userInfos["JWT"];
+            cookies.set('JWTtoken', JWTtoken, { path: '/' });
+            userInfos = await validateJWT(JWTtoken);
+        }
+
+        if (!userInfos || userInfos["empty"] == 0)
             throw redirect(303, '/sign_in');
 
         if (userInfos.length == 0)

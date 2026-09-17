@@ -3,7 +3,7 @@
   import type { ClientGameState } from '$lib/game/both/interfaces';
   import { initGameClient } from '$lib/game/frontend/pongVariables'
   import { connection, sendInput, sendReady } from '$lib/game/backend/network'
-  import { handleKeyDown, handleKeyUp, updateScale, updateInput, renderGameState } from '$lib/game/frontend/front1';
+  import { handleKeyDown, handleKeyUp, updateScale, updateInput, renderGameState } from '$lib/game/frontend/front';
   import type { AIDifficulty, MatchMode } from '$lib/game/both/interfaces';
   import { afterNavigate, goto } from '$app/navigation'
 
@@ -14,7 +14,7 @@
 
   afterNavigate ((navigation: any) =>
   {
-    if (navigation.from === null || (navigation.from.route.id !== "/game" && navigation.from.route.id !== "/game/matchmaking"))
+    if (navigation.from === null || (navigation.from.route.id !== "/game" && navigation.from.route.id !== "/game/play"))
     {
       goto('/game');
       return;
@@ -23,7 +23,7 @@
     resolveNavReady = undefined;
   });
 
-  let socket			: WebSocket;
+  let socket			: WebSocket | undefined;
   let connected			= $state(false);
   let localSide			= $state<1 | 2 | null>(null);
   let gameState			= $state<ClientGameState | null>(null);
@@ -82,7 +82,10 @@
   function disconnectSocket()
   {
     if (socket && socket.readyState !== WebSocket.CLOSED)
+    {
       socket.close();
+      socket = undefined;
+    }
   }
 
   function connectSocket(game: ReturnType<typeof initGameClient>)

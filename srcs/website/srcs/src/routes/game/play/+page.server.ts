@@ -17,7 +17,7 @@ export async function load({ cookies }) {
     if (userInfos["JWT"] != undefined)
     {
       cookies.set('JWTtoken', userInfos["JWT"], { path: '/' });
-      throw redirect(308, "/game/matchmaking");
+      throw redirect(308, "/game/play");
     }
 
     return {

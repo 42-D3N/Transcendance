@@ -3,7 +3,6 @@
     import { createScene } from '$lib/scene';
     import * as BABYLON from "@babylonjs/core";
     import earcut from 'earcut';
-    import { onMount, onDestroy } from 'svelte';
 
     let renderCanvas:HTMLCanvasElement;
     onMount(async () => {
