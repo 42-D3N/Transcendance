@@ -94,11 +94,19 @@
         {#each products as product}
             <div>
                 <img src={product.src} class="scale-80 mx-auto" alt=""/>
-                    <button onclick={() => sendData({id: product.id})} title="shop item" type="button" class="text-wrap inline-block rounded-xl bg-[#C41E3AFF] z-10 w-[90%] min-h-[15%] max-h-[50%] text-center">
-                        <span class="break-words text-l sm:text-xl md:text-3xl lg:text-4xl">
-                            {product.name} {product.price * shep}$
-                        </span>
-                    </button>
+                    {#if data.skins[product.id - 1].own}
+                        <button onclick={() => sendData({id: product.id})} title="shop item" type="button" class="text-wrap inline-block rounded-xl bg-[#6b0f1fFF] z-10 w-[90%] min-h-[15%] max-h-[50%] text-center">
+                            <span class="break-words text-l sm:text-xl md:text-3xl lg:text-4xl italic">
+                                $$ - SOLD OUT - $$
+                            </span>
+                        </button>
+                    {:else}
+                        <button onclick={() => sendData({id: product.id})} title="shop item" type="button" class="text-wrap inline-block rounded-xl bg-[#C41E3AFF] hover:bg-[#6b0f1fFF] z-10 w-[90%] min-h-[15%] max-h-[50%] text-center">
+                            <span class="break-words text-l sm:text-xl md:text-3xl lg:text-4xl">
+                                {product.name} {product.price * shep}$
+                            </span>
+                        </button>
+                    {/if}
             </div>
         {/each}
     </div>
