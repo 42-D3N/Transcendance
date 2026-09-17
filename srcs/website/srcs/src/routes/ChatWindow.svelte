@@ -3,7 +3,7 @@
 	import usericon from '$lib/assets/user/default.svg';
 
 	let { index, userId } = $props();
-	let chatMessage:string = $state();
+	let chatMessage:string = $state("");
 	let userNewChat:string = $state();
 	let messagesBox:HTMLElement;
 
@@ -39,21 +39,19 @@
 		}
 	}
 	function handleChatInput(event: any) {
-		if (event.key === "Enter" && !event.shiftKey && chatMessage != "" && openedChats[index].id != -1) {
+		if (event.keyCode == 13 && !event.shiftKey && chatMessage.length <= 800 && chatMessage != "" && openedChats[index].id != -1) {
 			chatMessage = chatMessage.trim();
 			if (chatMessage == "")
 				return ;
-			if (chatMessage.length > 2048)
-			{
-				chatMessage = "No.";
-				return ;
-			}
 			chatClient.sendMessage(chatMessage, openedChats[index].id);
 			chatMessage = "";
 		}
 	}
 	function onKeyDown(event: any) {
-		return event.keyCode != 13;
+		if (event.keyCode == 13 && !event.shiftKey) {
+			event.preventDefault();
+			return false
+		}
 	}
 </script>
 
@@ -101,6 +99,7 @@
 	<div>
 		<div class="border-t-[0.1rem] border-solid border-white flex max-w-full relative text-white">
 			<textarea class="send-message-field send-message-editor" disabled={openedChats[index].id === -1} placeholder="Envoyer un message..." onkeydown={onKeyDown} onkeyup={handleChatInput} bind:value={chatMessage}></textarea>
+			{#if chatMessage.length >= 650}<div class="bottom-full absolute right-[3.5rem] bg-black/50 mb-[0.1rem] px-[0.5rem] py-[0.3rem]{chatMessage.length>800?" text-red-400":""}">{chatMessage.length}/800</div>{/if}
 		</div>
 	</div>
 </div>

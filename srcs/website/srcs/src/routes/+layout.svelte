@@ -250,7 +250,7 @@
 								{#each activeChats as contact, index}
 									<div class="chat-row-wrapper" onclick={() => addChat(index)}>
 										<div class="ft-avatar-component ft-avatar-size-32">
-											<img class="h-full w-full object-cover overscroll-contain" src="https://www.chess.com/bundles/web/images/noavatar_l.84a92436.gif" alt="avatar de {contact.name}">
+											<img class="h-full w-full object-cover overscroll-contain" src={contact.avatar!= null?contact.avatar:usericon} alt="avatar de {contact.name}">
 										</div>
 										<div class="message-row-message overscroll-contain">
 											<div class="message-row-row overscroll-contain">

@@ -22,7 +22,7 @@ body:not(.keyboard-navigation-in-use) *:focus {
 }
 
 .send-message-field.send-message-editor {
-	@apply leading-[2rem] min-h-[4rem] overflow-auto field-sizing-content;
+	@apply leading-[2rem] min-h-[4rem] overflow-y-scroll max-h-[10rem] field-sizing-content;
 }
 
 .border-none {
