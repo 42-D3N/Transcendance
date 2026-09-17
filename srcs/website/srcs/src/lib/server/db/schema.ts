@@ -6,6 +6,7 @@ export const users = pgTable('users', {
 	username: varchar({ length:128 }).notNull().unique(),
 	email: varchar({ length:128 }).notNull().unique(),
 	password: text().notNull(),
+	privateAcc: boolean().notNull().default(false),
 	wins: integer().default(0),
 	losses: integer().default(0),
 	matches: integer().default(0),
@@ -39,7 +40,7 @@ export const matches = pgTable('matches', {
 	skinRac1: integer().default(null).references(() => shop.id),
 	skinRac2: integer().default(null).references(() => shop.id),
 	date: timestamp().defaultNow(),
-	winner: integer().notNull()
+	winner: integer().notNull().references(() => users.id),
 	}, (table) => [
     check("winner_check", sql`${table.winner} = ${table.user1} or ${table.winner} = ${table.user2}`)
 ]);
@@ -67,3 +68,13 @@ export const api_users = pgTable('api_users', {
 	role: varchar({ length:128 }).notNull().default("user"),
 	secret_key: varchar({ length:64 })
 });
+
+export const chat = pgTable("chat", {
+	id: serial().primaryKey(),
+	content: text().notNull(),
+	author: integer().notNull().references(() => users.id),
+	dest: integer().notNull().references(() => users.id),
+	timestamp: timestamp().defaultNow(),
+	}, (table) => [
+    check("self_chat_check", sql`${table.author} != ${table.dest}`)
+]);

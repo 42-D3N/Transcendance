@@ -494,3 +494,36 @@ Explain:
 ---
 
 # Credits
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2 : 3D (immsersive ??? | advanced ???) --> Redirect 1 point : 3D fun simple
+
+2 : Standard user management (missing online status)
+1 : Game custom (power-up__s__ ? | skins)
+
+2 : Fullstack
+2 : Real-time websocket
+2 : Chat + profile + friend
+2 : Public API (GET POST PUT DELETE)
+2 : AI Opponent
+2 : GAME
+2 : Backend as microservices
+2 : remote player
+1 : File upload and management system
+1 : ORM for the database
+1 : Support for additionnal browsers
+1 : SSR
+
+Total : 20/19
