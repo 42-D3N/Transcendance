@@ -18,10 +18,11 @@ interface Message {
 interface OpenedChat {
 	id: number,
 	name: string,
-	avatar: string,
+	avatar: string | null,
 	history: Message[],
 	hasError: boolean | null,
-	error: string | null
+	error: string | null,
+	update: boolean
 }
 
 export let activeChats:ChatContact[] = $state([]);
@@ -96,7 +97,10 @@ class ChatClient {
 					}
 					openedChats.forEach((chat, index, contacts) => {
 						if (chat.id === data.body.author || chat.id === data.body.target)
+						{
 							chat.history.push({author: data.body.author, target: data.body.target, message: data.body.message, timestamp: new Date(data.body.timestamp)});
+							chat.update = true;
+						}
 					});
 					break;
 
@@ -131,7 +135,10 @@ class ChatClient {
 						break;
 					openedChats.forEach((chat, index, contacts) => {
 						if (chat.id === data.body.target)
+						{
 							chat.history = data.body.history;
+							chat.update = true;
+						}
 					});
 					break;
 
@@ -174,7 +181,7 @@ export function updateChatLimit(newLimit:number) {
 export function addEmptyChat() {
 	while (openedChats.length >= chatLimit)
 		openedChats.pop();
-	openedChats.unshift({id: -1, name: "null", avatar: null, history: [], hasError: false, error: null});
+	openedChats.unshift({id: -1, name: "null", avatar: null, history: [], hasError: false, error: null, update: false});
 }
 
 export function addChat(index: number) {
@@ -187,6 +194,6 @@ export function addChat(index: number) {
 		return ;
 	while (openedChats.length >= chatLimit)
 		openedChats.pop();
-	openedChats.unshift({id: activeChats[index].id, name: activeChats[index].name, avatar: activeChats[index].avatar, history: [], hasError: false, error: null});
+	openedChats.unshift({id: activeChats[index].id, name: activeChats[index].name, avatar: activeChats[index].avatar, history: [], hasError: false, error: null, update: false});
 	chatClient.sendRequest(activeChats[index].id);
 }

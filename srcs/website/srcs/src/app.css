@@ -202,7 +202,7 @@ body:not(.keyboard-navigation-in-use) *:focus {
 }
 
 .opened-chats-container {
-	@apply right-[3rem] items-end bottom-0 flex h-[3rem] fixed z-10;
+	@apply right-[0.5rem] items-end bottom-0 flex h-[3rem] fixed z-10;
 }
 
 .error {

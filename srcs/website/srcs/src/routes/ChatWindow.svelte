@@ -5,6 +5,19 @@
 	let { index, userId } = $props();
 	let chatMessage:string = $state();
 	let userNewChat:string = $state();
+	let messagesBox:HTMLElement;
+
+	const scrollToBottom = async (node) => {
+		node.scroll({ top: node.scrollHeight, behavior: 'instant' });
+	};
+
+	$effect(() => {
+		if (openedChats[index].update)
+		{
+			scrollToBottom(messagesBox);
+			openedChats[index].update = false;
+		}
+    });
 
 	function close() {
 		openedChats.splice(index, 1);
@@ -26,8 +39,10 @@
 		}
 	}
 	function handleChatInput(event: any) {
-		chatMessage = chatMessage.trim();
 		if (event.key === "Enter" && !event.shiftKey && chatMessage != "" && openedChats[index].id != -1) {
+			chatMessage = chatMessage.trim();
+			if (chatMessage == "")
+				return ;
 			if (chatMessage.length > 2048)
 			{
 				chatMessage = "No.";
@@ -75,7 +90,7 @@
 		</div>
 	</div>
 	<div class="basis-full grow-2 shrink overflow-hidden relative">
-		<div class="h-full overflow-auto overscroll-y-contain">
+		<div class="h-full overflow-auto overscroll-y-contain" bind:this={messagesBox}>
 			{#each openedChats[index].history as message}
 				<div class="text-[1.3rem] relative rounded-lg m-[0.6rem] p-[0.5rem] break-all text-wrap whitespace-pre-wrap {userId === message.author?'bg-green-500 ml-[4rem]':'bg-yellow-400 mr-[4rem]'}">
 					{message.message}
@@ -85,7 +100,7 @@
 	</div>
 	<div>
 		<div class="border-t-[0.1rem] border-solid border-white flex max-w-full relative text-white">
-			<textarea class="send-message-field send-message-editor" disabled={openedChats[index].id === -1} placeholder="Envoyer un message..." onkeydown={onKeyDown} onkeyup={handleChatInput} bind:value={chatMessage}/>
+			<textarea class="send-message-field send-message-editor" disabled={openedChats[index].id === -1} placeholder="Envoyer un message..." onkeydown={onKeyDown} onkeyup={handleChatInput} bind:value={chatMessage}></textarea>
 		</div>
 	</div>
 </div>
