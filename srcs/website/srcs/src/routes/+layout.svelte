@@ -34,7 +34,6 @@
 
 	let mobToolbarEnabled = $state("none");
 	import "../app.css";
-    import { GridBlock } from '@babylonjs/core';
 	import SidebarTab from './SidebarTab.svelte';
     import ChatWindow from './ChatWindow.svelte';
 	function disableScroll() {

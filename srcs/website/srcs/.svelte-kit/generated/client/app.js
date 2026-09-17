@@ -1,3 +1,11 @@
+// in dev, this makes Vite inject its client as this module's first dependency,
+// so that global constant replacements are installed before any other module
+// (including user hooks) evaluates. In build it's inert.
+import.meta.hot;
+
+
+
+
 export { matchers } from './matchers.js';
 
 export const nodes = [
@@ -10,19 +18,22 @@ export const nodes = [
 	() => import('./nodes/6'),
 	() => import('./nodes/7'),
 	() => import('./nodes/8'),
-	() => import('./nodes/9')
+	() => import('./nodes/9'),
+	() => import('./nodes/10')
 ];
 
 export const server_loads = [0];
 
 export const dictionary = {
-		"/": [~3],
-		"/game": [6],
-		"/loading_screen": [7],
-		"/(login)/login": [~4,[2]],
-		"/(login)/sign_in": [~5,[2]],
-		"/user/logout": [~8],
-		"/user/profile": [~9]
+		"/": [~2],
+		"/game": [5],
+		"/game/gameItself": [6],
+		"/game/loadingScreen": [7],
+		"/game/matchmaking": [8],
+		"/(login)/login": [~3],
+		"/(login)/sign_in": [~4],
+		"/user/logout": [~9],
+		"/user/profile": [~10]
 	};
 
 export const hooks = {
@@ -40,3 +51,5 @@ export const hash = false;
 export const decode = (type, value) => decoders[type](value);
 
 export { default as root } from '../root.js';
+
+export const get_error_template = () => import('../shared/error-template.js').then(m => m.default);
