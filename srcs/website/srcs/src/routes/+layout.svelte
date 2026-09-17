@@ -9,9 +9,14 @@
 	import shopicon from '$lib/assets/shop_icon.svg';
 
 	let screenSize:number;
+	let screenSize:number;
 	let sidebar:any;
 	let header:any;
 	let mobileSpace:any;
+	let friendsContainer:any = $state();
+	let chatsContainer:any = $state();
+	let settingsContainer:any = $state();
+
 	let friendsContainer:any = $state();
 	let chatsContainer:any = $state();
 	let settingsContainer:any = $state();
@@ -29,13 +34,25 @@
         else
             chatClient.disconnect();
     });
+	import { browser } from "$app/environment";
+	import { chatClient, openedChats, activeChats, addEmptyChat, addChat, updateChatLimit } from '$lib/chat-client.svelte.ts';
+	import { formatTime } from "$lib/common";
+
+	$effect(() => {
+        if (!browser) return;
+
+        if (data.Token != -1)
+            chatClient.connect(data.Token, data.id);
+        else
+            chatClient.disconnect();
+    });
 
 	let { data, children } = $props();
 
 	let mobToolbarEnabled = $state("none");
 	import "../app.css";
-    import { GridBlock } from '@babylonjs/core';
 	import SidebarTab from './SidebarTab.svelte';
+    import ChatWindow from './ChatWindow.svelte';
     import ChatWindow from './ChatWindow.svelte';
 	function disableScroll() {
 		document.querySelector('body')?.classList.add('overflow-hidden');
@@ -87,12 +104,19 @@
 
 <svelte:head>
 	<link rel="icon" href={favicon}/>
+	<link rel="icon" href={favicon}/>
 	<title>ft_old_internet</title>
 </svelte:head>
 
 <svelte:window onclick={onClick} bind:innerWidth={screenSize} onresize={() => (updateChatLimit(Math.max(Math.floor(screenSize / 350), 1)))}/>
+<svelte:window onclick={onClick} bind:innerWidth={screenSize} onresize={() => (updateChatLimit(Math.max(Math.floor(screenSize / 350), 1)))}/>
 
 <div id="sidebar" class="lg:left-0 lg:fixed lg:z-100">
+	<div class="opened-chats-container">
+		{#each openedChats as chat, i (chat.id)}
+		<ChatWindow index={i} userId={data.id}/>
+		{/each}
+	</div>
 	<div class="opened-chats-container">
 		{#each openedChats as chat, i (chat.id)}
 		<ChatWindow index={i} userId={data.id}/>
@@ -163,6 +187,7 @@
 			</div>
 			<div class="ft-sidebar-footing-icon">
 				<a class="ft-button ft-button-small sidebar-link hover:bg-white/30" href="/user/logout" aria-label="Log out" data-sveltekit-reload>
+				<a class="ft-button ft-button-small sidebar-link hover:bg-white/30" href="/user/logout" aria-label="Log out" data-sveltekit-reload>
 					<span class="ft-icon-size-20 ft-icon-glyph">
 						<svg width="20" height="20" viewBox="0 0 24 24" data-glyph="local-door-left-exit" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path fill="#ffffff" d="M4.93,16.37 l-4.47,-3.93 c-0.33,-0.3,-0.33,-0.57,0,-0.87 l4.47,-3.93 c0.77,-0.7,1.07,-0.57,1.07,0.47 l0,7.8 c0,1.03,-0.3,1.17,-1.07,0.47 Z M15.13,13.5 l-10.77,-0.03 l0,-2.97 l10.77,0 c0.6,0,0.83,0.3,0.83,1.07 l0,0.87 c0,0.77,-0.23,1.07,-0.83,1.07 Z M10.0,15.43 l0.0,3.9 c0.0,0.67,0.0,0.67,0.67,0.67 l5.3,0.0 l0,2.0 l-5.3,0 c-2.0,0.0,-2.67,-0.67,-2.67,-2.67 l0,-3.9 Z M19.23,20.0 l2.07,-0.03 c0.7,-0.01,0.7,-0.01,0.7,-0.7 l0,-14.6 c-0.0,-0.67,-0.0,-0.67,-0.67,-0.67 l-10.67,-0.0 c-0.67,0.0,-0.67,0.0,-0.67,0.67 l-0.0,3.9 l-2.0,0 l0,-3.9 c0,-2.0,0.67,-2.67,2.67,-2.67 l10.67,0 c2.0,0,2.67,0.67,2.67,2.67 l0,14.6 c0,2.0,-0.67,2.67,-2.67,2.7 l-2.07,0.03 Z M22.67,22.53 l-3.33,1.27 c-0.97,0.4,-1.33,0.13,-1.33,-0.9 l0,-15.47 c0,-1.03,0.37,-1.57,1.33,-1.97 l2.17,-0.83 c1.87,-0.73,2.5,-0.3,2.5,1.7 l0,14.23 c0,1.03,-0.37,1.57,-1.33,1.97 Z M22.67,22.53"></path></svg>
 					</span>
@@ -199,12 +224,14 @@
 			<div id="mobile-header-buttons" class="flex place-items-center">
 				<div class="mobile-toolbar-action" bind:this={friendsContainer}>
 					<button id="friends-widget-button" aria-label="Friends" class="mobile-toolbar-action-button ft-button ft-button-small hover:bg-white/30 {(mobToolbarEnabled === "friends")?"bg-white/30":""}" onclick={() => buttonClick("friends")}>
+					<button id="friends-widget-button" aria-label="Friends" class="mobile-toolbar-action-button ft-button ft-button-small hover:bg-white/30 {(mobToolbarEnabled === "friends")?"bg-white/30":""}" onclick={() => buttonClick("friends")}>
 						<span class="ft-icon-size-20 ft-icon-glyph">
 							<svg width="20" height="20" viewBox="0 0 24 24" data-glyph="users" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path fill="#ffffff" d="M8 18V16.13C8 14.3 8.63 13.43 10.4 12.9L11.78 12.42C11.38 13.94 10.57 14.16 10.57 15.03C10.57 15.63 10.74 15.93 11.3 16.1L13.6 16.9C14.47 17.16 15.06 17.5 15.44 18H8ZM12.07 5.24C12.35 3.14 13.47 2 15.43 2C17.9 2 19 3.57 19 6.4C19 10 17.57 9.8 17.57 11.03C17.57 11.63 17.77 11.93 18.3 12.1L20.63 12.9C22.36 13.43 23 14.3 23 16.13V18H17.61C17.04 16.56 15.86 15.49 14.22 15L13.15 14.63C13.55 13.85 14.01 12.36 14.01 10.4C14.01 8.01 13.29 6.29 12.08 5.24H12.07ZM1 22V20.13C1 18.3 1.63 17.43 3.4 16.9L5.6 16.13C6.13 15.93 6.37 15.66 6.37 15.03C6.37 13.86 5 13.86 5 10.4C5 7.57 6.1 6 8.43 6C10.9 6 12 7.57 12 10.4C12 13.87 10.57 13.87 10.57 15.03C10.57 15.63 10.74 15.93 11.3 16.1L13.6 16.9C15.37 17.43 16 18.3 16 20.13V22H1Z"></path></svg>
 						</span>
 					</button>
 				</div>
 				<div class="mobile-toolbar-action" bind:this={chatsContainer}>
+					<button id="chats-widget-button" aria-label="Chats" class="mobile-toolbar-action-button ft-button ft-button-small hover:bg-white/30 {(mobToolbarEnabled === "chats")?"bg-white/30":""}" onclick={() => buttonClick("chats")}>
 					<button id="chats-widget-button" aria-label="Chats" class="mobile-toolbar-action-button ft-button ft-button-small hover:bg-white/30 {(mobToolbarEnabled === "chats")?"bg-white/30":""}" onclick={() => buttonClick("chats")}>
 						<span class="ft-icon-size-20 ft-icon-glyph">
 							<svg width="20" height="20" viewBox="0 0 24 24" data-glyph="message-envelope-fill" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path fill="#ffffff" d="M19.33 21H4.65999C2.24999 21 0.98999 19.75 0.98999 17.33V8.42997L9.75999 14.16C11.43 15.26 12.56 15.26 14.23 14.16L23 8.44997V17.33C23 19.74 21.75 21 19.33 21ZM1.03999 5.95997C1.25999 3.98997 2.48999 2.96997 4.66999 2.96997H19.34C21.52 2.96997 22.75 3.98997 22.97 5.95997L13.21 12.37C12.34 12.94 11.68 12.94 10.81 12.37L1.03999 5.95997Z"></path></svg>
@@ -220,6 +247,7 @@
 				</div>
 				<div class="mobile-toolbar-action">
 					<a id="logout-widget-button" aria-label="Log out" class="mobile-toolbar-action-button ft-button ft-button-small hover:bg-white/30" href="/user/logout" data-sveltekit-reload>
+					<a id="logout-widget-button" aria-label="Log out" class="mobile-toolbar-action-button ft-button ft-button-small hover:bg-white/30" href="/user/logout" data-sveltekit-reload>
 						<span class="ft-icon-size-20 ft-icon-glyph">
 							<svg width="20" height="20" viewBox="0 0 24 24" data-glyph="local-door-left-exit" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path fill="#ffffff" d="M4.93,16.37 l-4.47,-3.93 c-0.33,-0.3,-0.33,-0.57,0,-0.87 l4.47,-3.93 c0.77,-0.7,1.07,-0.57,1.07,0.47 l0,7.8 c0,1.03,-0.3,1.17,-1.07,0.47 Z M15.13,13.5 l-10.77,-0.03 l0,-2.97 l10.77,0 c0.6,0,0.83,0.3,0.83,1.07 l0,0.87 c0,0.77,-0.23,1.07,-0.83,1.07 Z M10.0,15.43 l0.0,3.9 c0.0,0.67,0.0,0.67,0.67,0.67 l5.3,0.0 l0,2.0 l-5.3,0 c-2.0,0.0,-2.67,-0.67,-2.67,-2.67 l0,-3.9 Z M19.23,20.0 l2.07,-0.03 c0.7,-0.01,0.7,-0.01,0.7,-0.7 l0,-14.6 c-0.0,-0.67,-0.0,-0.67,-0.67,-0.67 l-10.67,-0.0 c-0.67,0.0,-0.67,0.0,-0.67,0.67 l-0.0,3.9 l-2.0,0 l0,-3.9 c0,-2.0,0.67,-2.67,2.67,-2.67 l10.67,0 c2.0,0,2.67,0.67,2.67,2.67 l0,14.6 c0,2.0,-0.67,2.67,-2.67,2.7 l-2.07,0.03 Z M22.67,22.53 l-3.33,1.27 c-0.97,0.4,-1.33,0.13,-1.33,-0.9 l0,-15.47 c0,-1.03,0.37,-1.57,1.33,-1.97 l2.17,-0.83 c1.87,-0.73,2.5,-0.3,2.5,1.7 l0,14.23 c0,1.03,-0.37,1.57,-1.33,1.97 Z M22.67,22.53"></path></svg>
 						</span>
@@ -232,6 +260,7 @@
 		{#if mobToolbarEnabled !== "none"}
 			<div class="rounded-none overflow-auto overscroll-contain bg-black/50 text-white">
 				<div class="p-0 h-full">
+					<div class="sidebar-widget-container{name == "friends"?" sidebar-widget-has-tabs":""}">
 					<div class="sidebar-widget-container{name == "friends"?" sidebar-widget-has-tabs":""}">
 						{#if mobToolbarEnabled === "friends"}
 						<section>

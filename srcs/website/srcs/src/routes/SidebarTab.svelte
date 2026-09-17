@@ -7,6 +7,7 @@
     let show = $state(false);
 	let container:any;
 
+
 	function onTabClick(e:any) {
 		if (container.contains(e.target) == false)
 			show = false;
@@ -30,7 +31,9 @@
 	{#if show}
 	<div id={name+"-widget-slot"} class="fixed max-xl:left-[52px] left-[8px] pl-[unset] box-content max-h-[calc(100svh - 2 * 0.8rem)] overflow-hidden w-[30rem] z-1 max-xl:bottom-[12px] bottom-[50px]">
 		<div class="oveflow-hidden border-white border-[0.1rem] border-solid rounded-lg overscroll-contain box-border h-full cursor-default bg-black text-white">
+		<div class="oveflow-hidden border-white border-[0.1rem] border-solid rounded-lg overscroll-contain box-border h-full cursor-default bg-black text-white">
 			<div class="p-0 h-full">
+				<div class="sidebar-widget-container{name == "friends"?" sidebar-widget-has-tabs":""}">
 				<div class="sidebar-widget-container{name == "friends"?" sidebar-widget-has-tabs":""}">
 					{#if name == "friends"}
 					<section>

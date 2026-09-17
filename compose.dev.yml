@@ -57,6 +57,11 @@ services:
             - node_modules/
         - action: rebuild
           path: ./srcs/website/srcs/package.json
+  game_server:
+    command: npm run dev
+    image: game_serv
+    build: ./srcs/game-server
+    pull_policy: never
   chat-server:
     command: npm run dev
     image: transcendance-chat-server

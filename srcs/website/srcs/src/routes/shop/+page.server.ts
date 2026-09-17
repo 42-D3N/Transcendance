@@ -14,13 +14,15 @@ import { shop } from '../../lib/server/db/schema';
 export async function load({ cookies }) {
     const JWTtoken = cookies.get('JWTtoken');
     
+    
     if (!JWTtoken || JWTtoken === '-1') {
         throw redirect(308, '/login');
     }
     else
     {
         let userInfos = await validateJWT(JWTtoken);
-        // console.log(userInfos);
+        let skins: { user: number; product: number; own: boolean; }[];
+
         if (!userInfos)
         {
             cookies.set('JWTtoken', "-1", { path: '/' });
@@ -31,6 +33,10 @@ export async function load({ cookies }) {
             cookies.set('JWTtoken', userInfos["JWT"], { path: '/' });
             throw redirect(308, "/shop");
         }
+
+        skins = await db.select()
+            .from(inventory)
+            .where(eq(inventory.user, userInfos.id))
         
         return {
             Token: JWTtoken,
@@ -42,6 +48,7 @@ export async function load({ cookies }) {
             matches: userInfos.matches,
             wallet: userInfos.wallets,
             code: userInfos.code,
+            skins: skins
         };
     }
 }
