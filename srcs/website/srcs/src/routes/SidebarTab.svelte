@@ -1,8 +1,11 @@
 <script lang="ts">
 	import "../app.css";
+	import { activeChats, addEmptyChat, addChat } from '$lib/chat-client.svelte.ts';
+	import { formatTime } from "$lib/common";
 	let { name } = $props();
     let show = $state(false);
 	let container:any;
+
 	function onTabClick(e:any) {
 		if (container.contains(e.target) == false)
 			show = false;
@@ -25,9 +28,9 @@
 	</button>
 	{#if show}
 	<div id={name+"-widget-slot"} class="fixed max-xl:left-[52px] left-[8px] pl-[unset] box-content max-h-[calc(100svh - 2 * 0.8rem)] overflow-hidden w-[30rem] z-1 max-xl:bottom-[12px] bottom-[50px]">
-		<div class="oveflow-hidden rounded-lg overscroll-contain box-border h-full cursor-default bg-black/50 text-white">
+		<div class="oveflow-hidden border-white border-[0.1rem] border-solid rounded-lg overscroll-contain box-border h-full cursor-default bg-black text-white">
 			<div class="p-0 h-full">
-				<div class="grid h-[44rem]">
+				<div class="sidebar-widget-container{name == "friends"?" sidebar-widget-has-tabs":""}">
 					{#if name == "friends"}
 					<section>
 						<div class="flex max-w-full">
@@ -39,6 +42,40 @@
 							</button>
 						</div>
 					</section>
+					{:else if name === "chats"}
+					<section class="h-full overflow-x-hidden overflow-y-auto overscroll-contain pt-[0.8rem] pr-[0.8rem] pl-[0.8rem] pb-0">
+						<div class="items-stretch flex flex-col h-full overscroll-contain">
+							{#each activeChats as contact, index}
+								<div class="chat-row-wrapper" onclick={() => addChat(index)}>
+									<div class="ft-avatar-component ft-avatar-size-32">
+										<img class="h-full w-full object-cover overscroll-contain" src="https://www.chess.com/bundles/web/images/noavatar_l.84a92436.gif" alt="avatar de {contact.name}">
+									</div>
+									<div class="message-row-message overscroll-contain">
+										<div class="message-row-row overscroll-contain">
+											<div class="ft-user-block-component message-row-text overscroll-contain">
+												<div>{contact.name}</div>
+											</div>
+											<p class="message-row-message-content text-small p-0 m-0 overscroll-contain">{formatTime(contact.time)}</p>
+										</div>
+										<div class="message-row-row overscroll-contain">
+											<p class="message-row-message-content text-small p-0 m-0 overscroll-contain">{contact.message}</p>
+										</div>
+									</div>
+								</div>
+							{/each}
+						</div>
+					</section>
+					<footer class="items-center border-t-[0.1rem] border-white border-solid flex justify-between p-[0.8rem]">
+						<button class="ft-button-small ft-button" onclick={addEmptyChat}>
+							<span class="h-[1.6rem] w-[1.6rem] inline-grid place-content-center">
+								<svg data-glyph="mark-plus" aria-hidden="true" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="h-[1.6rem] w-[1.6rem]">
+									<path fill="currentColor" d="m12.07 22h-.13c-1.6 0-1.93-.33-1.93-1.93v-6.07h-6.07c-1.6 0-1.93-.33-1.93-1.93v-.13c0-1.6.33-1.93 1.93-1.93h6.07v-6.07c0-1.6.33-1.93 1.93-1.93h.13c1.6 0 1.93.33 1.93 1.93v6.07h6.07c1.6 0 1.93.33 1.93 1.93v.13c0 1.6-.33 1.93-1.93 1.93h-6.07v6.07c0 1.6-.33 1.93-1.93 1.93zm0 0"></path>
+								</svg>
+							</span>
+							<span>Nouveau chat</span>
+						</button>
+					</footer>
+					{:else if name === "settings"}
 					{/if}
 				</div>
 			</div>

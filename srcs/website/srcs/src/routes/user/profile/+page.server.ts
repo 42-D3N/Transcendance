@@ -3,7 +3,11 @@ import { validateJWT } from '$lib/server/user_management/jwt.js';
 import type { Actions } from './$types';
 import { db } from '$lib/server/db/index';
 import { eq, and, or } from 'drizzle-orm';
+<<<<<<< HEAD
 import { users, friends, matches, inventory } from '$lib/server/db/schema';
+=======
+import { users, friends, matches } from '$lib/server/db/schema';
+>>>>>>> main
 
 
 export async function load ({ cookies }) {
@@ -21,8 +25,11 @@ export async function load ({ cookies }) {
     let copinous = [];
     let actualFriends: {id: number; username: string; icon: string | null}[] = [];
     let userHistory: [];
+<<<<<<< HEAD
     let skins: { user: number; product: number; own: boolean; }[];
     let userSkins: { skinRac: number | null; skinBall: number | null; };
+=======
+>>>>>>> main
     
     if (!JWTtoken || JWTtoken === '-1')
     {

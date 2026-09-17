@@ -18,7 +18,7 @@
         { id: 1, name: "Old placeholder: ", price: 10, src: item1},
         { id: 2, name: "Game dev's fav colors: ", price: 20, src: item2},
         { id: 3, name: "Dev's fav color: ", price: 30, src: item3},
-        { id: 4, name: "Ugly color: ", price: 40, src: item4},
+        { id: 4, name: "Mariposa's creation: ", price: 40, src: item4},
         { id: 5, name: "TV snow: ", price: 50, src: item5},
         { id: 6, name: "Light: ", price: 60, src: item6},
         { id: 7, name: "Perturabo's love: ", price: 70, src: item7},

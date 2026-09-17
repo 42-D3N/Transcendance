@@ -27,7 +27,12 @@
     import type { PageProps } from './$types';
     let { data, form }: PageProps = $props();
     let friendNb = $state(data.friends.length);
-    console.log(data.userSkins);
+
+    afterNavigate ((navigation:any) => {
+        if (navigation.type === "goto" && navigation.from.route.id === "/user/profile/edit")
+            chatClient.execProfileChange(data.username, data.icon);
+    });
+
     function    Winrate()
     {
         if (parseInt(data.matches) === 0)
@@ -240,11 +245,11 @@
             </div>
         </div> 
 
-        {#if data.matches > 0}
-        <div class="mt-[4%] w-fit h-[20%] bg-[#292626FF] border-solid rounded-lg z-10 p-4">
-                <span class="text-white text-xl lg:text-4xl font-bold">Match History:</span>
-                <span class="text-zinc-400 text-xl lg:text-4xl font-bold">({data.matches})</span>
-        </div>
+        {#if parseInt(data.matches) > 0}
+            <div class="mt-[4%] w-fit h-[20%] bg-[#292626FF] border-solid rounded-lg z-10 p-4">
+                    <span class="text-white text-xl lg:text-4xl font-bold">Match History:</span>
+                    <span class="text-zinc-400 text-xl lg:text-4xl font-bold">({data.matches})</span>
+            </div>
         {/if}
 
         {#each data.matchHistory as match}

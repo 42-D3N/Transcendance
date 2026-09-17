@@ -2,10 +2,10 @@ import { createJWT, validateJWT } from '$lib/server/user_management/jwt.js';
 import { redirect, fail } from '@sveltejs/kit';
 import { randomBytes } from 'crypto';
 import { db } from '$lib/server/db/index';
-import { eq, and, or } from 'drizzle-orm';
-import { users, matches, inventory } from '$lib/server/db/schema';
+import { eq, or } from 'drizzle-orm';
+import { users, matches, } from '$lib/server/db/schema';
 import type { Actions } from './$types';
-import { writeFile, readdir, mkdir } from 'fs/promises';
+import { writeFile } from 'fs/promises';
 import path from 'path';
 
 export async function load ({ cookies }) {
@@ -175,4 +175,5 @@ export const actions = {
         
         throw redirect(303, "./edit");
     }
+
 } satisfies Actions;
