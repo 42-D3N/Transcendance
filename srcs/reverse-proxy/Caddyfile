@@ -1,5 +1,8 @@
 :5000 {
     tls /app/certs/nginx.crt /app/certs/nginx.key
+    handle /api/chat {
+        reverse_proxy chat-server:5786
+    }
     handle /api* {
         reverse_proxy api:9090
     }

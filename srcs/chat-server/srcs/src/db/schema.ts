@@ -6,7 +6,6 @@ export const users = pgTable('users', {
 	username: varchar({ length:128 }).notNull().unique(),
 	email: varchar({ length:128 }).notNull().unique(),
 	password: text().notNull(),
-	privateAcc: boolean().notNull().default(false),
 	wins: integer().default(0),
 	losses: integer().default(0),
 	matches: integer().default(0),

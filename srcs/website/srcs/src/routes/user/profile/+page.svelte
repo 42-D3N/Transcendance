@@ -3,10 +3,17 @@
     import { redirect } from '@sveltejs/kit';
     import { enhance } from '$app/forms';
     import profileicon from '$lib/assets/profile_icon.svg';
+    import { afterNavigate } from '$app/navigation'
+    import { chatClient } from '$lib/chat-client.svelte.ts';
 
     import type { PageProps } from './$types';
     let { data, form }: PageProps = $props();
     let friendNb = $state(data.friends.length);
+
+    afterNavigate ((navigation:any) => {
+        if (navigation.type === "goto" && navigation.from.route.id === "/user/profile/edit")
+            chatClient.execProfileChange(data.username, data.icon);
+    });
 
     function    Winrate()
     {

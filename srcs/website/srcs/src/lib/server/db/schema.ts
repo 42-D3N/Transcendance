@@ -68,3 +68,13 @@ export const api_users = pgTable('api_users', {
 	role: varchar({ length:128 }).notNull().default("user"),
 	secret_key: varchar({ length:64 })
 });
+
+export const chat = pgTable("chat", {
+	id: serial().primaryKey(),
+	content: text().notNull(),
+	author: integer().notNull().references(() => users.id),
+	dest: integer().notNull().references(() => users.id),
+	timestamp: timestamp().defaultNow(),
+	}, (table) => [
+    check("self_chat_check", sql`${table.author} != ${table.dest}`)
+]);

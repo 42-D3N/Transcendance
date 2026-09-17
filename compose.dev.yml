@@ -57,6 +57,25 @@ services:
             - node_modules/
         - action: rebuild
           path: ./srcs/website/srcs/package.json
+  chat-server:
+    command: npm run dev
+    image: transcendance-chat-server
+    build: ./srcs/chat-server
+    pull_policy: never
+    env_file:
+      - ./srcs/chat-server/srcs/.env
+    networks:
+      - transcendance
+    restart: always
+    develop:
+      watch:
+        - path: ./srcs/chat-server/srcs/src
+          action: sync
+          target: /app/src
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: ./srcs/chat-server/srcs/package.json
   adminer:
     image: adminer
     restart: always
