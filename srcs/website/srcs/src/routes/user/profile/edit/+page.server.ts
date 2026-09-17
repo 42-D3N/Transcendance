@@ -3,7 +3,7 @@ import { redirect, fail } from '@sveltejs/kit';
 import { randomBytes } from 'crypto';
 import { db } from '$lib/server/db/index';
 import { eq, and, or } from 'drizzle-orm';
-import { users, matches } from '$lib/server/db/schema';
+import { users, matches, inventory } from '$lib/server/db/schema';
 import type { Actions } from './$types';
 import { writeFile, readdir, mkdir } from 'fs/promises';
 import path from 'path';
@@ -76,7 +76,8 @@ export async function load ({ cookies }) {
         wallet: wallet,
         icon: icon,
         privateAcc: privateAcc,
-        matchHistory: userHistory
+        matchHistory: userHistory,
+        skins: skins
     });
 };
 
@@ -174,5 +175,4 @@ export const actions = {
         
         throw redirect(303, "./edit");
     }
-
 } satisfies Actions;

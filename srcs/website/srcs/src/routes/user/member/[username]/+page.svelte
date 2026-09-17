@@ -101,9 +101,9 @@
                 </div>
             </div>
 
-            <div class="mt-16 pb-8 w-full h-[20%] bg-[#292626FF] border-solid rounded-lg z-10 p-4">
-                    <span class="text-white text-4xl font-bold p-4">Match History</span>
-                    <span class="text-zinc-400 text-4xl font-bold">({data.matches})</span>
+            <div class="mt-[4%] w-fit h-[20%] bg-[#292626FF] border-solid rounded-lg z-10 p-4">
+                <span class="text-white text-xl lg:text-4xl font-bold">Match History:</span>
+                <span class="text-zinc-400 text-xl lg:text-4xl font-bold">({data.matches})</span>
             </div>
 
             {#each data.matchHistory as match}

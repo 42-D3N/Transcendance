@@ -3,7 +3,7 @@ import { validateJWT } from '$lib/server/user_management/jwt.js';
 import type { Actions } from './$types';
 import { db } from '$lib/server/db/index';
 import { eq, and, or } from 'drizzle-orm';
-import { users, friends, matches } from '$lib/server/db/schema';
+import { users, friends, matches, inventory } from '$lib/server/db/schema';
 
 
 export async function load ({ cookies }) {
@@ -21,6 +21,8 @@ export async function load ({ cookies }) {
     let copinous = [];
     let actualFriends: {id: number; username: string; icon: string | null}[] = [];
     let userHistory: [];
+    let skins: { user: number; product: number; own: boolean; }[];
+    let userSkins: { skinRac: number | null; skinBall: number | null; };
     
     if (!JWTtoken || JWTtoken === '-1')
     {
@@ -76,6 +78,11 @@ export async function load ({ cookies }) {
             })
         );
 
+        userSkins = (await db.select({ skinRac: users.skin_rac, skinBall: users.skin_ball })
+            .from(users)
+            .where(eq(users.id, userInfos.id))
+        )[0];
+
         actualFriends = await Promise.all(
             copinous.map(async (request) => {
                 let toFetch: number;
@@ -102,6 +109,10 @@ export async function load ({ cookies }) {
             .where(or(eq(matches.user1, userInfos.id), eq(matches.user2, userInfos.id)))
             .limit(5);
 
+        skins = await db.select()
+            .from(inventory)
+            .where(eq(inventory.user, userInfos.id))
+
         id = userInfos.id;
         username = userInfos.username;
         email = userInfos.email;
@@ -125,7 +136,9 @@ export async function load ({ cookies }) {
         icon: icon,
         friendRequests: requestsInfos,
         friends: actualFriends,
-        matchHistory: userHistory
+        matchHistory: userHistory,
+        skins: skins,
+        userSkins: userSkins
     });
 };
 
@@ -245,5 +258,35 @@ export const actions = {
                 )
             )
         );
+    },
+
+    changeSkinRac: async (event) => {
+        const form = await event.request.formData();
+        
+        const userId = form.get('userId') as string;
+        const product = form.get('product') as string;
+        const owned = form.get('owned') as string;
+
+        if (owned === "false")
+            throw redirect(308, "/shop");
+
+        await db.update(users).set({ skin_rac: parseInt(product) }).where(eq(parseInt(userId), users.id));
+
+        throw redirect(308, "/user/profile");
+    },
+
+    changeSkinBall: async (event) => {
+        const form = await event.request.formData();
+        
+        const userId = form.get('userId') as string;
+        const product = form.get('product') as string;
+        const owned = form.get('owned') as string;
+
+        if (owned === "false")
+            throw redirect(308, "/shop");
+
+        await db.update(users).set({ skin_ball: parseInt(product) }).where(eq(parseInt(userId), users.id));
+
+        throw redirect(308, "/user/profile");
     }
 } satisfies Actions;

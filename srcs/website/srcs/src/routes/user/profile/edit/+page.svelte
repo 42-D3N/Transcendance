@@ -4,6 +4,7 @@
     import Popup from "$lib/Popup.svelte";
     import { redirect } from '@sveltejs/kit';
     import usericon from '$lib/assets/user/default.svg';
+    
     let fileinput: HTMLInputElement;
     let avatar: string | undefined = $state();
     let fileError = $state(0);
@@ -73,7 +74,7 @@
 
 </script>
 
-<div class="absolute inset-0 z-0 bg-[#333131FF]"></div>
+<div class="fixed inset-0 z-0 bg-[#333131FF] size-full"></div>
 <div class="lg:scale-120 pb-8 z-1 lg:mt-[2%] lg:p-16 pl-6 pr-6 lg:ml-[25%] lg:w-[50%]">
     <form method="POST" enctype="multipart/form-data" use:enhance>
         <div class="pb-8 w-full h-[80%] bg-[#292626FF] border-solid rounded-lg z-10">
@@ -101,15 +102,13 @@
                 <div>
                     <span class="inline pl-3 text-white">Username:</span><input name="username" value={data.username} type="username" class="inline pl-3 font-black text-white text-4xl w-[10ch]"><br>
                     {#if form?.invalidName}<p class="error ml-2">please enter a valid username</p>{/if}
-                    <span class="inline pl-3 text-white">Email:</span><input name="email" value={data.email} type="email" class="inline pl-3 font-black text-white text-4xl max-w-[12ch] lg:max-w-[30ch]"><br>
+                    <span class="inline pl-3 text-white">Email:</span><input name="email" value={data.email} type="email" class="inline pl-3 font-black text-white text-4xl max-w-[12ch] xl:max-w-[22ch]"><br>
                     {#if form?.invalidMail}<p class="error max-w-[28ch] ml-2">please enter a valid email adress</p>{/if}
                     {#if form?.somethingExists}<p class="error max-w-[28ch] ml-2">username or mail already taken</p>{/if}
                     <span class="inline pl-12 pt-6 font-semibold text-zinc-400 text-xl">Wallets:</span><input name="wallet" value={data.wallet} type="wallet" class="inline pl-3 font-black text-white text-xl size-fit max-w-[6ch]"><br>
                     <span class="pl-12 text-zinc-400 text-lg">Winrate:</span>
                     <span class="text-white text-lg">{Winrate()}</span>
                 </div>
-                <input type="checkbox" id="agree" name="agree" checked={false} />
-                <label>Make account private</label>
             </div>
             <div class="ml-4">
                 <input type="checkbox" id="agree" name="agree" checked={data.privateAcc} value="private"/>
@@ -121,9 +120,9 @@
         </div>
     </form>
 
-    <div class="mt-16 pb-8 w-full h-[80%] bg-[#292626FF] border-solid rounded-lg z-10 p-4">
-        <span class="text-white text-4xl font-bold p-4">Match History</span>
-        <span class="text-zinc-400 text-4xl font-bold">({data.matches})</span>
+    <div class="mt-[4%] w-fit h-[20%] bg-[#292626FF] border-solid rounded-lg z-10 p-4">
+        <span class="text-white text-xl lg:text-4xl font-bold">Match History:</span>
+        <span class="text-zinc-400 text-xl lg:text-4xl font-bold">({data.matches})</span>
     </div>
 
     {#each data.matchHistory as match}

@@ -3,6 +3,26 @@
     import { redirect } from '@sveltejs/kit';
     import { enhance } from '$app/forms';
     import profileicon from '$lib/assets/profile_icon.svg';
+    import lock from '$lib/assets/locked.svg';
+    import item1 from "$lib/assets/item1.png";
+    import item2 from "$lib/assets/item2.png";
+    import item3 from "$lib/assets/item3.png";
+    import item4 from "$lib/assets/item4.png";
+    import item5 from "$lib/assets/item5.png";
+    import item6 from "$lib/assets/item6.png";
+    import item7 from "$lib/assets/item7.png";
+    import item8 from "$lib/assets/item8.png";
+
+    const products = [
+        { id: 1, name: "Old placeholder", src: item1},
+        { id: 2, name: "Game dev's fav colors", src: item2},
+        { id: 3, name: "Dev's fav color", src: item3},
+        { id: 4, name: "Mariposa's creation", src: item4},
+        { id: 5, name: "TV snow", src: item5},
+        { id: 6, name: "Light", src: item6},
+        { id: 7, name: "Perturabo's love", src: item7},
+        { id: 8, name: "WE ARE RICH", src: item8},
+    ];
 
     import type { PageProps } from './$types';
     let { data, form }: PageProps = $props();
@@ -38,7 +58,6 @@
     }
 </script>
 
-<div class="fixed inset-0 z-0 bg-[#333131FF] size-full"></div>
 <div class="fixed inset-0 z-0 bg-[#333131FF] size-full"></div>
 
 <div class="flex ml-[10%]">
@@ -95,6 +114,58 @@
             </div>
         </div>
 
+        <div class="mt-[4%] w-full h-[20%] bg-[#292626FF] border-solid rounded-lg z-10 p-4">
+            <span class="text-white text-xl lg:text-4xl font-bold">Racket skins:</span>
+            <div class="flex overflow-x-scroll m-4">
+                {#each data.skins as Skin}
+                    <form method="POST" enctype="multipart/form-data" class="flex flex-shrink-0 flex-col items-center bg-stone-700 rounded-xl border m-4" use:enhance={({ formData }) => {
+                            formData.append('userId', JSON.stringify(data.id));
+                            formData.append('product', JSON.stringify(Skin.product));
+                            formData.append('owned', JSON.stringify(Skin.own));
+                        }}
+                        >
+                        <button type="submit" class="flex flex-shrink-0 flex-col items-center" formaction="?/changeSkinRac">
+                            {#if !Skin.own}
+                                <div class="flex flex-col m-2 lg:h-[18rem] lg:w-[18rem] h-[8rem] w-[8rem] border-solid border border-white bg-[#161825FF] justify-center items-center">
+                                    <img class="lg:h-[2rem] lg:w-[2rem] h-[1rem] w-[1rem]" src={lock} alt=""/>
+                                </div>
+                                <span class="italic text-xs lg:text-lg">Go to shop to buy it now</span>
+                            {:else}
+                                <img class="block m-2 lg:h-[18rem] lg:w-[18rem] h-[8rem] w-[8rem] border-solid border" src={products[Skin.product].src} alt=""/>
+                                <span class="text-xs lg:text-lg text-[#161825FF] font-bold self-start text-left ml-2">{products[Skin.product].name}</span>
+                            {/if}
+                        </button>
+                    </form>
+                {/each}
+            </div>
+        </div>
+
+        <div class="mt-[4%] w-full h-[20%] bg-[#292626FF] border-solid rounded-lg z-10 p-4">
+            <span class="text-white text-xl lg:text-4xl font-bold">Ball skins:</span>
+            <div class="flex overflow-x-scroll m-4">
+                {#each data.skins as Skin}
+                    <form method="POST" enctype="multipart/form-data" class="flex flex-shrink-0 flex-col items-center bg-stone-700 rounded-xl border m-4" use:enhance={({ formData }) => {
+                            formData.append('userId', JSON.stringify(data.id));
+                            formData.append('product', JSON.stringify(Skin.product));
+                            formData.append('owned', JSON.stringify(Skin.own));
+                        }}
+                        >
+                        <button type="submit" class="flex flex-shrink-0 flex-col items-center" formaction="?/changeSkinBall">
+                            {#if !Skin.own}
+                                <div class="flex flex-col m-2 lg:h-[18rem] lg:w-[18rem] h-[8rem] w-[8rem] border-solid border border-white bg-[#161825FF] justify-center items-center">
+                                    <img class="lg:h-[2rem] lg:w-[2rem] h-[1rem] w-[1rem]" src={lock} alt=""/>
+                                </div>
+                                <span class="italic text-xs lg:text-lg">Go to shop to buy it now</span>
+                            {:else}
+                                <img class="block m-2 lg:h-[18rem] lg:w-[18rem] h-[8rem] w-[8rem] border-solid border" src={products[Skin.product].src} alt=""/>
+                                <span class="text-xs lg:text-lg text-[#161825FF] font-bold self-start text-left ml-2">{products[Skin.product].name}</span>
+                            {/if}
+                        </button>
+                    </form>
+                {/each}
+            </div>
+        </div>
+
         <div class="block mt-[4%] pb-8 bg-[#292626FF] border-solid rounded-lg z-10 pt-4">
             <div class="flex">
                 <span class="text-white text-xl lg:text-4xl font-bold p-4 pt-1">Friends</span>
@@ -114,6 +185,7 @@
                     {#if form?.requestPending }<p class="error">invite already pending</p>{/if}
                 </div>
             </div>
+
             <div class="m-4">
                 {#each data.friendRequests as frRequests}
                     <form method="POST" enctype="multipart/form-data" class="flex bg-stone-700 rounded-md mb-4" use:enhance={({ formData }) => {
@@ -122,7 +194,6 @@
                     }}
                     >
                         {#if !frRequests.icon}
-                            <span>???</span>
                             <img class="upload block m-2 lg:h-[4rem] lg:w-[4rem] h-[2rem] w-[2rem] border-solid rounded-md bg-amber-50" src={usericon} alt=""/>
                         {:else}
                             <img class="upload block m-2 lg:h-[4rem] lg:w-[4rem] h-[2rem] w-[2rem] border-solid rounded-md bg-amber-50" src={frRequests.icon} alt=""/>
