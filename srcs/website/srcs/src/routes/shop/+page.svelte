@@ -18,7 +18,7 @@
         { id: 1, name: "Old placeholder: ", price: 10, src: item1},
         { id: 2, name: "Game dev's fav colors: ", price: 20, src: item2},
         { id: 3, name: "Dev's fav color: ", price: 30, src: item3},
-        { id: 4, name: "Ugly color: ", price: 40, src: item4},
+        { id: 4, name: "Mariposa's creation: ", price: 40, src: item4},
         { id: 5, name: "TV snow: ", price: 50, src: item5},
         { id: 6, name: "Light: ", price: 60, src: item6},
         { id: 7, name: "Perturabo's love: ", price: 70, src: item7},
@@ -94,11 +94,19 @@
         {#each products as product}
             <div>
                 <img src={product.src} class="scale-80 mx-auto" alt=""/>
-                    <button onclick={() => sendData({id: product.id})} title="shop item" type="button" class="text-wrap inline-block rounded-xl bg-[#C41E3AFF] z-10 w-[90%] min-h-[15%] max-h-[50%] text-center">
-                        <span class="break-words text-l sm:text-xl md:text-3xl lg:text-4xl">
-                            {product.name} {product.price * shep}$
-                        </span>
-                    </button>
+                    {#if data.skins[product.id - 1].own}
+                        <button onclick={() => sendData({id: product.id})} title="shop item" type="button" class="text-wrap inline-block rounded-xl bg-[#6b0f1fFF] z-10 w-[90%] min-h-[15%] max-h-[50%] text-center">
+                            <span class="break-words text-l sm:text-xl md:text-3xl lg:text-4xl italic">
+                                $$ - SOLD OUT - $$
+                            </span>
+                        </button>
+                    {:else}
+                        <button onclick={() => sendData({id: product.id})} title="shop item" type="button" class="text-wrap inline-block rounded-xl bg-[#C41E3AFF] hover:bg-[#6b0f1fFF] z-10 w-[90%] min-h-[15%] max-h-[50%] text-center">
+                            <span class="break-words text-l sm:text-xl md:text-3xl lg:text-4xl">
+                                {product.name} {product.price * shep}$
+                            </span>
+                        </button>
+                    {/if}
             </div>
         {/each}
     </div>
