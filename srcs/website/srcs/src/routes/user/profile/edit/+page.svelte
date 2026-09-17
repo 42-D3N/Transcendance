@@ -108,6 +108,8 @@
                     <span class="pl-12 text-zinc-400 text-lg">Winrate:</span>
                     <span class="text-white text-lg">{Winrate()}</span>
                 </div>
+                <input type="checkbox" id="agree" name="agree" checked={false} />
+                <label>Make account private</label>
             </div>
             <div class="ml-4">
                 <input type="checkbox" id="agree" name="agree" checked={data.privateAcc} value="private"/>

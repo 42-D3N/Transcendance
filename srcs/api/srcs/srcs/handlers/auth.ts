@@ -12,13 +12,12 @@ var expire_time = '1h';
 
 export async function register(req: Request, res: Response, next: NextFunction) {
     const result = validationResult(req);
-    console.log(result);
     if (!result.isEmpty()) {
         return (HandleParsingError(result, next));
     }
     try {
         const { email, password }  = req.body;
-        const user = await db.select({email: users.email, password: users.password, id: users.id}).from(users).where(eq(email, users.email));
+        const user = await db.select({email: users.email, password: users.password, id: users.id}).from(users).where(eq(users.email, email));
         if (user.length === 0) {
             return next (new CustomError("Error: Api register wrong credentials", 400)); 
         }
@@ -26,7 +25,7 @@ export async function register(req: Request, res: Response, next: NextFunction) 
         if (!isMatch) {
             return next( new CustomError("Error: Api register wrong credentials", 400));
         }
-        const isdup = await db.select({id: api_users.user}).from(api_users).where(eq(user[0].id, api_users.user));
+        const isdup = await db.select({id: api_users.user}).from(api_users).where(eq(api_users.user, user[0].id));
         if (isdup.length !== 0) {
             return next(new CustomError("Error: user already register to the api", 400));
         }
@@ -52,7 +51,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
     }
     try {
         const { email, password } = req.body;
-        const user = await db.select({email: users.email, password: users.password, id: users.id}).from(users).where(eq(email, users.email));
+        const user = await db.select({email: users.email, password: users.password, id: users.id}).from(users).where(eq(users.email, email));
         if (user.length === 0) {
             return next (new CustomError("Error: Api register wrong credentials", 400));
         }
@@ -65,8 +64,8 @@ export async function login(req: Request, res: Response, next: NextFunction) {
             { id: user[0].id, role: role[0].role },
             role[0].secret_key,
             {algorithm: 'HS256',  expiresIn: expire_time });
-        console.log(`user: ${user[0].id}\nrole: ${role[0].role}\nsecret: ${role[0].secret_key}\ntoken: ${token} valid for ${expire_time}`);
-        res.status(201).json({ token, message: 'Logged in successfuly', role, secret: role[0].secret_key });
+        console.log(`user: ${user[0].id}\nrole: ${role[0].role}`);
+        res.status(201).json({ token, message: 'Logged in successfuly', role: role[0].role, });
     } catch (error) {
         if (handleErrorCode(error, next, null))
             return;
@@ -81,7 +80,7 @@ export async function deleteapiuser(req: Request, res: Response, next: NextFunct
     }
     try {
         const { email, password } = req.body;
-        const user = await db.select({email: users.email, password: users.password, id: users.id}).from(users).where(eq(email, users.email));
+        const user = await db.select({email: users.email, password: users.password, id: users.id}).from(users).where(eq(users.email, email));
         if (user.length === 0) {
             return next (new CustomError("Error: Api register wrong credentials", 400));
         }
@@ -89,7 +88,7 @@ export async function deleteapiuser(req: Request, res: Response, next: NextFunct
         if (!isMatch) {
             return next( new CustomError("Error: Api wrong password", 400));
         }
-        const ishere = await db.select({id: api_users.user}).from(api_users).where(eq(user[0].id, api_users.user));
+        const ishere = await db.select({id: api_users.user}).from(api_users).where(eq(api_users.user, user[0].id));
         if (ishere.length === 0) {
             return next(new CustomError("Error: user not register in api", 400));
         }

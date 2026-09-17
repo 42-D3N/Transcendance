@@ -39,6 +39,7 @@
 </script>
 
 <div class="fixed inset-0 z-0 bg-[#333131FF] size-full"></div>
+<div class="fixed inset-0 z-0 bg-[#333131FF] size-full"></div>
 
 <div class="flex ml-[10%]">
     <div class="pb-8 z-1 lg:mt-[2%] lg:p-16 pl-6 pr-6 w-[90%] h-fit">
@@ -121,6 +122,7 @@
                     }}
                     >
                         {#if !frRequests.icon}
+                            <span>???</span>
                             <img class="upload block m-2 lg:h-[4rem] lg:w-[4rem] h-[2rem] w-[2rem] border-solid rounded-md bg-amber-50" src={usericon} alt=""/>
                         {:else}
                             <img class="upload block m-2 lg:h-[4rem] lg:w-[4rem] h-[2rem] w-[2rem] border-solid rounded-md bg-amber-50" src={frRequests.icon} alt=""/>

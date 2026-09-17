@@ -16,7 +16,7 @@ export const init: ServerInit = async () => {
         { name: 'Product 5', price: 50, },
         { name: 'Product 6', price: 60, },
         { name: 'Product 7', price: 70, },
-        { name: 'Product 8', price: 80, },
+        { name: 'Product 8', price: 670, },
         ]);
         console.log('Products inserted!');
     }

@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { db } from "../db/db.ts";
 import { friends } from "../db/schema.ts";
 import type { Response, Request, NextFunction } from "express";
@@ -16,7 +16,7 @@ export async function deletefriends(req: Request, res: Response, next: NextFunct
     try {
         const Data = await db
         .delete(friends)
-        .where(eq(friends.user1, + req.body.user1) && (eq(friends.user2, + req.body.user2)))
+        .where(and(eq(friends.user1, + req.body.user1), (eq(friends.user2, + req.body.user2))))
         .returning({
             User1: friends.user1, 
             User2: friends.user2

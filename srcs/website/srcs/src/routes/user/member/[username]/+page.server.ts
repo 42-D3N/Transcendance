@@ -1,6 +1,5 @@
 import { redirect, fail } from '@sveltejs/kit';
 import { validateJWT } from '$lib/server/user_management/jwt.js';
-import type { Actions } from './$types';
 import { db } from '$lib/server/db/index';
 import { eq, and, or } from 'drizzle-orm';
 import { users, friends, matches } from '$lib/server/db/schema';

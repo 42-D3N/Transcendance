@@ -14,7 +14,7 @@ export async function adduser(req: Request, res: Response, next: NextFunction) {
   }
   try {
     const { username, email, password } = req.body;
-    const already = await db.select({username: users.username}).from(users).where(eq(email, users.email)).where(eq(username, users.username));
+    const already = await db.select({username: users.username}).from(users).where(eq(users.email, email)).where(eq(users.username, username));
     if (already.length !== 0) {
       return next(new CustomError("Error: user already in database", 400));
     }
@@ -36,7 +36,7 @@ export async function adduser(req: Request, res: Response, next: NextFunction) {
     res.status(201).json({ Data });
   } catch (error) {
     const { username } = req.body;
-    const used = await db.select({username: users.username}).from(users).where(eq(username, users.username));
+    const used = await db.select({username: users.username}).from(users).where(eq(users.username, username));
     if (handleErrorCode(error, next, used))
       return;
     next(new CustomError("Error: Failed to add user", 500));
@@ -68,7 +68,7 @@ export async function getuserid(req: Request, res: Response, next: NextFunction)
     const Data = await db
       .select()
       .from(users)
-      .where(eq(username, users.username));
+      .where(eq(users.username, username));
     if (Data.length === 0) {
       return next (new CustomError("Error: User not found", 404));
     }
@@ -161,8 +161,11 @@ export async function updateuser(req: Request, res: Response, next: NextFunction
     console.log("user updated",Data);
     res.status(200).json({ Data });
   } catch (error) {
+    let used = null;
     const { username } = req.body;
-    const used = await db.select({username: users.username}).from(users).where(eq(username, users.username));
+    if (username !== undefined){
+      used = await db.select({username: users.username}).from(users).where(eq(users.username, username));
+    }
     if (handleErrorCode(error, next, used))
       return;
     next(new CustomError("Error: Failed to update user", 500));
@@ -190,10 +193,13 @@ export async function P_updateuser(req: Request, res: Response,next: NextFunctio
     console.log("user updated",Data);
     res.status(201).json({ Data });
   } catch (error) {
+    let used = null;
     const { username } = req.body;
-    const used = await db.select({username: users.username}).from(users).where(eq(username, users.username));
+    if (username !== undefined && username !== null && username !== "") {
+      used = await db.select({username: users.username}).from(users).where(eq(users.username, username));
+    }
     if (handleErrorCode(error, next, used))
       return;
-    next(new CustomError("Error: Failed to update Data", 500));
+    next(new CustomError("Error: Failed to update user", 500));
   }
 }
