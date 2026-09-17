@@ -4,15 +4,15 @@
 		<div class="menu-buttons">
 			<div class="pvp-group">
 				<p class="pvp-group-title">PVP</p>
-				<a class="menu-button" href="/game/matchmaking?mode=pvp">Matchmaking</a>
+				<a class="menu-button" href="/game/play?mode=pvp">Matchmaking</a>
 			</div>
 			<div class="ai-group">
 				<p class="ai-group-title">Affrontements IA</p>
 				<div class="ai-grid">
-					<a class="menu-button ai-button" href="/game/matchmaking?mode=pve&aiDifficulty=easy">IA Easy</a>
-					<a class="menu-button ai-button" href="/game/matchmaking?mode=pve&aiDifficulty=normal">IA Normal</a>
-					<a class="menu-button ai-button" href="/game/matchmaking?mode=pve&aiDifficulty=hard">IA Hard</a>
-					<a class="menu-button ai-button" href="/game/matchmaking?mode=pve&aiDifficulty=impossible">IA Impossible</a>
+					<a class="menu-button ai-button" href="/game/play?mode=pve&aiDifficulty=easy">IA Easy</a>
+					<a class="menu-button ai-button" href="/game/play?mode=pve&aiDifficulty=normal">IA Normal</a>
+					<a class="menu-button ai-button" href="/game/play?mode=pve&aiDifficulty=hard">IA Hard</a>
+					<a class="menu-button ai-button" href="/game/play?mode=pve&aiDifficulty=impossible">IA Impossible</a>
 				</div>
 			</div>
 			<a class="menu-button" href="/game/loadingScreen">Preview du Loading screen</a>
