@@ -222,6 +222,6 @@ export function addChat(index: number) {
 		return ;
 	while (openedChats.length >= chatLimit)
 		openedChats.pop();
-	openedChats.unshift({id: activeChats[index].id, name: activeChats[index].name, avatar: activeChats[index].avatar, history: [], hasError: false, error: null, update: false, online: false});
+	openedChats.unshift({id: activeChats[index].id, name: activeChats[index].name, avatar: activeChats[index].avatar, history: [], hasError: false, error: null, update: false, online: activeChats[index].online});
 	chatClient.sendRequest(activeChats[index].id);
 }
