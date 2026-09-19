@@ -6,6 +6,7 @@ export const users = pgTable('users', {
 	username: varchar({ length:128 }).notNull().unique(),
 	email: varchar({ length:128 }).notNull().unique(),
 	password: text().notNull(),
+	privateAcc: boolean().notNull().default(false),
 	wins: integer().default(0),
 	losses: integer().default(0),
 	matches: integer().default(0),
@@ -14,6 +15,7 @@ export const users = pgTable('users', {
 	code: boolean().default(false),
 	skin_rac: integer().default(null).references(() => shop.id),
 	skin_ball: integer().default(null).references(() => shop.id),
+	online_status: boolean().default(false),
 });
 
 export const friends = pgTable('friends', {
@@ -63,7 +65,17 @@ export const shop = pgTable('shop', {
 });
 
 export const api_users = pgTable('api_users', {
-	user: integer().primaryKey().notNull().unique().references(() => users.id),
+	user: integer().primaryKey().notNull().references(() => users.id),
 	role: varchar({ length:128 }).notNull().default("user"),
 	secret_key: varchar({ length:64 })
 });
+
+export const chat = pgTable("chat", {
+	id: serial().primaryKey(),
+	content: text().notNull(),
+	author: integer().notNull().references(() => users.id),
+	dest: integer().notNull().references(() => users.id),
+	timestamp: timestamp().defaultNow().notNull(),
+	}, (table) => [
+    check("self_chat_check", sql`${table.author} != ${table.dest}`)
+]);

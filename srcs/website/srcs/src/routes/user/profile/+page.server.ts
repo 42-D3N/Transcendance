@@ -95,7 +95,8 @@ export async function load ({ cookies }) {
                     .select({
                         id: users.id,
                         username: users.username,
-                        icon: users.icon
+                        icon: users.icon,
+                        online: users.online_status,
                     })
                     .from(users)
                     .where(eq(users.id, toFetch));

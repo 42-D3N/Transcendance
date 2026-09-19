@@ -23,7 +23,7 @@
         { id: 7, name: "Perturabo's love", src: item7},
         { id: 8, name: "WE ARE RICH", src: item8},
     ];
-    import { afterNavigate } from '$app/navigation'
+    import { afterNavigate } from '$app/navigation';
     import { chatClient } from '$lib/chat-client.svelte.ts';
 
     import type { PageProps } from './$types';
@@ -104,6 +104,7 @@
                         <a class="relative z-0" href={"/user/member/"+friend.username+"_"+JSON.stringify(friend.id)}>
                             <button class="absolute z-10 h-[1rem] w-[1rem] lg:h-[2rem] lg:w-[2rem] right-0 bg-red-600 hover:bg-red-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.35),0_1px_2px_rgba(0,0,0,0.4)] rounded-md" onclick={(event) => {event.stopPropagation(); friendNb-- }} type="submit" title="endFriend"></button>
                             <div class="bg-stone-700 size-fit p-2 rounded-md">
+                                <span class="inline-block h-[6px] w-[6px] rounded-full {friend.online?"bg-green-500":"bg-red-500"} shadow-[0_0_2px_#00ff00]"></span>
                                 {#if !friend.icon}
                                     <img class="block ml-4 lg:m-4 2xl:h-[6rem] 2xl:w-[6rem] xl:h-[5rem] xl:w-[5rem] h-[3rem] w-[3rem] border-solid rounded-md bg-amber-50" src={usericon} alt=""/>
                                 {:else}
