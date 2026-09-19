@@ -1,10 +1,12 @@
 <script lang="ts">
 	import "../app.css";
 	import { activeChats, addEmptyChat, addChat } from '$lib/chat-client.svelte.ts';
+	import usericon from '$lib/assets/user/default.svg';
 	import { formatTime } from "$lib/common";
 	let { name } = $props();
     let show = $state(false);
 	let container:any;
+
 
 	function onTabClick(e:any) {
 		if (container.contains(e.target) == false)
@@ -48,7 +50,7 @@
 							{#each activeChats as contact, index}
 								<div class="chat-row-wrapper" onclick={() => addChat(index)}>
 									<div class="ft-avatar-component ft-avatar-size-32">
-										<img class="h-full w-full object-cover overscroll-contain" src="https://www.chess.com/bundles/web/images/noavatar_l.84a92436.gif" alt="avatar de {contact.name}">
+										<img class="h-full w-full object-cover overscroll-contain" src={contact.avatar!= null?contact.avatar:usericon} alt="avatar de {contact.name}">
 									</div>
 									<div class="message-row-message overscroll-contain">
 										<div class="message-row-row overscroll-contain">

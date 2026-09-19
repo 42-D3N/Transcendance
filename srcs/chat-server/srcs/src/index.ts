@@ -26,15 +26,14 @@ function timeSort(a: ChatContact, b: ChatContact): number {
 	return a.time.getTime() - b.time.getTime();
 }
 
-function newConn(sock: WebSocket, token: string) {
-	let userInfos = validateJWT(token);
-	if (!userInfos) {
-		sock.close(1 , "Invalid token.");
-		return 1;
+async function newConn(sock: WebSocket, token: string): Promise<boolean> {
+	let userInfos = await validateJWT(token);
+	if (userInfos.empty === 0) {
+		sock.close(3000 , "Invalid token.");
+		return false;
 	}
-	// TODO: Check if jwt data is correct
 	connections.set(sock, userInfos.id);
-	return 0;
+	return true;
 }
 
 async function sendContacts(sock: WebSocket) {
@@ -61,7 +60,8 @@ const start = async () => {
 		server.register(fastifyWebsocket);
 		server.register( async function (fastify) {
 			server.get('/api/chat', { websocket: true }, async (socket: WebSocket, req: http.IncomingMessage) => {
-				if (newConn(socket, req.query.token))
+				let authRes:boolean = await newConn(socket, req.query.token);
+				if (!authRes)
 					return ;
 				await sendContacts(socket);
 				socket.on('close', () => {

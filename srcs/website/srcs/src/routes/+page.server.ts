@@ -21,15 +21,17 @@ export async function load ({ cookies }) {
 	{
 		let userInfos = await validateJWT(JWTtoken);
 
+		if (userInfos["JWT"] != undefined)
+		{
+			JWTtoken = userInfos["JWT"];
+			cookies.set('JWTtoken', JWTtoken, { path: '/' });
+			userInfos = await validateJWT(JWTtoken);
+		}
+
 		if (!userInfos)
 		{
 			cookies.set('JWTtoken', "-1", { path: '/' });
 			throw redirect(303, '/login');
-		}
-		if (userInfos["JWT"] != undefined)
-		{
-			cookies.set('JWTtoken', userInfos["JWT"], { path: '/' });
-			throw redirect(303, ".");
 		}
 			
 		if (userInfos["empty"] == 0)

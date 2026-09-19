@@ -12,6 +12,7 @@ export const load = async ({ cookies }) => {
 
 	if (JWT && JWT != '-1')
 		redirect(303, '/');
+	return ({id: -1});
 
 };
 
