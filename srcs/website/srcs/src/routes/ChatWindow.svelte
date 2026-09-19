@@ -71,9 +71,10 @@
 			{:else}
 			<span class="flex shrink-0 text-[2.5rem] relative text-center">
 				<img class="h-[30px] w-[30px]" src={openedChats[index].avatar != null?openedChats[index].avatar:usericon}>
+				<span class="status-indicator {openedChats[index].online?"bg-green-500":"bg-red-500"}"></span>
 			</span>
 			<span class="ml-[1rem] items-center flex text-[1.4rem]">
-				<a class="text-white">{openedChats[index].name}</a>
+				<a class="text-white" href="/user/member/{openedChats[index].name}_{openedChats[index].id}" data-sveltekit-reload>{openedChats[index].name}</a>
 			</span>
 			{/if}
 		</div>
