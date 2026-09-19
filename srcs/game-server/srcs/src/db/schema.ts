@@ -65,7 +65,7 @@ export const shop = pgTable('shop', {
 });
 
 export const api_users = pgTable('api_users', {
-	user: integer().primaryKey().notNull().unique().references(() => users.id),
+	user: integer().primaryKey().notNull().references(() => users.id),
 	role: varchar({ length:128 }).notNull().default("user"),
 	secret_key: varchar({ length:64 })
 });
