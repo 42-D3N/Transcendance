@@ -32,6 +32,18 @@ async function newConn(sock: WebSocket, token: string): Promise<boolean> {
 		sock.close(3000 , "Invalid token.");
 		return false;
 	}
+	let numLog = 0;
+	connections.forEach((userId) => {
+		if (userId === userInfos.id)
+			numLog++;
+	});
+	if (numLog == 1) {
+		await db.update(users).set({online_status: true}).where(eq(users.id, userInfos.id));
+		connections.forEach((userId, sock) => {
+			if (userId != userInfos.id)
+				sock.send(JSON.stringify({type: "statusChange", valid:true, body:{id: userInfos.id, status: true}}));
+		});
+	}
 	connections.set(sock, userInfos.id);
 	return true;
 }
@@ -39,8 +51,8 @@ async function newConn(sock: WebSocket, token: string): Promise<boolean> {
 async function sendContacts(sock: WebSocket) {
 	const userId = connections.get(sock);
 	try {
-		const authors:ChatContact[] = await db.select({id: chat.author, name: users.username, avatar:users.icon, time: chat.timestamp, message: chat.content}).from(chat).where(eq(userId, chat.dest)).innerJoin(users, eq(chat.author, users.id));
-		const dests:ChatContact[] = await db.select({id: chat.dest, name: users.username, avatar:users.icon, time: chat.timestamp, message: chat.content}).from(chat).where(eq(userId, chat.author)).innerJoin(users, eq(chat.dest, users.id));
+		const authors:ChatContact[] = await db.select({id: chat.author, name: users.username, avatar:users.icon, time: chat.timestamp, message: chat.content, online:users.online_status}).from(chat).where(eq(userId, chat.dest)).innerJoin(users, eq(chat.author, users.id));
+		const dests:ChatContact[] = await db.select({id: chat.dest, name: users.username, avatar:users.icon, time: chat.timestamp, message: chat.content, online:users.online_status}).from(chat).where(eq(userId, chat.author)).innerJoin(users, eq(chat.dest, users.id));
 		const body:ChatContact[] = authors.concat(dests).sort(timeSort).filter(onlyUnique);
 		sock.send(JSON.stringify({type: "contacts", body}));
 	} catch (error) {
@@ -64,8 +76,21 @@ const start = async () => {
 				if (!authRes)
 					return ;
 				await sendContacts(socket);
-				socket.on('close', () => {
-					console.log("User "+connections.get(socket)+" disconnected.");
+				socket.on('close', async () => {
+					let numLog = 0;
+					let thisId = connections.get(socket);
+					console.log("User "+thisId+" disconnected.");
+					connections.forEach((userId) => {
+						if (userId === thisId)
+							numLog++;
+					});
+					if (numLog <= 1) {
+						await db.update(users).set({online_status: false}).where(eq(users.id, thisId));
+						connections.forEach((userId, sock) => {
+							if (userId != thisId)
+								sock.send(JSON.stringify({type: "statusChange", valid:true, body:{id: thisId, status: false}}));
+						});
+					}
 					connections.delete(socket);
 				});
 				socket.on('message', async (message: string) => {
@@ -111,13 +136,13 @@ const start = async () => {
 
 						case "newChat":
 							try {
-								const targetId = await db.select({id: users.id, name: users.username, avatar: users.icon}).from(users).where(eq(users.username, packet.target));
+								const targetId = await db.select({id: users.id, name: users.username, avatar: users.icon, online:users.online_status}).from(users).where(eq(users.username, packet.target));
 								if (targetId.length === 0)
 									socket.send(JSON.stringify({type:"newChat", valid:false, body:{cause: "User does not exist.", index: packet.index}}));
 								else if (targetId[0].id === connections.get(socket))
 									socket.send(JSON.stringify({type:"newChat", valid:false, body:{cause: "Cannot chat with yourself.", index: packet.index}}));
 								else
-									socket.send(JSON.stringify({type:"newChat", valid:true, body:{id:targetId[0].id, name:targetId[0].name, avatar:targetId[0].avatar, index:packet.index}}));
+									socket.send(JSON.stringify({type:"newChat", valid:true, body:{id:targetId[0].id, name:targetId[0].name, avatar:targetId[0].avatar, online:targetId[0].online, index:packet.index}}));
 							} catch (error) {
 								console.log(error);
 							}
@@ -129,7 +154,7 @@ const start = async () => {
 								break ;
 							}
 							try {
-								const body = await db.select({id: users.id, name: users.username, avatar: users.icon}).from(users).where(eq(users.id, packet.target));
+								const body = await db.select({id: users.id, name: users.username, avatar: users.icon, online:users.online_status}).from(users).where(eq(users.id, packet.target));
 								if (body.length === 0) {
 									socket.send(JSON.stringify({type: "infos", valid:false, body:{cause: "User does not exist."}}));
 									break ;

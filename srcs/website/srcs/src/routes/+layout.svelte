@@ -250,6 +250,7 @@
 									<div class="chat-row-wrapper" onclick={() => addChat(index)}>
 										<div class="ft-avatar-component ft-avatar-size-32">
 											<img class="h-full w-full object-cover overscroll-contain" src={contact.avatar!= null?contact.avatar:usericon} alt="avatar de {contact.name}">
+											<span class="status-indicator {contact.online?"bg-green-500":"bg-red-500"}"></span>
 										</div>
 										<div class="message-row-message overscroll-contain">
 											<div class="message-row-row overscroll-contain">

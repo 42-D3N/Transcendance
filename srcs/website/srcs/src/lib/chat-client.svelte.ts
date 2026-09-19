@@ -5,7 +5,8 @@ interface ChatContact {
 	avatar: string,
 	name: string,
 	message: string,
-	time: Date
+	time: Date,
+	online: boolean
 }
 
 interface Message {
@@ -22,7 +23,8 @@ interface OpenedChat {
 	history: Message[],
 	hasError: boolean | null,
 	error: string | null,
-	update: boolean
+	update: boolean,
+	online: boolean
 }
 
 export let activeChats:ChatContact[] = $state([]);
@@ -58,12 +60,12 @@ class ChatClient {
 
 		this.ws.onmessage = event => {
 			let data = JSON.parse(event.data);
-			// console.log(data);
+			console.log(data);
 			switch (data.type) {
 				case "contacts":
 					activeChats.splice(0);
 					data.body.forEach((element:any) => {
-						activeChats.push({id: element.id, name: element.name, avatar:element.avatar, message: element.message, time:new Date(element.time)});
+						activeChats.push({id: element.id, name: element.name, avatar:element.avatar, message: element.message, time:new Date(element.time), online: element.online});
 					});
 					break ;
 
@@ -74,6 +76,7 @@ class ChatClient {
 						openedChats[data.body.index].id = data.body.id;
 						openedChats[data.body.index].name = data.body.name;
 						openedChats[data.body.index].avatar = data.body.avatar;
+						openedChats[data.body.index].online = data.body.online;
 					}
 					else {
 						openedChats[data.body.index].hasError = true;
@@ -94,11 +97,11 @@ class ChatClient {
 					});
 					if (!isIn) {
 						if (data.body.author === this.userId) {
-							activeChats.push({id: data.body.target, name: "", avatar:"", message: data.body.message, time:new Date(data.body.timestamp)});
+							activeChats.push({id: data.body.target, name: "", avatar:"", message: data.body.message, time:new Date(data.body.timestamp), online: false});
 							this.ws?.send(JSON.stringify({ type: "infos", target: data.body.target }));
 						}
 						else {
-							activeChats.push({id: data.body.author, name: "", avatar:"", message: data.body.message, time:new Date(data.body.timestamp)});
+							activeChats.push({id: data.body.author, name: "", avatar:"", message: data.body.message, time:new Date(data.body.timestamp), online: false});
 							this.ws?.send(JSON.stringify({ type: "infos", target: data.body.author }));
 						}
 					}
@@ -118,6 +121,7 @@ class ChatClient {
 						if (contact.id === data.body.id) {
 							contact.name = data.body.name;
 							contact.avatar = data.body.avatar;
+							contact.online = data.body.online;
 						}
 					});
 					break;
@@ -136,6 +140,19 @@ class ChatClient {
 						}
 					});
 					break;
+
+				case "statusChange":
+					activeChats.forEach((contact, index, contacts) => {
+						if (contact.id === data.body.id) {
+							contact.online = data.body.status;
+						}
+					});
+					openedChats.forEach((chat, index, contacts) => {
+						if (chat.id === data.body.id) {
+							chat.online = data.body.status;
+						}
+					});
+					break ;
 
 				case "history":
 					if (!data.valid)
@@ -188,7 +205,7 @@ export function updateChatLimit(newLimit:number) {
 export function addEmptyChat() {
 	while (openedChats.length >= chatLimit)
 		openedChats.pop();
-	openedChats.unshift({id: emptyChatId, name: "null", avatar: null, history: [], hasError: false, error: null, update: false});
+	openedChats.unshift({id: emptyChatId, name: "null", avatar: null, history: [], hasError: false, error: null, update: false, online: false});
 	if (emptyChatId < -10)
 		emptyChatId = -1;
 	else
@@ -205,6 +222,6 @@ export function addChat(index: number) {
 		return ;
 	while (openedChats.length >= chatLimit)
 		openedChats.pop();
-	openedChats.unshift({id: activeChats[index].id, name: activeChats[index].name, avatar: activeChats[index].avatar, history: [], hasError: false, error: null, update: false});
+	openedChats.unshift({id: activeChats[index].id, name: activeChats[index].name, avatar: activeChats[index].avatar, history: [], hasError: false, error: null, update: false, online: false});
 	chatClient.sendRequest(activeChats[index].id);
 }
