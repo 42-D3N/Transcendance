@@ -1,7 +1,7 @@
 <script lang="ts">
 	let displayNav = $state(false);
 	import usericon from '$lib/assets/user/default.svg';
-	import favicon from '$lib/assets/favicon.svg';
+	import favicon from '$lib/assets/image_convertie.svg';
 	import homeicon from '$lib/assets/home_icon.svg';
 	import gameicon from '$lib/assets/game_icon.svg';
 	import profileicon from '$lib/assets/profile_icon.svg';
