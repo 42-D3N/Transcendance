@@ -30,7 +30,10 @@ export async function load ({ cookies }) {
         }
 
         if (!userInfos || userInfos["empty"] == 0)
-            throw redirect(303, '/sign_in');
+        {
+            cookies.set('JWTtoken', '-1', { path: '/' });
+            throw redirect(303, '/login');
+        }
 
         if (userInfos.length == 0)
             console.error("couldn't retrieve userData");

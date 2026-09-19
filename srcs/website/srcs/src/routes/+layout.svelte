@@ -98,7 +98,7 @@
 		{/each}
 	</div>
 	<div id="mobile-shroud-sidebar" class="lg:hidden {(!displayNav)?"hidden":""} inset-0 fixed z-2 bg-black/30"></div>
-	<nav id="sidebar-main-menu" class="flex max-lg:fixed flex-col h-svh max-lg:h-[unset] max-lg:top-19 px-[0.8rem] pt-[0.8rem] pb-[1.2rem] max-lg:bottom-0 w-68 lg:max-xl:w-[5.6rem] bg-[#292626FF] max-lg:z-100 max-lg:{(!displayNav)?"hidden":""}" bind:this={sidebar}>
+	<nav id="sidebar-main-menu" class="flex max-lg:fixed flex-col h-svh max-lg:h-[unset] max-lg:top-19 px-[0.8rem] pt-[0.8rem] pb-[1.2rem] max-lg:bottom-0 w-68 lg:max-xl:w-[5.6rem] bg-[#292626FF] max-lg:z-100 max-lg:{(!displayNav)?"hidden":""}" bind:this={sidebar} data-sveltekit-reload>
 		<a href="/" class="items-center grid gap-[1.2rem] relative max-lg:hidden w-full">
 			<img alt="logo" class="col-span-full" src={favicon} height="120px" width="120px"/>
 		</a>

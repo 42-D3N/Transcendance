@@ -3,11 +3,7 @@ import { validateJWT } from '$lib/server/user_management/jwt.js';
 import type { Actions } from './$types';
 import { db } from '$lib/server/db/index';
 import { eq, and, or } from 'drizzle-orm';
-<<<<<<< HEAD
 import { users, friends, matches, inventory } from '$lib/server/db/schema';
-=======
-import { users, friends, matches } from '$lib/server/db/schema';
->>>>>>> main
 
 
 export async function load ({ cookies }) {
@@ -25,11 +21,8 @@ export async function load ({ cookies }) {
     let copinous = [];
     let actualFriends: {id: number; username: string; icon: string | null}[] = [];
     let userHistory: [];
-<<<<<<< HEAD
     let skins: { user: number; product: number; own: boolean; }[];
     let userSkins: { skinRac: number | null; skinBall: number | null; };
-=======
->>>>>>> main
     
     if (!JWTtoken || JWTtoken === '-1')
     {
@@ -102,9 +95,9 @@ export async function load ({ cookies }) {
                     .select({
                         id: users.id,
                         username: users.username,
-                        icon: users.icon
-                    })
-                    .from(users)
+                            icon: users.icon
+                        })
+                        .from(users)
                     .where(eq(users.id, toFetch));
                 return user[0];
             })
@@ -190,7 +183,7 @@ export const actions = {
         // check if not already friends
         let requestExisting = (await db.select({ user1:friends.user1, user2:friends.user2, isaccepted:friends.isaccepted })
         .from(friends)
-        .where(and(
+        .where(or(
             eq(friends.user1, parseInt(infoTab[1])),
             eq(friends.user2, parseInt(infoTab[1]))
         )));

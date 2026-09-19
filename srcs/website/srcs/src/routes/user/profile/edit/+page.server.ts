@@ -19,12 +19,12 @@ export async function load ({ cookies }) {
     let wallet = '0';
     let icon = 'default.svg';
     let privateAcc = false;
-    let userHistory: [];
+    let userHistory: [] = [];
 
     if (!JWTtoken || JWTtoken === '-1')
     {
         cookies.set('JWTtoken', '-1', { path: '/' });
-        throw redirect(308, '/sign_in');
+        throw redirect(308, '/login');
     }
     else
     {
@@ -76,8 +76,7 @@ export async function load ({ cookies }) {
         wallet: wallet,
         icon: icon,
         privateAcc: privateAcc,
-        matchHistory: userHistory,
-        skins: skins
+        matchHistory: userHistory
     });
 };
 

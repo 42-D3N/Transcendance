@@ -3,6 +3,7 @@
     import { enhance } from '$app/forms';
     import Popup from "$lib/Popup.svelte";
     import { redirect } from '@sveltejs/kit';
+    import xp from '$lib/assets/test.webp';
     import usericon from '$lib/assets/user/default.svg';
     
     let fileinput: HTMLInputElement;
@@ -74,110 +75,203 @@
 
 </script>
 
-<div class="fixed inset-0 z-0 bg-[#333131FF] size-full"></div>
+<img class="fixed inset-0 z-0 bg-[#404040] size-full" src={xp} alt=""/>
 <div class="lg:scale-120 pb-8 z-1 lg:mt-[2%] lg:p-16 pl-6 pr-6 lg:ml-[25%] lg:w-[50%]">
     <form method="POST" enctype="multipart/form-data" use:enhance>
-        <div class="pb-8 w-full h-[80%] bg-[#292626FF] border-solid rounded-lg z-10">
-            <div class="flex p-4">
-                {#if avatar}
-                    <div class="relative">
-                        <img class="upload block hover:opacity-60 lg:h-[12rem] lg:w-[12rem] h-[8rem] w-[8rem] border-solid rounded-md bg-amber-50" src={avatar} alt="" onclick={() => fileinput.click()} />
-                        <button class="absolute size-fit bg-red-600 hover:bg-red-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.35),0_1px_2px_rgba(0,0,0,0.4)] rounded-md right-0 top-0" onclick={NoNoYourPreviewSuckPlsDeleteItDaddy}>
-                            <span class="text-white font-bold p-4">✕</span>
-                        </button>
-                    </div>
-                {:else}
-                    {#if !data.icon}
-                        <img class="upload block hover:opacity-60 lg:h-[12rem] lg:w-[12rem] h-[8rem] w-[8rem] border-solid rounded-md bg-amber-50" src={usericon} alt="" onclick={() => fileinput.click()} />
-                    {:else}
+        <div
+            class="w-full bg-[#C0C0C0] border-t-2 border-l-2 border-b-2 border-r-2 border-t-white border-l-white border-b-[#404040] border-r-[#404040] z-10"
+            style="font-family: Tahoma, 'MS Sans Serif', sans-serif;"
+        >
+            <div class="flex items-center gap-2 px-2 py-1 bg-[#000080]">
+                <span class="text-white text-sm md:text-base font-bold">Edit Profile</span>
+            </div>
+
+            <div class="p-4">
+                <div class="flex gap-4">
+                    {#if avatar}
                         <div class="relative">
-                            <img class="upload block hover:opacity-60 lg:h-[12rem] lg:w-[12rem] h-[8rem] w-[8rem] border-solid rounded-md bg-amber-50" src={data.icon} alt={data.icon} onclick={() => fileinput.click()} />
-                            <button class="absolute size-fit bg-red-600 hover:bg-red-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.35),0_1px_2px_rgba(0,0,0,0.4)] rounded-md right-0 top-0" type="submit" formaction="?/delIcon">
-                                <span class="text-white font-bold pl-2 pr-2 ">✕</span>
+                            <div class="p-[2px] bg-white border-t-2 border-l-2 border-b-2 border-r-2 border-t-[#404040] border-l-[#404040] border-b-white border-r-white">
+                                <img
+                                    class="upload block hover:opacity-80 lg:h-[10rem] lg:w-[10rem] h-[7rem] w-[7rem] bg-amber-50"
+                                    src={avatar}
+                                    alt=""
+                                    onclick={() => fileinput.click()}
+                                />
+                            </div>
+                            <button
+                                class="absolute h-[18px] w-[18px] flex items-center justify-center text-[11px] font-bold text-black bg-[#C0C0C0] border-t-2 border-l-2 border-b-2 border-r-2 border-t-white border-l-white border-b-[#404040] border-r-[#404040] active:border-t-[#404040] active:border-l-[#404040] active:border-b-white active:border-r-white right-0 top-0"
+                                onclick={NoNoYourPreviewSuckPlsDeleteItDaddy}
+                            >
+                                ✕
                             </button>
                         </div>
+                    {:else}
+                        {#if !data.icon}
+                            <div class="p-[2px] bg-white border-t-2 border-l-2 border-b-2 border-r-2 border-t-[#404040] border-l-[#404040] border-b-white border-r-white h-fit">
+                                <img
+                                    class="upload block hover:opacity-80 lg:h-[10rem] lg:w-[10rem] h-[7rem] w-[7rem] bg-amber-50"
+                                    src={usericon}
+                                    alt=""
+                                    onclick={() => fileinput.click()}
+                                />
+                            </div>
+                        {:else}
+                            <div class="relative">
+                                <div class="p-[2px] bg-white border-t-2 border-l-2 border-b-2 border-r-2 border-t-[#404040] border-l-[#404040] border-b-white border-r-white">
+                                    <img
+                                        class="upload block hover:opacity-80 lg:h-[10rem] lg:w-[10rem] h-[7rem] w-[7rem] bg-amber-50"
+                                        src={data.icon}
+                                        alt={data.icon}
+                                        onclick={() => fileinput.click()}
+                                    />
+                                </div>
+                                <button
+                                    class="absolute h-[18px] w-[18px] flex items-center justify-center text-[11px] font-bold text-black bg-[#C0C0C0] border-t-2 border-l-2 border-b-2 border-r-2 border-t-white border-l-white border-b-[#404040] border-r-[#404040] active:border-t-[#404040] active:border-l-[#404040] active:border-b-white active:border-r-white right-0 top-0"
+                                    type="submit"
+                                    formaction="?/delIcon"
+                                >
+                                    ✕
+                                </button>
+                            </div>
+                        {/if}
                     {/if}
-                {/if}
-                <input name="icon" style="display:none" type="file" accept=".jpg, .jpeg, .png, .webp" onchange={onFileSelected} bind:this={fileinput} >
-                <div>
-                    <span class="inline pl-3 text-white">Username:</span><input name="username" value={data.username} type="username" class="inline pl-3 font-black text-white text-4xl w-[10ch]"><br>
-                    {#if form?.invalidName}<p class="error ml-2">please enter a valid username</p>{/if}
-                    <span class="inline pl-3 text-white">Email:</span><input name="email" value={data.email} type="email" class="inline pl-3 font-black text-white text-4xl max-w-[12ch] xl:max-w-[22ch]"><br>
-                    {#if form?.invalidMail}<p class="error max-w-[28ch] ml-2">please enter a valid email adress</p>{/if}
-                    {#if form?.somethingExists}<p class="error max-w-[28ch] ml-2">username or mail already taken</p>{/if}
-                    <span class="inline pl-12 pt-6 font-semibold text-zinc-400 text-xl">Wallets:</span><input name="wallet" value={data.wallet} type="wallet" class="inline pl-3 font-black text-white text-xl size-fit max-w-[6ch]"><br>
-                    <span class="pl-12 text-zinc-400 text-lg">Winrate:</span>
-                    <span class="text-white text-lg">{Winrate()}</span>
+
+                    <input
+                        name="icon"
+                        style="display:none"
+                        type="file"
+                        accept=".jpg, .jpeg, .png, .webp"
+                        onchange={onFileSelected}
+                        bind:this={fileinput}
+                    />
+
+                    <div class="flex flex-col gap-1.5 pt-1 min-w-0">
+                        <div class="flex items-center gap-2">
+                            <span class="text-black text-sm w-16 shrink-0">Username:</span>
+                            <input
+                                name="username"
+                                value={data.username}
+                                type="username"
+                                class="font-bold text-black text-base bg-white px-2 py-0.5 border-t-2 border-l-2 border-b-2 border-r-2 border-t-[#404040] border-l-[#404040] border-b-white border-r-white outline-none w-[16ch]"
+                            />
+                        </div>
+                        {#if form?.invalidName}<p class="error text-[#800000] text-xs ml-[4.5rem]">please enter a valid username</p>{/if}
+
+                        <div class="flex items-center gap-2">
+                            <span class="text-black text-sm w-16 shrink-0">Email:</span>
+                            <input
+                                name="email"
+                                value={data.email}
+                                type="email"
+                                class="font-bold text-black text-base bg-white px-2 py-0.5 border-t-2 border-l-2 border-b-2 border-r-2 border-t-[#404040] border-l-[#404040] border-b-white border-r-white outline-none w-full max-w-[22ch]"
+                            />
+                        </div>
+                        {#if form?.invalidMail}<p class="error text-[#800000] text-xs ml-[4.5rem]">please enter a valid email address</p>{/if}
+                        {#if form?.somethingExists}<p class="error text-[#800000] text-xs ml-[4.5rem]">username or mail already taken</p>{/if}
+
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="text-[#404040] text-sm w-16 shrink-0">Wallets:</span>
+                            <input
+                                name="wallet"
+                                value={data.wallet}
+                                type="wallet"
+                                class="font-bold text-black text-sm bg-white px-2 py-0.5 border-t-2 border-l-2 border-b-2 border-r-2 border-t-[#404040] border-l-[#404040] border-b-white border-r-white outline-none w-[6ch]"
+                            />
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <span class="text-[#404040] text-sm w-16 shrink-0">Winrate:</span>
+                            <span class="text-black text-sm">{Winrate()}</span>
+                        </div>
+                    </div>
                 </div>
+
+                <label class="flex items-center gap-2 mt-4">
+                    <input
+                        type="checkbox"
+                        id="agree"
+                        name="agree"
+                        checked={data.privateAcc}
+                        value="private"
+                        class="h-[14px] w-[14px] appearance-none bg-white border-t-2 border-l-2 border-b-2 border-r-2 border-t-[#404040] border-l-[#404040] border-b-white border-r-white checked:bg-white relative checked:after:content-['✓'] checked:after:absolute checked:after:text-[10px] checked:after:font-bold checked:after:text-black checked:after:leading-none checked:after:left-[2px] checked:after:top-[-1px]"
+                    />
+                    <span class="text-black text-sm">Make account private</span>
+                </label>
+
+                <button
+                    class="mt-4 px-4 py-1.5 bg-[#C0C0C0] border-t-2 border-l-2 border-b-2 border-r-2 border-t-white border-l-white border-b-[#404040] border-r-[#404040] active:border-t-[#404040] active:border-l-[#404040] active:border-b-white active:border-r-white"
+                    type="submit"
+                    formaction="?/saveMods"
+                >
+                    <span class="text-black font-bold text-sm">Save Changes</span>
+                </button>
             </div>
-            <div class="ml-4">
-                <input type="checkbox" id="agree" name="agree" checked={data.privateAcc} value="private"/>
-                <span class="text-white">Make account private</span>
-            </div>
-            <button class="block ml-4 mt-4 w-fit p-2 bg-green-600 hover:bg-green-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.35),0_1px_2px_rgba(0,0,0,0.4)] rounded-md" type="submit" formaction="?/saveMods">
-                <span class="text-white font-bold p-4">Save Changes</span>
-            </button>
         </div>
     </form>
 
-    <div class="mt-[4%] w-fit h-[20%] bg-[#292626FF] border-solid rounded-lg z-10 p-4">
-        <span class="text-white text-xl lg:text-4xl font-bold">Match History:</span>
-        <span class="text-zinc-400 text-xl lg:text-4xl font-bold">({data.matches})</span>
-    </div>
+    {#if parseInt(data.matches) > 0}
+        <div
+            class="mt-[4%] w-fit bg-[#C0C0C0] border-t-2 border-l-2 border-b-2 border-r-2 border-t-white border-l-white border-b-[#404040] border-r-[#404040] z-10 px-3 py-2"
+            style="font-family: Tahoma, 'MS Sans Serif', sans-serif;"
+        >
+            <span class="text-black text-sm lg:text-lg font-bold">Match History:</span>
+            <span class="text-[#404040] text-sm lg:text-lg font-bold">({data.matches})</span>
+        </div>
+    {/if}
 
     {#each data.matchHistory as match}
-        <div class="block mt-[1%] w-full h-[20%] bg-[#292626FF] border-solid rounded-lg z-10 p-4">
-            <div class="flex">
-
+        <div
+            class="block mt-[1%] w-full bg-[#C0C0C0] border-t-2 border-l-2 border-b-2 border-r-2 border-t-white border-l-white border-b-[#404040] border-r-[#404040] z-10"
+            style="font-family: Tahoma, 'MS Sans Serif', sans-serif;"
+        >
+            <div class="flex items-center px-3 py-1 bg-[#000080]">
                 {#if match.winner === data.id}
-                    <span class="text-green-600 text-lg lg:text-2xl font-bold">Win</span>
+                    <span class="text-[#00ff00] text-sm lg:text-lg font-bold">Win</span>
                 {:else}
-                    <span class="text-red-600 text-lg lg:text-2xl font-bold">Lose</span>
+                    <span class="text-[#ff5555] text-sm lg:text-lg font-bold">Lose</span>
                 {/if}
-                <div class="mx-[1%] self-stretch pb-1 w-px shrink-0 bg-black"></div>
-                
-                <span class="ml-auto text-white text-lg lg:text-xl">{formatTime(new Date(match.date))}</span>
+
+                <span class="ml-auto text-white text-xs lg:text-sm">{formatTime(new Date(match.date))}</span>
             </div>
-            <hr class="w-[20%] lg:w-[8%]">
-            <div class="h-[20%] p-4">
 
-                <div class="flex">
+            <div class="mx-3 mt-2 border-t border-[#808080]">
+                <div class="border-t border-white w-[20%] lg:w-[8%]"></div>
+            </div>
 
+            <div class="p-3">
+                <div class="flex items-center">
                     <div class="flex-1 flex items-center">
-                        <a class="w-fit" href={"/user/member/"+match.user1Pseudo+"_"+JSON.stringify(match.user1)}>
-                            <span class="text-lg lg:text-3xl text-white font-semibold">{match.user1Pseudo}#{match.user1}</span>
+                        <a class="w-fit" href={"/user/member/" + match.user1Pseudo + "_" + JSON.stringify(match.user1)}>
+                            <span class="text-sm lg:text-xl text-black font-semibold hover:underline" style="color: #0000EE;">{match.user1Pseudo}#{match.user1}</span>
                         </a>
                     </div>
-                    
-                    {#if match.user1Score > match.user2Score}
-                        <span class="ml-auto text-lg lg:text-2xl not-lg:mt-2 font-bold text-green-800">{match.user1Score}</span>
-                    {:else}
-                        <span class="ml-auto text-lg lg:text-2xl not-lg:mt-2 font-bold text-red-800">{match.user1Score}</span>
-                    {/if}
 
-                    <div class="not-lg:hidden mx-[2%] self-stretch items-center w-px shrink-0 bg-black"></div>
-                    <div class="lg:hidden ml-1 mr-1">-</div>
-                    
-                    {#if match.user1Score > match.user2Score}
-                        <span class="ml-auto text-lg lg:text-2xl not-lg:mt-2 font-bold text-red-800">{match.user2Score}</span>
-                    {:else}
-                        <span class="ml-auto text-lg lg:text-2xl not-lg:mt-2 font-bold text-green-800">{match.user2Score}</span>
-                    {/if}
+                    <div class="flex items-center gap-2 bg-white px-3 py-1 border-t-2 border-l-2 border-b-2 border-r-2 border-t-[#404040] border-l-[#404040] border-b-white border-r-white">
+                        {#if match.user1Score > match.user2Score}
+                            <span class="text-sm lg:text-xl font-bold text-[#008000]">{match.user1Score}</span>
+                            <span class="text-[#808080]">|</span>
+                            <span class="text-sm lg:text-xl font-bold text-[#800000]">{match.user2Score}</span>
+                        {:else}
+                            <span class="text-sm lg:text-xl font-bold text-[#800000]">{match.user1Score}</span>
+                            <span class="text-[#808080]">|</span>
+                            <span class="text-sm lg:text-xl font-bold text-[#008000]">{match.user2Score}</span>
+                        {/if}
+                    </div>
 
                     <div class="flex-1 flex items-center justify-end">
-                        <a class="w-fit" href={"/user/member/"+match.user2Pseudo+"_"+JSON.stringify(match.user2)}>
-                            <span class="text-lg lg:text-3xl text-white font-semibold">{match.user2Pseudo}#{match.user2}</span>
+                        <a class="w-fit" href={"/user/member/" + match.user2Pseudo + "_" + JSON.stringify(match.user2)}>
+                            <span class="text-sm lg:text-xl text-black font-semibold hover:underline" style="color: #0000EE;">{match.user2Pseudo}#{match.user2}</span>
                         </a>
                     </div>
-                    
                 </div>
-                <div class="flex w-full">
+
+                <div class="flex w-full mt-1">
                     {#if match.user1EloChange > 0}
-                        <span class="flex-1 flex items-center text-lg lg:text-2xl text-green-600 font-bold">+{match.user1EloChange}</span>
-                        <span class="flex-1 flex items-center text-lg lg:text-2xl justify-end text-red-600 font-bold">{match.user2EloChange}</span>
+                        <span class="flex-1 text-xs lg:text-base text-[#008000] font-bold">+{match.user1EloChange}</span>
+                        <span class="flex-1 text-right text-xs lg:text-base text-[#800000] font-bold">{match.user2EloChange}</span>
                     {:else}
-                        <span class="flex-1 flex items-center text-lg lg:text-2xl text-red-600 font-bold">{match.user1EloChange}</span>
-                        <span class="flex-1 flex items-center text-lg lg:text-2xl justify-end text-green-600 font-bold">+{match.user2EloChange}</span>
+                        <span class="flex-1 text-xs lg:text-base text-[#800000] font-bold">{match.user1EloChange}</span>
+                        <span class="flex-1 text-right text-xs lg:text-base text-[#008000] font-bold">+{match.user2EloChange}</span>
                     {/if}
                 </div>
             </div>
