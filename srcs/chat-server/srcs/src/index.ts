@@ -196,7 +196,7 @@ server.register(async function (server) {
 		for (const [socket, state] of connections) {
 			if (!state.isAlive) {
 				let numLog = 0;
-				console.log("User "+state.id+" disconnected.");
+				console.log("User "+state.id+"'s connection is dead, disconnecting.");
 				connections.forEach((userId) => {
 					if (userId.id === state.id)
 						numLog++;
