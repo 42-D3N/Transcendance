@@ -75,7 +75,7 @@ export const chat = pgTable("chat", {
 	content: text().notNull(),
 	author: integer().notNull().references(() => users.id),
 	dest: integer().notNull().references(() => users.id),
-	timestamp: timestamp().defaultNow(),
+	timestamp: timestamp().defaultNow().notNull(),
 	}, (table) => [
     check("self_chat_check", sql`${table.author} != ${table.dest}`)
 ]);
