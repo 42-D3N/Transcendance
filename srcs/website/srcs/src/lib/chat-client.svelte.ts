@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store';
+import { goto } from '$app/navigation';
 
 interface ChatContact {
 	id: number,
@@ -44,10 +44,16 @@ class ChatClient {
 			console.log("Connected to chat server");
 		};
 
-		this.ws.onclose = () => {
+		this.ws.onclose = (event) => {
+			if (event.code == 3000)
+			{
+				console.log("Disconnected from chat server, token is invalid.");
+				goto('/user/logout');
+				return ;
+			}
 			console.log("Disconnected from chat server, attempting reconnection in 5s.");
 			this.ws = null;
-			setTimeout(this.connect, 5000, [token, this.userId]);
+			setTimeout(() => this.connect(token, this.userId), 5000);
 		};
 
 		this.ws.onmessage = event => {

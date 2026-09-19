@@ -23,6 +23,8 @@
         { id: 7, name: "Perturabo's love", src: item7},
         { id: 8, name: "WE ARE RICH", src: item8},
     ];
+    import { afterNavigate } from '$app/navigation'
+    import { chatClient } from '$lib/chat-client.svelte.ts';
 
     import type { PageProps } from './$types';
     let { data, form }: PageProps = $props();
