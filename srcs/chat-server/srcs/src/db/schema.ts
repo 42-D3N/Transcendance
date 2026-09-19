@@ -15,6 +15,7 @@ export const users = pgTable('users', {
 	code: boolean().default(false),
 	skin_rac: integer().default(null).references(() => shop.id),
 	skin_ball: integer().default(null).references(() => shop.id),
+	online_status: boolean().default(false),
 });
 
 export const friends = pgTable('friends', {
