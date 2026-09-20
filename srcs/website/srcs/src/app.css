@@ -19,6 +19,62 @@ body:not(.keyboard-navigation-in-use) *:focus {
 	--text-small--line-height: 1.3333333333;
 }
 
+/* Sidebar */
+
+.mobile-shroud-sidebar {
+	@apply lg:hidden inset-0 fixed z-2 bg-black/30;
+}
+
+.ft-sidebar-main-menu {
+	@apply flex-col h-svh px-[0.8rem] pt-[0.8rem] pb-[1.2rem] w-68 lg:max-xl:w-[5.6rem] bg-[#292626FF];
+
+	@variant max-lg {
+		@apply fixed h-[unset] top-19 bottom-0 z-100;
+	}
+}
+
+.logo-link {
+	@apply items-center grid gap-[1.2rem] relative max-lg:hidden w-full;
+}
+
+.sidebar-buttons-box {
+	@apply items-stretch flex flex-col;
+}
+
+.ft-user-profile-button {
+	@apply flex justify-around gap-[0.4rem] text-left items-center overflow-visible relative whitespace-nowrap w-full border-0 text-[1.4rem] leading-[1.1428] p-[0.8rem] rounded-lg bg-[#292626FF] hover:bg-[#333131FF];
+	word-break: unset;
+}
+
+.ft-user-avatar {
+	@apply block h-[3.6rem] w-[3.6rem] border-solid rounded-md bg-amber-50;
+	
+	@variant lg {
+		@apply h-[3.6rem] w-[3.6rem];
+	}
+}
+
+.ft-sidebar-link-text {
+	@apply overflow-hidden text-ellipsis;
+}
+
+.ft-sidebar-footing-icon .sidebar-link {
+	--button-padding: 0.6rem;
+}
+
+.ft-sidebar-footing-icon {
+	@apply size-full relative;
+}
+
+.sidebar-footer-icons {
+	@apply grid place-items-center px-[0.4rem] grid-cols-[repeat(4,3.2rem)] grid-rows-[3.2rem] justify-between mt-[0.8rem];
+	@variant lg:max-xl {
+		@apply grid-cols-[3.2rem] grid-rows-[repeat(4,3.2rem)] justify-around gap-[0.4rem];
+		margin: unset;
+		padding: unset;
+	}
+}
+
 .send-message-field {
 	@apply bg-inherit text-inherit basis-full text-[1.3rem] p-[1rem] resize-none;
 	border: none;
@@ -31,14 +87,6 @@ body:not(.keyboard-navigation-in-use) *:focus {
 
 .border-none {
 	border: none;
-}
-
-.justify-unset {
-    justify-content: unset;
-}
-
-.break-unset {
-    word-break: unset;
 }
 
 .user-grid-buttons {
@@ -119,27 +167,6 @@ body:not(.keyboard-navigation-in-use) *:focus {
 
 .ft-icon-img {
 	@apply block h-(--icon-size) w-(--icon-size) select-none;
-}
-
-.ft-sidebar-link-text {
-	@apply overflow-hidden text-ellipsis;
-}
-
-.ft-sidebar-footing-icon .sidebar-link {
-	--button-padding: 0.6rem;
-}
-
-.ft-sidebar-footing-icon {
-	@apply size-full relative;
-}
-
-.sidebar-footer-icons {
-	@apply grid place-items-center px-[0.4rem] grid-cols-[repeat(4,3.2rem)] grid-rows-[3.2rem] justify-between mt-[0.8rem];
-	@variant lg:max-xl {
-		@apply grid-cols-[3.2rem] grid-rows-[repeat(4,3.2rem)] justify-around gap-[0.4rem];
-		margin: unset;
-		padding: unset;
-	}
 }
 
 .chat-row-wrapper {

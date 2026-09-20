@@ -97,13 +97,12 @@
 		<ChatWindow index={i} userId={data.id}/>
 		{/each}
 	</div>
-	<div id="mobile-shroud-sidebar" class="lg:hidden {(!displayNav)?"hidden":""} inset-0 fixed z-2 bg-black/30"></div>
-	<nav id="sidebar-main-menu" class="flex max-lg:fixed flex-col h-svh max-lg:h-[unset] max-lg:top-19 px-[0.8rem] pt-[0.8rem] pb-[1.2rem] max-lg:bottom-0 w-68 lg:max-xl:w-[5.6rem] bg-[#292626FF] max-lg:z-100 max-lg:{(!displayNav)?"hidden":""}" bind:this={sidebar} data-sveltekit-reload>
-		<a href="/" class="items-center grid gap-[1.2rem] relative max-lg:hidden w-full">
+	<div class="mobile-shroud-sidebar {(!displayNav)?"hidden":""}"></div>
+	<nav id="sidebar-main-menu" class="ft-sidebar-main-menu flex {(!displayNav)?"max-lg:hidden":""}" bind:this={sidebar} data-sveltekit-reload>
+		<a href="/" class="logo-link">
 			<img alt="logo" class="col-span-full" src={favicon} height="120px" width="120px"/>
 		</a>
-		<div id="sidebar-menus-buttons" class="min-h-0 overflow-hidden shrink">
-			<div class="items-stretch flex flex-col h-full">
+		<div id="sidebar-menus-buttons" class="sidebar-buttons-box min-h-0 overflow-hidden shrink h-full">
 				<a class="ft-button ft-button-medium sidebar-link hover:bg-[#333131FF]" href="/">
 					<img class="ft-icon-img ft-icon-size-24" src={homeicon} alt="icon"/>
 					<span class="ft-sidebar-link-text text-2xl/tight text-white">Home</span>
@@ -120,11 +119,10 @@
 					<img class="ft-icon-img ft-icon-size-24" src={shopicon} alt="icon"/>
 					<span class="ft-sidebar-link-text text-2xl/tight text-white">Shop</span>
 				</a>
-			</div>
 		</div>
 		<hr class="mt-auto border-none">
 		{#if data.Token === '-1'}
-		<div id="sidebar-login-buttons" class="items-stretch flex flex-col gap-[1.2rem] mt-[1.2rem]">
+		<div id="sidebar-login-buttons" class="sidebar-buttons-box gap-[1.2rem] mt-[1.2rem]">
 			<a id="signup-button" class="ft-button ft-button-medium sidebar-link sidebar-collapse-icon bg-[#1A8A35FF] hover:bg-[#27B849FF]" href="/sign_in">
 				<span class="content-center h-8 w-8 xl:hidden max-lg:hidden">
 					<svg width="20" height="20" viewBox="0 0 24 24" data-glyph="user-badge-plus" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M0 20.0301C0 18.0301 0.63 17.1301 2.47 16.4001L3.97 15.8001C6.84 14.6701 7.2 14.4301 7.2 13.6701C7.2 11.3701 5.37 11.3701 5.37 7.40008C5.37 4.23008 6.84 1.83008 9.94 1.83008C13.17 1.83008 14.64 4.23008 14.64 7.40008C14.64 7.73008 14.63 8.04008 14.6 8.32008C10.78 9.36008 8.01 12.8301 8.01 17.0001C8.01 18.8601 8.56 20.5701 9.51 22.0001H0.0100002L0 20.0301ZM17 23.9701C13.2 23.9701 10.03 20.8001 10.03 17.0001C10.03 13.1701 13.2 10.0301 17 10.0301C20.83 10.0301 23.97 13.1601 23.97 17.0001C23.97 20.8001 20.84 23.9701 17 23.9701ZM15.97 21.0301C15.97 21.6601 16.3 22.0001 16.9 22.0001H17C17.63 22.0001 17.97 21.6701 17.97 21.0701V18.0001H21.07C21.67 18.0001 22 17.6701 22 17.0301V16.9301C22 16.3301 21.67 16.0001 21.03 16.0001H17.96V12.9701C17.96 12.3401 17.63 12.0001 17.03 12.0001H16.93C16.3 12.0001 15.96 12.3301 15.96 12.9301V16.0001H12.93C12.33 16.0001 12 16.3301 12 16.9701V17.0701C12 17.6701 12.33 18.0001 12.97 18.0001H15.97V21.0301Z"></path></svg>
@@ -139,19 +137,14 @@
 			</a>
 		</div>
 		{:else}
-		<a class="flex justify-around gap-[0.4rem] text-left items-center overflow-visible relative whitespace-nowrap w-full break-unset border-0 text-[1.4rem]/1.1428 p-[0.8rem] rounded-lg bg-[#292626FF] hover:bg-[#333131FF]" href="/user/profile">
-			{#if !data.icon}
-				<img class="upload block lg:h-[3.6rem] lg:w-[3.6rem] h-[3.6rem] w-[3.6rem] border-solid rounded-md bg-amber-50" src={usericon} alt=""/>
-			{:else}
-				<img class="upload block lg:h-[3.6rem] lg:w-[3.6rem] h-[3.6rem] w-[3.6rem] border-solid rounded-md bg-amber-50" src={data.icon} alt={data.icon}/>
-			{/if}
+		<a class="ft-user-profile-button" href="/user/profile">
+			<img class="ft-user-avatar" src={!data.icon?usericon:data.icon} alt="your avatar"/>
 			<div id="user-info-container">	
 				<span class="lg:max-xl:hidden text-white">{data.username}</span><br>
 				<span class="content-center w-5 text-lg hidden xl:block text-white">wallet: {data.wallet}$</span>
 			</div>
 		</a>
 		<div class="sidebar-footer-icons mobile-hidden">
-			<SidebarTab name="friends"/>
 			<SidebarTab name="chats"/>
 			<div class="ft-sidebar-footing-icon">
 				<a class="ft-button ft-button-small sidebar-link hover:bg-white/30" href="/docs/api_doc.pdf">
@@ -196,13 +189,6 @@
 			</div>
 			{:else}
 			<div id="mobile-header-buttons" class="flex place-items-center">
-				<div class="mobile-toolbar-action" bind:this={friendsContainer}>
-					<button id="friends-widget-button" aria-label="Friends" class="mobile-toolbar-action-button ft-button ft-button-small hover:bg-white/30 {(mobToolbarEnabled === "friends")?"bg-white/30":""}" onclick={() => buttonClick("friends")}>
-						<span class="ft-icon-size-20 ft-icon-glyph">
-							<svg width="20" height="20" viewBox="0 0 24 24" data-glyph="users" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path fill="#ffffff" d="M8 18V16.13C8 14.3 8.63 13.43 10.4 12.9L11.78 12.42C11.38 13.94 10.57 14.16 10.57 15.03C10.57 15.63 10.74 15.93 11.3 16.1L13.6 16.9C14.47 17.16 15.06 17.5 15.44 18H8ZM12.07 5.24C12.35 3.14 13.47 2 15.43 2C17.9 2 19 3.57 19 6.4C19 10 17.57 9.8 17.57 11.03C17.57 11.63 17.77 11.93 18.3 12.1L20.63 12.9C22.36 13.43 23 14.3 23 16.13V18H17.61C17.04 16.56 15.86 15.49 14.22 15L13.15 14.63C13.55 13.85 14.01 12.36 14.01 10.4C14.01 8.01 13.29 6.29 12.08 5.24H12.07ZM1 22V20.13C1 18.3 1.63 17.43 3.4 16.9L5.6 16.13C6.13 15.93 6.37 15.66 6.37 15.03C6.37 13.86 5 13.86 5 10.4C5 7.57 6.1 6 8.43 6C10.9 6 12 7.57 12 10.4C12 13.87 10.57 13.87 10.57 15.03C10.57 15.63 10.74 15.93 11.3 16.1L13.6 16.9C15.37 17.43 16 18.3 16 20.13V22H1Z"></path></svg>
-						</span>
-					</button>
-				</div>
 				<div class="mobile-toolbar-action" bind:this={chatsContainer}>
 					<button id="chats-widget-button" aria-label="Chats" class="mobile-toolbar-action-button ft-button ft-button-small hover:bg-white/30 {(mobToolbarEnabled === "chats")?"bg-white/30":""}" onclick={() => buttonClick("chats")}>
 						<span class="ft-icon-size-20 ft-icon-glyph">
