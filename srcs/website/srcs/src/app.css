@@ -252,3 +252,33 @@ body:not(.keyboard-navigation-in-use) *:focus {
 .error {
     @apply text-sm text-red-700 italic;
 }
+
+/* User pages */
+
+.status-indicator {
+	@apply absolute bottom-0 right-0 h-[1rem] w-[1rem] rounded-full;
+}
+
+.retro-scroll::-webkit-scrollbar {
+  @apply h-4;
+}
+
+.retro-scroll::-webkit-scrollbar-track {
+  @apply bg-[#808080] border-t-2 border-l-2 border-b-2 border-r-2 border-t-[#404040] border-l-[#404040] border-b-white border-r-white;
+}
+
+.retro-scroll::-webkit-scrollbar-thumb {
+  @apply bg-[#c0c0c0] border-t-2 border-l-2 border-b-2 border-r-2 border-t-white border-l-white border-b-[#404040] border-r-[#404040];
+}
+
+.retro-scroll::-webkit-scrollbar-thumb:active {
+  @apply border-t-[#404040] border-l-[#404040] border-b-white border-r-white;
+}
+
+.retro-scroll::-webkit-scrollbar-button:single-button {
+  @apply bg-[#c0c0c0] w-4 border-t-2 border-l-2 border-b-2 border-r-2 border-t-white border-l-white border-b-[#404040] border-r-[#404040];
+}
+
+.retro-scroll {
+  @apply [scrollbar-width:thin] [scrollbar-color:#dcdcdc_#808080];
+}

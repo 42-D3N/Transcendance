@@ -5,7 +5,6 @@
 
 		<div class="bg-white border border-[#c5d9e8] rounded-[4px] shadow-[0_1px_2px_rgba(0,0,0,0.1)] overflow-hidden">
 
-			<!-- PVP module -->
 			<div class="border-b border-dotted border-[#c5d9e8]">
 				<div class="bg-[#e1ecf7] px-3 py-1.5 border-b border-[#c5d9e8]">
 					<span class="text-[13px] font-bold text-[#3b5998]">PVP</span>
@@ -20,7 +19,6 @@
 				</div>
 			</div>
 
-			<!-- AI module -->
 			<div class="border-b border-dotted border-[#c5d9e8]">
 				<div class="bg-[#e1ecf7] px-3 py-1.5 border-b border-[#c5d9e8]">
 					<span class="text-[13px] font-bold text-[#3b5998]">Affrontements IA</span>

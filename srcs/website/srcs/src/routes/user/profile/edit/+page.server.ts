@@ -19,12 +19,12 @@ export async function load ({ cookies }) {
     let wallet = '0';
     let icon = 'default.svg';
     let privateAcc = false;
-    let userHistory: [];
+    let userHistory: [] = [];
 
     if (!JWTtoken || JWTtoken === '-1')
     {
         cookies.set('JWTtoken', '-1', { path: '/' });
-        throw redirect(308, '/sign_in');
+        throw redirect(308, '/login');
     }
     else
     {
@@ -76,8 +76,7 @@ export async function load ({ cookies }) {
         wallet: wallet,
         icon: icon,
         privateAcc: privateAcc,
-        matchHistory: userHistory,
-        skins: skins
+        matchHistory: userHistory
     });
 };
 
@@ -108,13 +107,11 @@ export const actions = {
 
         if (newName != userInfos.username)
         {
-            // console.log("changing {user_id}",userInfos.id,"username: ",userInfos.username,"->",newName);
             await db.update(users).set({username: newName}).where(eq(users.id, userInfos.id));
         }
         
         if (newMail != userInfos.email)
         {
-            // console.log("changing {user_id}",userInfos.id,"email: ",userInfos.email,"->",newMail);
             await db.update(users).set({email: newMail}).where(eq(users.id, userInfos.id));
         }
 
@@ -136,17 +133,14 @@ export const actions = {
             const filePath = path.join(uploadDir, randomString.toString('hex')+"."+end[end.length - 1]);
             await db.update(users).set({icon: '/userIcons/'+randomString.toString('hex')+"."+end[end.length - 1]}).where(eq(users.id, userInfos.id));
             await writeFile(filePath, buffer);
-            // console.log("Saving new icon as: "+filePath);
             
             if (userInfos.icon)
             {
                 const res = await event.fetch(`${userInfos.icon}`, {
                     method: 'DELETE'
                 });
-                // console.log("deleting old icon");
             }
             userInfos.icon = randomString.toString("hex")+"."+end[end.length - 1];
-            // console.log("changing {user_id}",userInfos.id,"icon: ",userInfos.icon,"->\n",randomString.toString("hex")+"."+end[end.length - 1]);
         }
 
         const updatedJWT = await createJWT(userInfos);
@@ -168,7 +162,6 @@ export const actions = {
             const res = await event.fetch(`${userInfos.icon}`, {
                 method: 'DELETE'
             });
-            console.log("deleting old icon");
         }
         
         await db.update(users).set({icon: null}).where(eq(users.id, userInfos.id));

@@ -93,7 +93,7 @@
 	<div class="mobile-shroud-sidebar {(!displayNav)?"hidden":""}"></div>
 	<nav id="sidebar-main-menu" class="ft-sidebar-main-menu flex {(!displayNav)?"max-lg:hidden":""}" bind:this={sidebar} data-sveltekit-reload>
 		<a href="/" class="logo-link">
-			<img alt="logo" class="col-span-full" src={favicon} height="120px" width="120px"/>
+			<img alt="logo" class="col-span-full" src={favicon} height="160px" width="160px"/>
 		</a>
 		<div id="sidebar-menus-buttons" class="sidebar-buttons-box min-h-0 overflow-hidden shrink h-full">
 			<a class="ft-button ft-button-medium sidebar-link hover:bg-[#333131FF]" href="/">
@@ -133,7 +133,7 @@
 		<a class="ft-user-profile-button" href="/user/profile">
 			<img class="ft-user-avatar" src={!data.icon?usericon:data.icon} alt="your avatar"/>
 			<div id="user-info-container">	
-				<span class="lg:max-xl:hidden text-white">{data.username}</span><br/>
+				<span class="lg:max-xl:hidden text-white">{data.username < 10?data.username:data.username.slice(0, 7)}</span><br/>
 				<span class="content-center w-5 text-lg hidden xl:block text-white">wallet: {data.wallet}$</span>
 			</div>
 		</a>
