@@ -166,6 +166,8 @@ PostgreSQL was selected because it is reliable, widely used, and well suited to 
 
 ## Database Schema
 
+![alt text](dbb.drawio.svg)
+
 The database is organized around user accounts, social features, the shop, and match history.
 
 ### Main Tables with types
