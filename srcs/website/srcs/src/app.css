@@ -19,6 +19,8 @@ body:not(.keyboard-navigation-in-use) *:focus {
 	--text-small--line-height: 1.3333333333;
 }
 
+/* Layout */
+
 /* Sidebar */
 
 .mobile-shroud-sidebar {
@@ -75,24 +77,6 @@ body:not(.keyboard-navigation-in-use) *:focus {
 	}
 }
 
-.send-message-field {
-	@apply bg-inherit text-inherit basis-full text-[1.3rem] p-[1rem] resize-none;
-	border: none;
-	word-break: break-word;
-}
-
-.send-message-field.send-message-editor {
-	@apply leading-[2rem] min-h-[4rem] overflow-y-scroll max-h-[10rem] field-sizing-content;
-}
-
-.border-none {
-	border: none;
-}
-
-.user-grid-buttons {
-	grid-template-columns: repeat(4, 3.2rem);
-}
-
 #sidebar-main-menu {
 	@variant lg:max-xl {
 		--navWidth: 5.6rem;
@@ -108,9 +92,21 @@ body:not(.keyboard-navigation-in-use) *:focus {
 	word-break: unset;
 }
 
-.ft-heading-xxx-small {
-	@apply text-[1.4rem] leading-[1.1428571429];
+.sidebar-link.sidebar-collapse-icon {
+	@apply flex justify-around;
 }
+
+.sidebar-login-buttons .sidebar-link {
+	@apply gap-[0.4rem];
+}
+
+.sidebar-widget-container {
+	--base-widget-height: 44rem;
+	@apply grid h-(--base-widget-height);
+	grid-template-rows: minmax(0, 1fr) 0fr;
+}
+
+/* Buttons */
 
 .ft-button-medium {
 	--button-height: 4rem;
@@ -169,43 +165,24 @@ body:not(.keyboard-navigation-in-use) *:focus {
 	@apply block h-(--icon-size) w-(--icon-size) select-none;
 }
 
-.chat-row-wrapper {
-	@apply items-center grid rounded-lg gap-[0.8rem] p-[0.8rem];
-	grid-template-columns: 3.2rem 1fr;
+.ft-heading-xxx-small {
+	@apply text-[1.4rem] leading-[1.1428571429];
 }
 
-.ft-avatar-component {
-	@apply rounded-lg h-(--ft-avatar-size) w-(--ft-avatar-size) flex overflow-hidden relative;
+.border-none {
+	border: none;
 }
 
-.message-row-message {
-	align-items: start;
-	@apply flex flex-col justify-stretch w-full;
+/* Chat */
+
+.send-message-field {
+	@apply bg-inherit text-inherit basis-full text-[1.3rem] p-[1rem] resize-none;
+	border: none;
+	word-break: break-word;
 }
 
-.message-row-row {
-	align-items: start;
-	justify-content: end;
-	@apply grid relative w-full;
-	grid-template-columns: minmax(0, 1fr) max-content;
-}
-
-.message-row-row .message-row-text {
-	justify-self: start;
-	@apply overflow-hidden text-ellipsis whitespace-nowrap w-full;
-}
-
-.ft-user-block-component {
-	@apply items-center inline-flex flex-row gap-[0.4rem] max-w-full overflow-hidden wrap-break-word;
-}
-
-.message-row-message-content {
-	@apply max-w-full overflow-hidden text-ellipsis whitespace-nowrap;
-}
-
-.ft-avatar-size-32 {
-	--ft-avatar-size: 3.2rem;
-	--ft-avatar-status-size: 0.8rem;
+.send-message-field.send-message-editor {
+	@apply leading-[2rem] min-h-[4rem] overflow-y-scroll max-h-[10rem] field-sizing-content;
 }
 
 .chat-row-wrapper {
@@ -246,6 +223,16 @@ body:not(.keyboard-navigation-in-use) *:focus {
 	--ft-avatar-size: 3.2rem;
 	--ft-avatar-status-size: 0.8rem;
 }
+
+.opened-chats-container {
+	@apply right-[0.5rem] items-end bottom-0 flex h-[3rem] fixed z-10;
+}
+
+.status-indicator {
+	@apply absolute bottom-0 right-0 h-[1rem] w-[1rem] rounded-full;
+}
+
+/* Mobile header */
 
 .mobile-toolbar-action button {
 	--buton-padding: 0.6rem;
@@ -256,53 +243,12 @@ body:not(.keyboard-navigation-in-use) *:focus {
 	--buttonPaddings: 0
 }
 
-.sidebar-link.sidebar-collapse-icon {
-	@apply flex justify-around;
-}
-
-.sidebar-login-buttons .sidebar-link {
-	@apply gap-[0.4rem];
-}
-
 .mobile-hidden {
 	@variant max-lg {
 		@apply hidden;
 	}
 }
 
-.sidebar-widget-container {
-	--base-widget-height: 44rem;
-	@apply grid h-(--base-widget-height);
-	grid-template-rows: minmax(0, 1fr) 0fr;
-}
-
-.sidebar-widget-container.sidebar-widget-has-tabs {
-	grid-template-rows: min-content minmax(0, 1fr) 0fr;
-}
-
-.opened-chats-container {
-	@apply right-[0.5rem] items-end bottom-0 flex h-[3rem] fixed z-10;
-}
-
-.sidebar-widget-container {
-	--base-widget-height: 44rem;
-	@apply grid h-(--base-widget-height);
-	grid-template-rows: minmax(0, 1fr) 0fr;
-}
-
-.sidebar-widget-container.sidebar-widget-has-tabs {
-	grid-template-rows: min-content minmax(0, 1fr) 0fr;
-}
-
-.opened-chats-container {
-	@apply right-[0.5rem] items-end bottom-0 flex h-[3rem] fixed z-10;
-}
-
 .error {
     @apply text-sm text-red-700 italic;
-    @apply text-sm text-red-700 italic;
-}
-
-.status-indicator {
-	@apply absolute bottom-0 right-0 h-[1rem] w-[1rem] rounded-full;
 }

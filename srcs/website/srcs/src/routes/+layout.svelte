@@ -12,9 +12,7 @@
 	let sidebar:any;
 	let header:any;
 	let mobileSpace:any;
-	let friendsContainer:any = $state();
 	let chatsContainer:any = $state();
-	let settingsContainer:any = $state();
 
 	import { redirect } from '@sveltejs/kit';
 	import { browser } from "$app/environment";
@@ -32,9 +30,9 @@
 
 	let { data, children } = $props();
 
-	let mobToolbarEnabled = $state("none");
+	let mobToolbarEnabled:boolean = $state(false);
 	import "../app.css";
-	import SidebarTab from './SidebarTab.svelte';
+	import ChatTab from './ChatTab.svelte';
     import ChatWindow from './ChatWindow.svelte';
 	function disableScroll() {
 		document.querySelector('body')?.classList.add('overflow-hidden');
@@ -51,34 +49,29 @@
 	function enableSidebar() {
 		displayNav = true;
 		disableScroll();
-		mobToolbarEnabled = "none";
+		mobToolbarEnabled = false;
 	}
 	function disableSidebar() {
 		displayNav = false;
 		enableScroll();
 	}
-	function buttonClick(button:any) {
-		if (mobToolbarEnabled !== button)
-		{
+	function buttonClick() {
+		if (!mobToolbarEnabled)
 			disableScroll();
-			mobToolbarEnabled = button;
-		}
 		else
-		{
 			enableScroll();
-			mobToolbarEnabled = "none";
-		}
+		mobToolbarEnabled = !mobToolbarEnabled;
 	}
 	function onClick(e:any) {
-		if (displayNav && ((sidebar.contains(e.target) == false && header.contains(e.target) == false) || mobToolbarEnabled !== "none"))
+		if (displayNav && ((sidebar.contains(e.target) == false && header.contains(e.target) == false) || mobToolbarEnabled))
 		{
 			displayNav = false;
-			if (mobToolbarEnabled === "none")
+			if (!mobToolbarEnabled)
 				enableScroll();
 		}
-		if (data.Token !== '-1' && friendsContainer.contains(e.target) == false && chatsContainer.contains(e.target) == false && settingsContainer.contains(e.target) == false && mobileSpace.contains(e.target) == false && header.contains(e.target) == false)
+		if (data.Token !== '-1' && chatsContainer.contains(e.target) == false && mobileSpace.contains(e.target) == false && header.contains(e.target) == false)
 		{	
-			mobToolbarEnabled = "none";
+			mobToolbarEnabled = false;
 			enableScroll();
 		}
 	}
@@ -103,22 +96,22 @@
 			<img alt="logo" class="col-span-full" src={favicon} height="120px" width="120px"/>
 		</a>
 		<div id="sidebar-menus-buttons" class="sidebar-buttons-box min-h-0 overflow-hidden shrink h-full">
-				<a class="ft-button ft-button-medium sidebar-link hover:bg-[#333131FF]" href="/">
-					<img class="ft-icon-img ft-icon-size-24" src={homeicon} alt="icon"/>
-					<span class="ft-sidebar-link-text text-2xl/tight text-white">Home</span>
-				</a>
-				<a class="ft-button ft-button-medium sidebar-link hover:bg-[#333131FF]" href="/game">
-					<img class="ft-icon-img ft-icon-size-24" src={gameicon} alt="icon"/>
-					<span class="ft-sidebar-link-text text-2xl/tight text-white">Game</span>
-				</a>
-				<a class="ft-button ft-button-medium sidebar-link hover:bg-[#333131FF]" href="/user/profile">
-					<img class="ft-icon-img ft-icon-size-24" src={profileicon} alt="icon"/>
-					<span class="ft-sidebar-link-text text-2xl/tight text-white">Profile</span>
-				</a>
-				<a class="ft-button ft-button-medium sidebar-link hover:bg-[#333131FF]" href="/shop">
-					<img class="ft-icon-img ft-icon-size-24" src={shopicon} alt="icon"/>
-					<span class="ft-sidebar-link-text text-2xl/tight text-white">Shop</span>
-				</a>
+			<a class="ft-button ft-button-medium sidebar-link hover:bg-[#333131FF]" href="/">
+				<img class="ft-icon-img ft-icon-size-24" src={homeicon} alt="icon"/>
+				<span class="ft-sidebar-link-text text-2xl/tight text-white">Home</span>
+			</a>
+			<a class="ft-button ft-button-medium sidebar-link hover:bg-[#333131FF]" href="/game">
+				<img class="ft-icon-img ft-icon-size-24" src={gameicon} alt="icon"/>
+				<span class="ft-sidebar-link-text text-2xl/tight text-white">Game</span>
+			</a>
+			<a class="ft-button ft-button-medium sidebar-link hover:bg-[#333131FF]" href="/user/profile">
+				<img class="ft-icon-img ft-icon-size-24" src={profileicon} alt="icon"/>
+				<span class="ft-sidebar-link-text text-2xl/tight text-white">Profile</span>
+			</a>
+			<a class="ft-button ft-button-medium sidebar-link hover:bg-[#333131FF]" href="/shop">
+				<img class="ft-icon-img ft-icon-size-24" src={shopicon} alt="icon"/>
+				<span class="ft-sidebar-link-text text-2xl/tight text-white">Shop</span>
+			</a>
 		</div>
 		<hr class="mt-auto border-none">
 		{#if data.Token === '-1'}
@@ -145,7 +138,7 @@
 			</div>
 		</a>
 		<div class="sidebar-footer-icons mobile-hidden">
-			<SidebarTab name="chats"/>
+			<ChatTab/>
 			<div class="ft-sidebar-footing-icon">
 				<a class="ft-button ft-button-small sidebar-link hover:bg-white/30" href="/docs/api_doc.pdf">
 					<span class="ft-icon-size-20 ft-icon-glyph">
@@ -190,13 +183,13 @@
 			{:else}
 			<div id="mobile-header-buttons" class="flex place-items-center">
 				<div class="mobile-toolbar-action" bind:this={chatsContainer}>
-					<button id="chats-widget-button" aria-label="Chats" class="mobile-toolbar-action-button ft-button ft-button-small hover:bg-white/30 {(mobToolbarEnabled === "chats")?"bg-white/30":""}" onclick={() => buttonClick("chats")}>
+					<button id="chats-widget-button" aria-label="Chats" class="mobile-toolbar-action-button ft-button ft-button-small hover:bg-white/30 {mobToolbarEnabled?"bg-white/30":""}" onclick={() => buttonClick()}>
 						<span class="ft-icon-size-20 ft-icon-glyph">
 							<svg width="20" height="20" viewBox="0 0 24 24" data-glyph="message-envelope-fill" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path fill="#ffffff" d="M19.33 21H4.65999C2.24999 21 0.98999 19.75 0.98999 17.33V8.42997L9.75999 14.16C11.43 15.26 12.56 15.26 14.23 14.16L23 8.44997V17.33C23 19.74 21.75 21 19.33 21ZM1.03999 5.95997C1.25999 3.98997 2.48999 2.96997 4.66999 2.96997H19.34C21.52 2.96997 22.75 3.98997 22.97 5.95997L13.21 12.37C12.34 12.94 11.68 12.94 10.81 12.37L1.03999 5.95997Z"></path></svg>
 						</span>
 					</button>
 				</div>
-				<div class="mobile-toolbar-action" bind:this={settingsContainer}>
+				<div class="mobile-toolbar-action">
 					<a class="ft-button ft-button-small sidebar-link hover:bg-white/30" href="/docs/api_doc.pdf" download="api_doc.pdf">
 						<span class="ft-icon-size-20 ft-icon-glyph">
 							<img src={api_down} alt="api download doc">
@@ -214,22 +207,10 @@
 			{/if}
 		</div>
 		<div id="mobile-toolbar-mount-point" class="left-0 right-0 absolute top-full" bind:this={mobileSpace}>
-		{#if mobToolbarEnabled !== "none"}
+		{#if mobToolbarEnabled}
 			<div class="rounded-none overflow-auto overscroll-contain bg-black/50 text-white">
 				<div class="p-0 h-full">
-					<div class="sidebar-widget-container{name == "friends"?" sidebar-widget-has-tabs":""}">
-						{#if mobToolbarEnabled === "friends"}
-						<section>
-							<div class="flex max-w-full">
-								<button id="tab-friends" class="content-center items-center border-none box-border inline-flex flex-[1 1 0] h-[4.8rem] justify-center overflow-hidden flex-nowrap p-[1.2rem] cursor-pointer">
-									<span class="block max-w-full overflow-hidden text-ellipsis whitespace-nowrap ft-heading-xxx-small">Amis</span>
-								</button>
-								<button id="tab-requests" class="content-center items-center border-none box-border inline-flex flex-[1 1 0] h-[4.8rem] justify-center overflow-hidden flex-nowrap p-[1.2rem] cursor-pointer">
-									<span class="block max-w-full overflow-hidden text-ellipsis whitespace-nowrap ft-heading-xxx-small">Demandes</span>
-								</button>
-							</div>
-						</section>
-						{:else if mobToolbarEnabled === "chats"}
+					<div class="sidebar-widget-container">
 						<section class="h-full overflow-x-hidden overflow-y-auto overscroll-contain pt-[0.8rem] pr-[0.8rem] pl-[0.8rem] pb-0">
 							<div class="items-stretch flex flex-col h-full overscroll-contain">
 								{#each activeChats as contact, index}
@@ -263,8 +244,6 @@
 								<span>Nouveau chat</span>
 							</button>
 						</footer>
-						{:else if mobToolbarEnabled === "settings"}
-						{/if}
 					</div>
 				</div>
 			</div>
