@@ -8,6 +8,10 @@ services:
       - transcendance
     ports:
       - "5000:5000"
+    depends_on:
+      - website
+      - game_server
+      - chat-server
   database:
     image: transcendance-db
     build: ./srcs/database
@@ -37,6 +41,13 @@ services:
         condition: service_healthy
     networks:
       - transcendance
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9090/healthcheck || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+      start_interval: 5s
     develop:
       watch:
         - path: ./srcs/api/srcs/srcs
@@ -56,6 +67,9 @@ services:
     networks:
       - transcendance
     restart: always
+    depends_on:
+      api:
+        condition: service_healthy
     develop:
       watch:
         - path: ./srcs/website/srcs/src
@@ -75,6 +89,9 @@ services:
     networks:
       - transcendance
     restart: always
+    depends_on:
+      api:
+        condition: service_healthy
   chat-server:
     command: npm run dev
     image: transcendance-chat-server
@@ -85,6 +102,9 @@ services:
     networks:
       - transcendance
     restart: always
+    depends_on:
+      api:
+        condition: service_healthy
     develop:
       watch:
         - path: ./srcs/chat-server/srcs/src
@@ -97,6 +117,9 @@ services:
   adminer:
     image: adminer
     restart: always
+    depends_on:
+      database:
+        condition: service_healthy
     networks:
       - transcendance
     ports:

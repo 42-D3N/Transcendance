@@ -7,6 +7,7 @@ import { register, login, deleteapiuser } from "./handlers/auth.ts";
 import { notFound } from "./middleware/not-found.ts";
 import { error } from "./middleware/error.ts";
 import dataRouter from "./routes/data.ts";
+import { healthCheck } from "./handlers/health_check.ts";
 import { CustomError } from "./lib/custom-error.ts";
 import { authMiddleware } from "./middleware/auth.ts";
 
@@ -29,6 +30,8 @@ app.set("trust proxy", 1);
 app.use(urlencoded({ extended: true }));
 app.use(json());
 
+app.get("/healthcheck", healthCheck);
+
 //auth
 app.post("/api/register", v.validateEmail(), v.validatePassword(), publicLimiter, register);
 app.post("/api/login", v.validateEmail(), v.validatePassword(), publicLimiter, login);
@@ -36,7 +39,6 @@ app.delete("/api/quit", v.validateEmail(), v.validatePassword(), publicLimiter, 
 
 app.use(authMiddleware);
 app.use(apiLimiter);
-
 
 app.use("/api", dataRouter);
 
