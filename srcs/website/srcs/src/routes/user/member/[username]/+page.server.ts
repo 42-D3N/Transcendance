@@ -19,7 +19,6 @@ export async function load ({ cookies, params, fetch }) {
     let actualFriends: {id: number; username: string; icon: string | null}[] = [];
     let userHistory: [];
 
-
     if (!JWTtoken || JWTtoken === '-1')
     {
         cookies.set('JWTtoken', '-1', { path: '/' });
@@ -85,12 +84,12 @@ export async function load ({ cookies, params, fetch }) {
             })
         );
 
-        if (userInfos.matches > 0)
+        if (TakenInfos.matches > 0)
             userHistory = await db.select()
             .from(matches)
-            .where(or(eq(matches.user1, userInfos.id), eq(matches.user2, userInfos.id)))
+            .where(or(eq(matches.user1, TakenInfos.id), eq(matches.user2, TakenInfos.id)))
             .limit(5);
-
+        
         id = TakenInfos.id;
         username = TakenInfos.username;
         email = TakenInfos.email;

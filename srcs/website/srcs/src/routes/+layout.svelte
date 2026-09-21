@@ -100,7 +100,7 @@
 	<div id="mobile-shroud-sidebar" class="lg:hidden {(!displayNav)?"hidden":""} inset-0 fixed z-2 bg-black/30"></div>
 	<nav id="sidebar-main-menu" class="flex max-lg:fixed flex-col h-svh max-lg:h-[unset] max-lg:top-19 px-[0.8rem] pt-[0.8rem] pb-[1.2rem] max-lg:bottom-0 w-68 lg:max-xl:w-[5.6rem] bg-[#292626FF] max-lg:z-100 max-lg:{(!displayNav)?"hidden":""}" bind:this={sidebar} data-sveltekit-reload>
 		<a href="/" class="items-center grid gap-[1.2rem] relative max-lg:hidden w-full">
-			<img alt="logo" class="col-span-full" src={favicon} height="120px" width="120px"/>
+			<img alt="logo" class="col-span-full" src={favicon} height="160px" width="160px"/>
 		</a>
 		<div id="sidebar-menus-buttons" class="min-h-0 overflow-hidden shrink">
 			<div class="items-stretch flex flex-col h-full">
@@ -145,8 +145,13 @@
 			{:else}
 				<img class="upload block lg:h-[3.6rem] lg:w-[3.6rem] h-[3.6rem] w-[3.6rem] border-solid rounded-md bg-amber-50" src={data.icon} alt={data.icon}/>
 			{/if}
-			<div id="user-info-container">	
-				<span class="lg:max-xl:hidden text-white">{data.username}</span><br>
+			<div id="user-info-container">
+					
+				<span class="lg:max-xl:hidden text-white">{#if data.username.length < 10}
+					{data.username}
+				{:else}
+					{data.username.slice(0, 7)}...
+				{/if}</span><br>
 				<span class="content-center w-5 text-lg hidden xl:block text-white">wallet: {data.wallet}$</span>
 			</div>
 		</a>
