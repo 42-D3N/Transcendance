@@ -29,7 +29,6 @@
 
     import type { PageProps } from './$types';
     let { data, form }: PageProps = $props();
-    console.log(data.friends);
     // svelte-ignore state_referenced_locally
     let friendNb = $state(data.friends.length);
 

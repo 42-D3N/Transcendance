@@ -16,7 +16,6 @@ export const load = async ({ cookies }) => {
 
 		if (userInfos && userInfos["empty"] != 0)
 			redirect(303, '/');
-		console.log("oiia");
 	}
 	// return ({id: -1});
 };
