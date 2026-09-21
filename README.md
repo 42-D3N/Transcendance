@@ -1,526 +1,307 @@
 *This project has been created as part of the 42 curriculum by tle-pape, macolomi, aeherve, rdestruh.*
 
+# ft_transcendance
 
-# Description
+This project was created as part of the 42 curriculum by tle-pape, macolomi, aeherve, and rdestruh.
 
-## Project Overview
+## Description
 
-Transcendance is the last project of 42 curriculum.
-This is a group web project consisting of an open-source website. Members are free to create one or more applications.
+Transcendance is the last project of 42 curriculum. This is a group web project consisting of an open-source website. Members are free to create one or more applications.
 
-## Goals
+### Goal
 
-The goal of the project is to :
-- Creating a website.
-- Create a Pong
-- 
+- Real-time Pong with remote multiplayer support.
+- AI opponent for solo play.
+- Chat, profiles, and friends management.
+- Shop, wallet, and cosmetic skin customization.
+- Match history and player statistics.
+- Separate services for the website, API, game server, and chat server.
 
-The application provides users with :
-- Pong game including multiplayer and leaderboard.
-- 
 
----
+## Instructions
 
-# Team Information
+### Prerequisites
 
-## Célen Colomines (Célen)
-- Role(s) : Project Owner, Developer
-- Responsibilities :
+- Docker.
+- Make.
 
-## Raphaël Destruhaut (raporius)
-- Role(s) : Tech lead, Architect, Developer
-- Responsibilities :
+### Environment Configuration
 
-## Aedan Herve (Dadoune)
-- Role(s) : ???, Developer
-- Responsibilities :
+Copy the provided example files and replace value inside with valid values before starting the project:
 
-## Thomas Le Pape (D3N)
-- Role(s) : Project Manager, Frontend & Backend Developer
-- Responsibilities :
+```bash
+cp srcs/database/.env.example srcs/database/.env
+cp srcs/website/srcs/.env.example srcs/website/srcs/.env
+cp srcs/api/srcs/.env.example srcs/api/srcs/.env
+cp srcs/chat-server/srcs/.env.example srcs/chat-server/srcs/.env
+cp srcs/game-server/srcs/.env.example srcs/game-server/srcs/.env
+```
+If multiple `.env` have the same field, use the same value.
 
----
+Required variables by service:
 
-# Technical Stack
+- `srcs/database/.env`
+  - `POSTGRES_USER`
+  - `POSTGRES_PASSWORD`
+  - `POSTGRES_DB`
+  - `ADMIN_USERNAME`
+  - `ADMIN_EMAIL`
+  - `ADMIN_PASSWORD`
+- `srcs/website/srcs/.env`
+  - `DATABASE_URL`
+  - `SECRET_KEY_JWT`
+- `srcs/api/srcs/.env`
+  - `DATABASE_URL`
+  - `ADMIN_USERNAME`
+  - `ADMIN_EMAIL`
+  - `ADMIN_PASSWORD`
+- `srcs/chat-server/srcs/.env`
+  - `DATABASE_URL`
+  - `SECRET_KEY_JWT`
+- `srcs/game-server/srcs/.env`
+  - `DATABASE_URL`
 
-## Frontend
+`DATABASE_URL` must point to the PostgreSQL instance used by the project. A typical format is:
 
-Technologies and frameworks used :
-- 
+```text
+postgres://user:password@host:port/database
+user is `POSTGRES_USER`
+password is `POSTGRES_PASSWORD`
+database is `POSTGRES_DB`
+```
 
-### Frontend Choice Justification
+`SECRET_KEY_JWT` must be the same in every .env that contain it.
+It must be at least 32 character long.
 
-Explain why these technologies were selected :
 
-## Backend
+### Installation
 
-Technologies and frameworks used :
+1. Clone the repository.
+2. Create the `.env` files from the examples and fill in the values.
+3. Start the development stack.
 
-### Backend Choice Justification
+### Run the Project
 
-Explain why these technologies were selected :
+The main development command is:
 
-## Database
+```bash
+make up
+```
 
-Database system used :
+This runs the Docker Compose development stack with watch mode.
 
-### Database Choice Justification
+Useful companion commands:
 
-Explain :
+```bash
+make down
+make re
+make fclean
+```
 
-## Other Technologies
+Once the stack is running, open:
 
-- Docker
-- GitHub Actions
+- `https://localhost:5000` for the main application.
+- `https://localhost:4040` for Adminer.
 
----
+## Team Information
 
-# Database Schema
-
-## Overview
-
-`Describe the global database architecture and organization.`
-
-## Tables / Collections
-
-### Users
-| Field | Type | Description |
+| Member | Role(s) | Responsibilities |
 |---|---|---|
-| id | UUID | Primary key |
-| email | VARCHAR | User email |
-| password_hash | TEXT | Encrypted password |
-| created_at | TIMESTAMP | Creation date |
+| Thomas Le Pape (tle-pape) | Project Manager, Frontend & Backend Game Developer | Designed and implemented the Pong game flow, gameplay integration, and the game-related front-end work. |
+| Célen Colomines (macolomi) | Project Owner, API Developer, Frontend & Backend Developer | Worked on the API, shop, wallet, and database-related features. |
+| Aedan Herve (aeherve) | Frontend & Backend Developer | Worked on authentication, profiles, friends management, and user management. |
+| Raphaël Destruhaut (rdestruh) | Tech Lead, Architect, Developer | Worked on the infrastructure and chat service. |
 
-### Projects
-| Field | Type | Description |
+## Project Management
+
+The team split the work by service and by feature area, then synchronized progress through regular Discord conversations and in-person meetings. Each member focused on the parts they owned most directly, which made it easier to work in parallel across the website, API, chat service, and game server.
+
+### Tools Used
+
+- Discord for day-to-day communication.
+- In-person meetings for larger decisions and coordination.
+- Git for collaboration and integration.
+
+## Technical Stack
+
+### Frontend
+
+- SvelteKit.
+- TypeScript.
+- Tailwind CSS.
+- Vite.
+- Babylon.js for the 3D loading scene.
+
+### Frontend Justification
+
+SvelteKit was chosen because it provides a full-stack framework with routing, server-side rendering, and a good developer experience for a compact project. Tailwind CSS made it faster to build a consistent UI, and TypeScript helped keep the front-end code safe while integrating real-time game logic.
+
+### Backend
+
+- Express for the main API.
+- Fastify for the chat and game microservices.
+- WebSockets for real-time communication.
+- JWT-based authentication.
+
+### Backend Justification
+
+Express was used for the main API because it is simple and familiar, while Fastify was a good fit for lightweight websocket services. WebSockets were essential for the game and chat features because both need live, bidirectional updates between clients and servers.
+
+### Database
+
+- PostgreSQL.
+- Drizzle ORM.
+
+### Database Justification
+
+PostgreSQL was selected because it is reliable, widely used, and well suited to relational data such as users, friends, matches, inventory, and chat history. Drizzle ORM was chosen to keep the schema close to the code and to benefit from type-safe queries.
+
+### Other Technologies
+
+- Docker and Docker Compose for service orchestration.
+- Caddy as reverse proxy.
+- Adminer for database administration.
+- bcrypt / bcryptjs for password handling.
+- `ws` and `@fastify/websocket` for websocket transport.
+
+## Database Schema
+
+The database is organized around user accounts, social features, the shop, and match history.
+
+### Main Tables with types
+
+| Table | Fields (with data types) | Primary Key | Description |
+|---|---|---|---|
+| `users` | `id: serial`, `username: varchar(128)`, `email: varchar(128)`, `password: text`, `privateAcc: boolean`, `wins: integer`, `losses: integer`, `matches: integer`, `wallet: integer`, `icon: varchar(128)`, `code: boolean`, `skin_rac: integer`, `skin_ball: integer`, `online_status: boolean` | `id` | Stores the main user profile, authentication data, statistics, wallet, avatar, and cosmetic selections. |
+| `friends` | `user1: integer`, `user2: integer`, `isaccepted: boolean` | `user1`, `user2` | Stores friend relationships with a composite primary key on (`user1`, `user2`). |
+| `matches` | `id: serial`, `user1: integer`, `user1Pseudo: varchar(128)`, `user1EloChange: integer`, `user2: integer`, `user2Pseudo: varchar(128)`, `user2EloChange: integer`, `user1Score: integer`, `user2Score: integer`, `idBall1: integer`, `idBall2: integer`, `skinRac1: integer`, `skinRac2: integer`, `date: timestamp`, `winner: integer` | `id` | Stores completed matches, scores, ELO changes, and the cosmetics used during the match. |
+| `inventory` | `user: integer`, `product: integer`, `own: boolean` | `user`, `product` | Links users to shop items they own (composite primary key on `user` + `product`). |
+| `shop` | `id: serial`, `name: varchar(128)`, `price: integer` | `id` | Stores the available shop items. |
+| `api_users` | `user: integer`, `role: varchar(128)`, `secret_key: varchar(64)` | `user` | Stores API-related user access information. |
+| `chat` | `id: serial`, `content: text`, `author: integer`, `dest: integer`, `timestamp: timestamp` | `id` | Stores direct chat messages between users. |
+
+### Relationships
+
+- `friends.user1` and `friends.user2` reference `users.id`.
+- `matches.user1`, `matches.user2`, and `matches.winner` reference `users.id`.
+- `inventory.user` references `users.id` and `inventory.product` references `shop.id`.
+- `users.skin_rac` and `users.skin_ball` reference `shop.id`.
+- `matches.idBall1`, `matches.idBall2`, `matches.skinRac1`, and `matches.skinRac2` reference `shop.id`.
+- `chat.author` and `chat.dest` reference `users.id`.
+
+The schema diagram is also available in `dbb.drawio`.
+
+## Features List
+
+| Feature | Team Member(s) | Description |
 |---|---|---|
-| id | UUID | Primary key |
-| title | VARCHAR | Project title |
-| owner_id | UUID | Linked user |
-| created_at | TIMESTAMP | Creation date |
+| Pong game | Thomas Le Pape | Implemented the main real-time game flow, gameplay rendering, and input handling. |
+| Remote multiplayer | Thomas Le Pape, Raphaël Destruhaut | Enabled players on different machines to join the same live match. |
+| AI opponent | Thomas Le Pape | Added a solo mode with AI behavior, reaction time, and prediction. |
+| Chat system | Raphaël Destruhaut | Implemented the chat service and real-time message exchange. |
+| User profiles | Aedan Herve | Built the profile-related user experience and user data integration. |
+| Friends management | Aedan Herve | Implemented friend relations and acceptance flow. |
+| Authentication and user management | Aedan Herve, Raphaël Destruhaut | Added JWT-based authentication and account handling. |
+| Shop, wallet, and skins | Célen Colomines | Implemented the shop flow, wallet system, and cosmetic customization. |
+| Public API | Célen Colomines | Built the API layer for database and user-facing operations. |
+| Match history and stats | Thomas Le Pape, Célen Colomines | Stored and exposed match results and player statistics. |
 
-## Relationships
+## Modules
 
-- One user can own multiple projects
-- One project can contain multiple tasks
-- One task can belong to one project
+| Module | Type | Points | Justification | Implementation | Team Member(s) |
+|---|---|---:|---|---|---|
+| Frameworks | Major | 2 | The project is built with full-stack frameworks on both the client and service side. | SvelteKit powers the website, while Express and Fastify power the backend services. | All team members |
+| Backend as microservices | Major | 2 | The architecture is cleaner when services can be isolated and restarted independently. | The app is split into multiple Dockerized services: website, API, chat server, game server, and database. | Raphaël Destruhaut, Thomas Le Pape |
+| Allow users to interact with other users | Major | 2 | Social interaction is a core part of the platform. | Chat, profiles, and friends are implemented as separate but connected features. | Raphaël Destruhaut, Aedan Herve |
+| Public API | Major | 2 | A public API makes the database and user operations easier to integrate. | The API service exposes the backend logic and database actions. | Célen Colomines |
+| Real-time features using WebSockets | Major | 2 | The game and chat both require live updates. | WebSockets are used for game inputs, state updates, and chat messages. | Raphaël Destruhaut, Thomas Le Pape |
+| First game | Major | 2 | The core deliverable is a complete web-based game. | Pong is implemented as a real-time, server-authoritative game. | Thomas Le Pape |
+| Remote players | Major | 2 | Players must be able to play from separate machines. | The game server synchronizes both clients over the network. | Thomas Le Pape, Raphaël Destruhaut |
+| AI Opponent | Major | 2 | Solo gameplay adds replay value and supports offline play. | The AI predicts ball trajectories and uses reaction timing. | Thomas Le Pape |
+| Standard user management and authentication | Major | 2 | Accounts are needed for profiles, chat, and the game economy. | JWT authentication and user account management are handled in the backend. | Aedan Herve, Raphaël Destruhaut |
+| Game cosmetic | Major | 2 | Cosmetic customization makes the game feel more personal. | A shop, wallet, racket skins, and ball skins are available to the player. | Célen Colomines, Thomas Le Pape |
+| File upload and management system | Minor | 1 | Avatars and user assets require file handling. | User image assets are stored and linked to profile data. | Aedan Herve |
+| ORM for the database | Minor | 1 | An ORM keeps the schema and queries consistent. | Drizzle is used across the services for typed queries and schema management. | Célen Colomines, Raphaël Destruhaut |
+| Support for additional browsers | Minor | 1 | The site was checked to avoid browser-specific issues. | The front-end was validated with browser compatibility in mind. | All team members |
+| SSR | Minor | 1 | Server-side rendering improves the initial page load experience. | SvelteKit renders the website with SSR support. | Sveltekit |
+| Simple 3D | Minor | 1 | A small 3D scene adds polish and variety. | Babylon.js is used for the loading/preview screen. | Célen Colomines |
 
-## Schema Visualization
+**Total: 25 points on 19**
 
-Insert :
-- ERD image
-- Database diagram
-- Link to schema documentation
+## Individual Contributions
 
----
+### Thomas Le Pape
 
-# Instructions
+- Implemented the Pong gameplay loop, client interactions, and responsive controls.
+- Worked on the real-time gameplay UI, ready checks, and cosmetic integration.
+- Contributed to the AI opponent and the remote match flow.
 
-## Prerequisites
+Challenges:
 
-Required software and tools :
-- Git
+- Keeping the game state synchronized between the front-end and the game server.
+- Making AI working and human-like.
+- Making the mobile controls responsive without breaking desktop gameplay.
 
-## Environment Configuration
+### Célen Colomines
 
-Create a .env file and configure :
-- Database URL
-- API keys
-- Authentication secrets
-- Application ports
+- Implemented the API layer.
+- Built the shop, wallet, and cosmetic item flow.
+- Worked on database-related features.
 
-Example variables:
-- DATABASE_URL
-- JWT_SECRET
-- API_KEY
-- PORT
+Challenges:
 
-## Installation
+- Making the shop and customization flow fit cleanly with the rest of the app.
+- Make the routes secured.
+- Gracefully manage JWT Encryption with secret key.
 
-### Clone the repository
+### Aedan Herve
 
-1. Clone the project
-2. Move into the project folder
+- Implemented authentication and user management.
+- Built the profile and friends features.
+- Integrated user-facing account data with the database.
 
-### Install dependencies
+Challenges:
 
-Frontend:
-- Install frontend dependencies
+- Gracefully managing JWT token creation, modification and deletion.
+- Making a user-friendly profile management.
 
-Backend:
-- Install backend dependencies
+### Raphaël Destruhaut
 
-## Database Setup
+- Worked on the infrastructure and service architecture.
+- Implemented the chat service.
+- Contributed to user-management-related backend work.
 
-1. Create the database
-2. Run migrations
-3. Seed initial data if needed
+Challenges:
 
-## Running the Project
+- Create a layout that lives up to his ambitions.
+- Bypass the limitation of the reverse-proxy.
 
-### Development Mode
+## Resources
 
-Frontend:
-- Start development server
+### Documentation
 
-Backend:
-- Start API server
+- [SvelteKit](https://svelte.dev/docs/kit/introduction)
+- [Svelte](https://svelte.dev/docs)
+- [Tailwind CSS](https://tailwindcss.com/docs/installation/using-vite)
+- [TypeScript](https://www.typescriptlang.org/docs/)
+- [Drizzle ORM](https://orm.drizzle.team/docs/overview)
+- [Fastify](https://fastify.dev/docs/latest/)
+- [WebSocket reference](https://github.com/websockets/ws/blob/master/doc/ws.md)
+- [MDN Web Docs](https://developer.mozilla.org/)
+- [Caddy documentation](https://caddyserver.com/docs/)
+- [PostgreSQL documentation](https://www.postgresql.org/docs/)
+- [Docker documentation](https://docs.docker.com/)
+- [Babylon.js documentation](https://doc.babylonjs.com/)
+- [Docker documentation](https://docs.docker.com/)
 
-### Production Mode
+## Credits
 
-1. Build frontend
-2. Build backend
-3. Deploy services
+jguelen general help with the subject and documentation.
 
-## Testing
+tchampio for debugging help.
 
-Run:
-- Unit tests
-- Integration tests
-- End-to-end tests
+Wendy Asmatico for the help.
 
-## Linting and Formatting
+marcheva for being Juda.
 
-Explain:
-- Lint commands
-- Formatting tools
-- Code quality checks
-
----
-
-# Features List
-
-## Feature1
-- Description :
-- Team Members :
-
-## Feature2
-- Description :
-- Team Members :
-
----
-
-# Modules
-
-## Major Modules
-
-### Frameworks
-- Type: Major Module
-- Points : 2
-- Description :
-  - Use a framework for both the frontend and backend.
-- Justification :
-  - We wanted to use frameworks for both so we got this.
-- Implementation :
-  - ?
-- Team Members :
-  - ?
-
-
-### First Game
-- Type: Major Module
-- Points : 2
-- Description :
-  - Implement a complete web-based game where users can play against each
-other.
-- Justification :
-  - We wanted to make a game so we done it.
-- Implementation :
-  - ?
-- Team Members :
-  - ?
-
-
-### LAN Game
-- Type: Major Module
-- Points : 2
-- Description :
-  - Remote players — Enable two players on separate computers to play the
-same game in real-time.
-- Justification :
-  - We wanted to use multiple computer to play together.
-- Implementation :
-  - ?
-- Team Members :
-  - ?
-
-
-### 4 Players Gamemode
-- Type: Major Module
-- Points : 2
-- Description :
-  - Multiplayer game (more than two players).
-- Justification :
-  - We wanted to make a 4 players game.
-- Implementation :
-  - ?
-- Team Members :
-  - ?
-
-
-### Second Game
-- Type: Major Module
-- Points : 2
-- Description :
-  - Add another game with user history and matchmaking.
-- Justification :
-  - We wanted to add a second game.
-- Implementation :
-  - ?
-- Team Members :
-  - ?
-
-
-### User Management
-- Type: Major Module
-- Points : 2
-- Description :
-  - Standard user management and authentication.
-- Justification :
-  - We wanted at least a basic user management system.
-- Implementation :
-  - ?
-- Team Members :
-  - ?
-
-
-### Game customization
-- Type: Major Module
-- Points : 2
-- Description :
-  - Game customization options.
-- Justification :
-  - We wanted to add some game customization options.
-- Implementation :
-  - ?
-- Team Members :
-  - ?
-
-
-### Backend as microservices
-- Type: Major Module
-- Points : 2
-- Description :
-  - Backend as microservices.
-- Justification :
-  - We wanted to have a backend designed as microservices
-- Implementation :
-  - ?
-- Team Members :
-  - ?
-
-
-### Chat
-- Type: Major Module
-- Points : 2
-- Description :
-  - Allow users to interact with other users.
-- Justification :
-  - A good game cannot be without chat.
-- Implementation :
-  - ?
-- Team Members :
-  - ?
-
-
-### AI Opponent
-- Type: Major Module
-- Points : 2
-- Description :
-  - Introduce an AI Opponent for games.
-- Justification :
-  - We wanted an AI to play solo
-- Implementation :
-  - ?
-- Team Members :
-  - ?
-
-
-<!-- ### 
-- Type: Major Module
-- Points : 2
-- Description :
-  - 
-- Justification :
-  - 
-- Implementation :
-  - 
-- Team Members :
-  -  -->
-
-## Minor Modules
-
-### Stats & History
-- Type: Minor Module
-- Points : 1
-- Description :
-  - Game statistics and match history (requires a game module).
-- Justification :
-  - We needed this module to add a second game.
-- Implementation :
-  - ?
-- Team Members :
-  - ?
-
-
-### ORM for database
-- Type: Minor Module
-- Points : 1
-- Description :
-  - Use an ORM for the database.
-- Justification :
-  - ?
-- Implementation :
-  - ?
-- Team Members :
-  - ?
-
-### Gamification
-- Type: Minor Module
-- Points : 1
-- Description :
-  - A gamification system to reward users for their actions.
-- Justification :
-  - POINTS
-- Implementation :
-  - ?
-- Team Members :
-  - ?
-
-
-<!-- ### 
-- Type: Minor Module
-- Points : 1
-- Description :
-  - 
-- Justification :
-  - 
-- Implementation :
-  - 
-- Team Members :
-  -  -->
-
-## Total Points
-
-| Module | Type | Points |
-|---|---|---|
-| [Frameworks](#frameworks) | Major | 2 |
-| [First Game](#first-game) | Major | 2 |
-| [LAN Game](#lan-game) | Major | 2 |
-| [4 Players Gamemode](#4-players-gamemode) | Major | 2 |
-| [Second Game](#second-game) | Major | 2 |
-| [User Management](#user-management) | Major | 2 |
-| [Game customization](#game-customization) | Major | 2 |
-| [Backend as microservices](#backend-as-microservices) | Major | 2 |
-| [Chat](#chat) | Major | 2 |
-| [AI Opponent](#ai-opponent) | Major | 2 |
-| [Stats & History](#stats--history) | Minor | 1 |
-| [ORM for database](#orm-for-database) | Minor | 1 |
-| [Gamification](#gamification) | Minor | 1 |
-| Module M | Major | 2 |
-| Module m | Minor | 1 |
-
-Total: 23 Points
-
----
-
-# Project Management
-
-## Organization Method
-
-Describe:
-
-## Project Management Tools
-
-
-## Communication Channels
-
-- Discord
-
-## Git Workflow
-
-Explain:
-- Branching strategy
-- Pull request process
-- Code review policy
-- Merge strategy
-
----
-
-# Individual Contributions
-
-## Member 1
-### Contributions
-
-### Challenges Faced
-
----
-
-## Member 2
-### Contributions
-
-### Challenges Faced
-
----
-
-## Member 3
-### Contributions
-
-### Challenges Faced
-
----
-
-## Member 4
-### Contributions
-
-### Challenges Faced
-
----
-
-# Resources
-
-## Documentation
-
-
-## Tutorials and Articles
-
-
-## Learning Resources
-
----
-
-# License
-
----
-
-# Credits
-
-
-
-
-
-
-
-
-
-
-1 : 3D fun simple
-
-2 : Standard user management (missing online status)
-
-2 : Fullstack
-2 : Backend as microservices
-2 : Chat + profile + friend
-2 : Public API (GET POST PUT DELETE)
-2 : Real-time websocket
-2 : AI Opponent
-2 : GAME
-2 : remote player
-1 : File upload and management system
-1 : ORM for the database
-1 : Support for additionnal browsers
-1 : SSR
-1 : (Custom) Shop + Wallet system + skin system
-
-
-Total : 21/19
+Thank you to everyone who supported us emotionally. <3

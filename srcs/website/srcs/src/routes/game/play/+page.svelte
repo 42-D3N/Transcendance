@@ -149,7 +149,7 @@
     else if (skinId === 4)
       return ('bg-[#1bff00]');
     else if (skinId === 5)
-      return ('bg-[#fff59d]');
+      return ('bg-[#5bc6fe]');
     else if (skinId === 6)
       return ('bg-[linear-gradient(to_right,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#8000ff,#f00)]');
     else if (skinId === 7)
@@ -308,7 +308,7 @@
               <div class="border border-[#111111] bg-[#f4f4f4] px-2 py-1 font-mono text-[0.6rem] font-bold uppercase tracking-[0.08em] text-[#111111] sm:text-[0.7rem]">{topPlayerLabel}</div>
             </div>
 
-            <div id="terrain" class="relative h-full w-full overflow-hidden border-[3px] border-[#111111] bg-[#2d2d2d]" style="aspect-ratio: 65 / 73;">
+            <div id="terrain" class="relative h-full w-full overflow-hidden border-[3px] border-[#111111] bg-[#ffffff]" style="aspect-ratio: 65 / 73;">
               <div class="absolute left-[3%] right-[3%] top-1/2 border-t-[3px] border-dashed border-[#f4f4f4]/80"></div>
               <div class="absolute left-1/2 top-1/2 h-20 w-20 -translate-x-1/2 -translate-y-1/2 rounded-full border-[2px] border-[#f4f4f4]/80"></div>
               <div id="racketUp" class={`absolute z-20 top-[1.7%] h-[1.35%] min-h-[6px] w-[12.3%] rounded-sm border-[2px] border-[#111111] shadow-[2px_2px_0_#111111] ${topRacketClass}`}></div>
