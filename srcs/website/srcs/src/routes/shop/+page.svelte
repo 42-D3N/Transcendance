@@ -35,7 +35,8 @@
         const result = await response.json();
         const data = JSON.parse(result.data);
         return_val = data[2];
-        window.location.reload();
+        if (return_val == 3 || return_val == 4)
+            window.location.reload();
     }
     
     async function save_code() {
@@ -121,18 +122,6 @@
 {/if}
 {#if return_val === 2}
 <Popup message="Already own the item" 
-    duration = {5000}
-    class="fixed top-5 left-1/2 z-[1000] block -translate-x-1/2 items-center gap-4 rounded-lg bg-[#C41E3A] px-[18px] py-3 text-[#000000] shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
-    onClose={() => return_val = 0}/>
-{/if}
-{#if return_val === 3}
-<Popup message="Thanks for your buy"
-    duration = {5000}
-    class="fixed top-5 left-1/2 z-[1000] block -translate-x-1/2 items-center gap-4 rounded-lg bg-[#C41E3A] px-[18px] py-3 text-[#000000] shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
-    onClose={() => return_val = 0}/>
-{/if}
-{#if return_val === 4}
-<Popup message="Code accepted. Please reload the page"
     duration = {5000}
     class="fixed top-5 left-1/2 z-[1000] block -translate-x-1/2 items-center gap-4 rounded-lg bg-[#C41E3A] px-[18px] py-3 text-[#000000] shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
     onClose={() => return_val = 0}/>

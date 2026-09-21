@@ -90,14 +90,13 @@
                 <div class="flex gap-4">
                     {#if avatar}
                         <div class="relative">
-                            <div class="p-[2px] bg-white border-t-2 border-l-2 border-b-2 border-r-2 border-t-[#404040] border-l-[#404040] border-b-white border-r-white">
+                            <button type="button" class="p-[2px] bg-white border-t-2 border-l-2 border-b-2 border-r-2 border-t-[#404040] border-l-[#404040] border-b-white border-r-white" onclick={() => fileinput.click()}>
                                 <img
                                     class="upload block hover:opacity-80 lg:h-[10rem] lg:w-[10rem] h-[7rem] w-[7rem] bg-amber-50"
                                     src={avatar}
-                                    alt=""
-                                    onclick={() => fileinput.click()}
+                                    alt="Your avatar"
                                 />
-                            </div>
+							</button>
                             <button
                                 class="absolute h-[18px] w-[18px] flex items-center justify-center text-[11px] font-bold text-black bg-[#C0C0C0] border-t-2 border-l-2 border-b-2 border-r-2 border-t-white border-l-white border-b-[#404040] border-r-[#404040] active:border-t-[#404040] active:border-l-[#404040] active:border-b-white active:border-r-white right-0 top-0"
                                 onclick={NoNoYourPreviewSuckPlsDeleteItDaddy}
@@ -107,24 +106,22 @@
                         </div>
                     {:else}
                         {#if !data.icon}
-                            <div class="p-[2px] bg-white border-t-2 border-l-2 border-b-2 border-r-2 border-t-[#404040] border-l-[#404040] border-b-white border-r-white h-fit">
+                            <button type="button" class="p-[2px] bg-white border-t-2 border-l-2 border-b-2 border-r-2 border-t-[#404040] border-l-[#404040] border-b-white border-r-white h-fit" onclick={() => fileinput.click()}>
                                 <img
                                     class="upload block hover:opacity-80 lg:h-[10rem] lg:w-[10rem] h-[7rem] w-[7rem] bg-amber-50"
                                     src={usericon}
-                                    alt=""
-                                    onclick={() => fileinput.click()}
+                                    alt="Your avatar"
                                 />
-                            </div>
+                            </button>
                         {:else}
                             <div class="relative">
-                                <div class="p-[2px] bg-white border-t-2 border-l-2 border-b-2 border-r-2 border-t-[#404040] border-l-[#404040] border-b-white border-r-white">
+                                <button type="button" class="p-[2px] bg-white border-t-2 border-l-2 border-b-2 border-r-2 border-t-[#404040] border-l-[#404040] border-b-white border-r-white" onclick={() => fileinput.click()}>
                                     <img
                                         class="upload block hover:opacity-80 lg:h-[10rem] lg:w-[10rem] h-[7rem] w-[7rem] bg-amber-50"
                                         src={data.icon}
                                         alt={data.icon}
-                                        onclick={() => fileinput.click()}
                                     />
-                                </div>
+                                </button>
                                 <button
                                     class="absolute h-[18px] w-[18px] flex items-center justify-center text-[11px] font-bold text-black bg-[#C0C0C0] border-t-2 border-l-2 border-b-2 border-r-2 border-t-white border-l-white border-b-[#404040] border-r-[#404040] active:border-t-[#404040] active:border-l-[#404040] active:border-b-white active:border-r-white right-0 top-0"
                                     type="submit"

@@ -8,7 +8,7 @@
 	import api_down from '$lib/assets/api_download.svg';
 	import shopicon from '$lib/assets/shop_icon.svg';
 
-	let screenSize:number;
+	let screenSize:number = $state();
 	let sidebar:any;
 	let header:any;
 	let mobileSpace:any;
@@ -214,7 +214,7 @@
 						<section class="h-full overflow-x-hidden overflow-y-auto overscroll-contain pt-[0.8rem] pr-[0.8rem] pl-[0.8rem] pb-0">
 							<div class="items-stretch flex flex-col h-full overscroll-contain">
 								{#each activeChats as contact, index}
-									<div class="chat-row-wrapper" onclick={() => addChat(index)}>
+									<button class="chat-row-wrapper" onclick={() => addChat(index)}>
 										<div class="ft-avatar-component ft-avatar-size-32">
 											<img class="h-full w-full object-cover overscroll-contain" src={contact.avatar!= null?contact.avatar:usericon} alt="avatar de {contact.name}">
 											<span class="status-indicator {contact.online?"bg-green-500":"bg-red-500"}"></span>
@@ -230,7 +230,7 @@
 												<p class="message-row-message-content text-small p-0 m-0 overscroll-contain">{contact.message}</p>
 											</div>
 										</div>
-									</div>
+									</button>
 								{/each}
 							</div>
 						</section>
