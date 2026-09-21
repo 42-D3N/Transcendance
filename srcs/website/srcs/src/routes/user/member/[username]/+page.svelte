@@ -29,8 +29,10 @@
 
     import type { PageProps } from './$types';
     let { data, form }: PageProps = $props();
+    let friendNb = $state(0);
     // svelte-ignore state_referenced_locally
-    let friendNb = $state(data.friends.length);
+    if (data.friends)
+        friendNb = data.friends.length;
 
     afterNavigate ((navigation:any) => {
         if (navigation.type === "goto" && navigation.from.route.id === "/user/profile/edit")
