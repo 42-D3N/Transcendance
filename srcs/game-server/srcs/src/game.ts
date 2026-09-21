@@ -17,6 +17,9 @@ export interface GameUserData
   losses: number;
   matches: number;
   wallet: number;
+  icon?: string | null;
+  skin_rac?: number | string | null;
+  skin_ball?: number | string | null;
 }
 
 export interface GameSessionConfig
@@ -36,6 +39,7 @@ export interface GameSession
   storeInputs: (socket: WebSocket, message: ClientInputMessage) => void;
   setPlayerReady: (socket: WebSocket) => void;
   getOpponentUsername: (side: PlayerSide) => string | null;
+  getOpponentSkinRac: (side: PlayerSide) => number | string | null;
   playerCount: () => number;
   isFull: () => boolean;
 }
@@ -47,8 +51,8 @@ function getPlayerSide(vars: Game, player: Player): PlayerSide
 
 function resetPlayers(vars: Game)
 {
-  vars.player1.input = { move: 0, special: false };
-  vars.player2.input = { move: 0, special: false };
+  vars.player1.input = { move: 0 };
+  vars.player2.input = { move: 0 };
   vars.player1.racket.pos.x = vars.GAME_WIDTH / 2;
   vars.player2.racket.pos.x = vars.GAME_WIDTH / 2;
   vars.player1.racket.vel.x = 0;
@@ -57,8 +61,6 @@ function resetPlayers(vars: Game)
   {
     vars.player2.ai.lastDecisionTime = 0;
     vars.player2.ai.targetX = null;
-    vars.player2.ai.powerUseThisRound = false;
-    vars.player2.ai.powerUsedThisRound = false;
   }
 }
 
@@ -93,9 +95,7 @@ function buildClientGameState(vars: Game): ClientGameState
 {
   const prediction = vars.state.status === 'round_end'
     ? predictLanding(vars)
-    : vars.state.status === 'power_pause'
-      ? predictPoweredTrajectory(vars)
-      : null;
+    : null;
   const countdown = vars.state.status === 'countdown'
     ? Math.max(1, Math.min(3, Math.ceil((vars.countdownEndTick - vars.state.tick) / vars.TICK_RATE)))
     : vars.state.status === 'round_end'
@@ -153,46 +153,6 @@ function predictLanding(vars: Game)
   };
 }
 
-function predictPoweredTrajectory(vars: Game)
-{
-  if (vars.power.boostedTarget === null)
-    return (null);
-
-  const speed = Math.max(Math.hypot(vars.ball.vel.x, vars.ball.vel.y), 1);
-  const start = getBallCenter(vars);
-  let x = start.x;
-  let y = start.y;
-  let velocityX = vars.ball.vel.x / speed;
-  const velocityY = vars.ball.vel.y / speed;
-  const minX = vars.ball.size.w / 2;
-  const maxX = vars.GAME_WIDTH - vars.ball.size.w / 2;
-
-  const targetY = vars.power.boostedTarget === 1
-    ? vars.player1.racket.pos.y - vars.ball.size.h / 2
-    : vars.player2.racket.pos.y + vars.player2.racket.size.h + vars.ball.size.h / 2;
-
-  if (velocityY === 0)
-    return { start, end: start };
-  for (let guard = 0; guard < 16; guard++)
-  {
-    const distanceToTarget = (targetY - y) / velocityY;
-    const distanceToWall = velocityX === 0
-      ? Number.POSITIVE_INFINITY
-      : Math.abs(((velocityX > 0 ? maxX : minX) - x) / velocityX);
-
-    if (distanceToTarget <= distanceToWall)
-      return {
-        start,
-        end: { x: x + velocityX * distanceToTarget, y: targetY }
-      };
-
-    x += velocityX * distanceToWall;
-    y += velocityY * distanceToWall;
-    velocityX *= -1;
-  }
-  return { start, end: { x, y } };
-}
-
 function updateRackets(player: Player, vars: Game)
 {
   const min = 0;
@@ -214,25 +174,6 @@ function updateAI(vars: Game, connectedPlayers: ConnectedPlayer[])
   const ai = vars.player2.ai;
   if (!ai)
     return;
-
-  if (ai.powerUseThisRound && !ai.powerUsedThisRound)
-  {
-    const canUsePower = vars.state.status === 'playing'
-      && vars.power.pendingOwner === null
-      && vars.power.boostedTarget === null
-      && isBallMovingTowardOpponent(2, vars)
-      && isBallOnOwnerHalf(2, vars);
-
-    if (canUsePower)
-    {
-      armPowerIfPossible(2, vars);
-      if (vars.power.pendingOwner === 2)
-      {
-        ai.powerUseThisRound = false;
-        ai.powerUsedThisRound = true;
-      }
-    }
-  }
 
   const reactionTicks = Math.max(1, Math.ceil(ai.level.reactionTime / vars.TICK_INTERVAL));
   const racketCenter = vars.player2.racket.pos.x + vars.player2.racket.size.w / 2;
@@ -296,140 +237,6 @@ function updateAI(vars: Game, connectedPlayers: ConnectedPlayer[])
   }
 }
 
-function getRemainingPowerUses(side: PlayerSide, vars: Game)
-{
-  return (side === 1 ? vars.power.remainingUses.p1 : vars.power.remainingUses.p2);
-}
-
-function isBallMovingTowardOpponent(side: PlayerSide, vars: Game)
-{
-  return (side === 1 ? vars.ball.vel.y < 0 : vars.ball.vel.y > 0);
-}
-
-function isBallOnOwnerHalf(side: PlayerSide, vars: Game)
-{
-  const { y } = getBallCenter(vars);
-  return (side === 1 ? y > vars.POWER_TRIGGER_LINE_Y : y < vars.POWER_TRIGGER_LINE_Y);
-}
-
-function armPowerIfPossible(side: PlayerSide, vars: Game)
-{
-  if (vars.state.status !== 'playing'
-    || vars.power.pendingOwner !== null
-    || vars.power.boostedTarget !== null
-    || getRemainingPowerUses(side, vars) <= 0
-    || !isBallMovingTowardOpponent(side, vars)
-    || !isBallOnOwnerHalf(side, vars))
-    return;
-
-  if (side === 1)
-    vars.power.remainingUses.p1--;
-  else
-    vars.power.remainingUses.p2--;
-  vars.power.pendingOwner = side;
-}
-
-function updatePowerInputs(vars: Game)
-{
-  const players = [
-    { side: 1 as const, input: vars.player1.input, latched: vars.power.specialLatch.p1 },
-    { side: 2 as const, input: vars.player2.input, latched: vars.power.specialLatch.p2 }
-  ];
-
-  for (const player of players)
-  {
-    if (player.input.special && !player.latched)
-      armPowerIfPossible(player.side, vars);
-
-    if (player.side === 1)
-      vars.power.specialLatch.p1 = player.input.special;
-    else
-      vars.power.specialLatch.p2 = player.input.special;
-  }
-
-  if (vars.power.pendingOwner !== null && !isBallMovingTowardOpponent(vars.power.pendingOwner, vars))
-    vars.power.pendingOwner = null;
-}
-
-function applyPoweredDirectionShift(vars: Game)
-{
-  const previousVerticalDirection = Math.sign(vars.ball.vel.y);
-  const boostedSpeed = vars.ball.speed;
-  const horizontalOffset = boostedSpeed * vars.POWER_DIRECTION_VARIATION * (Math.random() < 0.5 ? -1 : 1);
-  const minHorizontalSpeed = boostedSpeed * 0.2;
-  const maxHorizontalSpeed = boostedSpeed * 0.85;
-  const wallBuffer = vars.ball.size.w * 2;
-  const leftGap = vars.ball.pos.x;
-  const rightGap = vars.GAME_WIDTH - (vars.ball.pos.x + vars.ball.size.w);
-  let nextX = Math.max(-maxHorizontalSpeed, Math.min(maxHorizontalSpeed, vars.ball.vel.x + horizontalOffset));
-
-  if (leftGap < wallBuffer && rightGap < wallBuffer)
-    nextX = Math.sign(vars.ball.vel.x) === 0 ? minHorizontalSpeed : Math.sign(vars.ball.vel.x) * minHorizontalSpeed;
-  else if (leftGap < wallBuffer && nextX <= minHorizontalSpeed)
-  {
-    vars.ball.pos.x = wallBuffer;
-    nextX = minHorizontalSpeed;
-  }
-  else if (rightGap < wallBuffer && nextX >= -minHorizontalSpeed)
-  {
-    vars.ball.pos.x = vars.GAME_WIDTH - wallBuffer - vars.ball.size.w;
-    nextX = -minHorizontalSpeed;
-  }
-
-  const nextY = previousVerticalDirection * Math.sqrt(boostedSpeed * boostedSpeed - nextX * nextX);
-  vars.ball.vel.x = nextX;
-  vars.ball.vel.y = nextY;
-}
-
-function triggerPowerPause(owner: PlayerSide, vars: Game)
-{
-  vars.power.pendingOwner = null;
-  vars.power.pauseUntilTick = vars.state.tick + vars.POWER_PAUSE_TICKS;
-  vars.power.boostedTarget = owner === 1 ? 2 : 1;
-  vars.power.baseSpeedBeforeBoost = vars.ball.speed;
-  vars.ball.speed *= vars.POWER_SPEED_MULTIPLIER;
-  applyPoweredDirectionShift(vars);
-  vars.state.status = 'power_pause';
-}
-
-function maybeTriggerPowerAtMidline(previousCenterY: number, vars: Game)
-{
-  if (vars.power.pendingOwner === null)
-    return (false);
-
-  const currentCenterY = getBallCenter(vars).y;
-  const crossedMidline = vars.power.pendingOwner === 1
-    ? previousCenterY > vars.POWER_TRIGGER_LINE_Y && currentCenterY <= vars.POWER_TRIGGER_LINE_Y
-    : previousCenterY < vars.POWER_TRIGGER_LINE_Y && currentCenterY >= vars.POWER_TRIGGER_LINE_Y;
-
-  if (!crossedMidline)
-    return (false);
-
-  triggerPowerPause(vars.power.pendingOwner, vars);
-  return (true);
-}
-
-function clearPowerState(vars: Game)
-{
-  vars.power.pendingOwner = null;
-  vars.power.pauseUntilTick = 0;
-  vars.power.boostedTarget = null;
-  vars.power.baseSpeedBeforeBoost = null;
-}
-
-function finishPoweredShot(vars: Game)
-{
-  if (vars.power.boostedTarget === null)
-    return;
-
-  vars.ball.speed = Math.min(
-    Math.max(vars.power.baseSpeedBeforeBoost ?? vars.rules.baseSpeed, vars.rules.baseSpeed),
-    vars.rules.maxSpeed
-  );
-  vars.power.boostedTarget = null;
-  vars.power.baseSpeedBeforeBoost = null;
-}
-
 function overlapsRacket(player: Player, vars: Game)
 {
   const ball = vars.ball;
@@ -453,7 +260,7 @@ function bounceOnRacket(player: Player, vars: Game, verticalDirection: 1 | -1)
   const angle = impact * maxAngle;
   ball.speed = Math.min(
     Math.max(ball.speed, vars.rules.baseSpeed) + vars.rules.acceleration,
-    vars.power.boostedTarget === null ? vars.rules.maxSpeed : ball.speed
+    vars.rules.maxSpeed
   );
   const speed = ball.speed;
 
@@ -463,12 +270,6 @@ function bounceOnRacket(player: Player, vars: Game, verticalDirection: 1 | -1)
 
 function resetBall(vars: Game, direction: 1 | -1)
 {
-  clearPowerState(vars);
-  if (vars.player2.ai)
-  {
-    vars.player2.ai.powerUseThisRound = Math.random() < (1 / 3);
-    vars.player2.ai.powerUsedThisRound = false;
-  }
   vars.ball.pos.x = vars.BALL_BASE_POSITION.x;
   vars.ball.pos.y = vars.BALL_BASE_POSITION.y;
   vars.ball.speed = vars.rules.baseSpeed;
@@ -479,12 +280,8 @@ function resetBall(vars: Game, direction: 1 | -1)
 
 function updateBall(vars: Game)
 {
-  const previousCenterY = getBallCenter(vars).y;
   vars.ball.pos.x += vars.ball.vel.x * vars.DT;
   vars.ball.pos.y += vars.ball.vel.y * vars.DT;
-
-  if (maybeTriggerPowerAtMidline(previousCenterY, vars))
-    return;
 
   if (vars.ball.pos.x <= 0)
   {
@@ -500,15 +297,11 @@ function updateBall(vars: Game)
   if (vars.ball.vel.y > 0 && overlapsRacket(vars.player1, vars))
   {
     vars.ball.pos.y = vars.player1.racket.pos.y - vars.ball.size.h;
-    if (vars.power.boostedTarget === 1)
-      finishPoweredShot(vars);
     bounceOnRacket(vars.player1, vars, -1);
   }
   if (vars.ball.vel.y < 0 && overlapsRacket(vars.player2, vars))
   {
     vars.ball.pos.y = vars.player2.racket.pos.y + vars.player2.racket.size.h;
-    if (vars.power.boostedTarget === 2)
-      finishPoweredShot(vars);
     bounceOnRacket(vars.player2, vars, 1);
   }
 
@@ -536,11 +329,10 @@ function updateBall(vars: Game)
   else if (vars.roundEndTick > vars.state.tick)
     vars.state.status = 'round_end';
 
-  if (vars.power.boostedTarget === null)
-    vars.ball.speed = Math.min(
-      vars.ball.speed + vars.rules.acceleration * vars.DT,
-      vars.rules.maxSpeed
-    );
+  vars.ball.speed = Math.min(
+    vars.ball.speed + vars.rules.acceleration * vars.DT,
+    vars.rules.maxSpeed
+  );
 }
 
 export async function updatebdd(vars: Game)
@@ -642,8 +434,6 @@ export function createGameSession(id: string, config: GameSessionConfig): GameSe
       return;
     }
 
-    updatePowerInputs(vars);
-
     if (vars.state.status === 'round_end')
     {
       updatePlayersForSession();
@@ -672,12 +462,6 @@ export function createGameSession(id: string, config: GameSessionConfig): GameSe
         vars.countdownLaunchVelocity = null;
         vars.state.status = 'playing';
       }
-    }
-    else if (vars.state.status === 'power_pause')
-    {
-      updatePlayersForSession();
-      if (vars.state.tick >= vars.power.pauseUntilTick)
-        vars.state.status = 'playing';
     }
     else if (vars.state.status === 'playing')
     {
@@ -761,7 +545,8 @@ export function createGameSession(id: string, config: GameSessionConfig): GameSe
         type: 'playerAssigned',
         side,
         instanceId: id,
-        opponentUsername: getOpponentUsername(side)
+        opponentUsername: getOpponentUsername(side),
+        opponentSkinRac: getOpponentSkinRac(side)
       });
       cli.send(payload);
     }
@@ -852,7 +637,7 @@ export function createGameSession(id: string, config: GameSessionConfig): GameSe
       vars.waitingForReconnectUntilTick = 0;
       return;
     }
-    if (vars.state.status === 'playing' || vars.state.status === 'round_end' || vars.state.status === 'power_pause' || vars.state.status === 'countdown')
+    if (vars.state.status === 'playing' || vars.state.status === 'round_end' || vars.state.status === 'countdown')
     {
       vars.waitingForReconnect = true;
       vars.waitingForReconnectSide = removedSide;
@@ -896,6 +681,12 @@ export function createGameSession(id: string, config: GameSessionConfig): GameSe
     return opponent?.username ?? null;
   }
 
+  function getOpponentSkinRac(side: PlayerSide): number | string | null
+  {
+    const opponent = side === 1 ? vars.playerUserData.p2 : vars.playerUserData.p1;
+    return opponent?.skin_rac ?? null;
+  }
+
   return {
     id,
     config,
@@ -906,6 +697,7 @@ export function createGameSession(id: string, config: GameSessionConfig): GameSe
     storeInputs,
     setPlayerReady,
     getOpponentUsername,
+    getOpponentSkinRac,
     playerCount,
     isFull
   };

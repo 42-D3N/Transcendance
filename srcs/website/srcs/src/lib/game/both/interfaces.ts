@@ -50,7 +50,6 @@ export type GameStatus =
   | "ready_check"
   | "countdown"
   | "playing"
-  | "power_pause"
   | "round_end"
   | "game_end";
 
@@ -83,14 +82,11 @@ export interface AI
   level: AILevel;
   lastDecisionTime: number;
   targetX: number | null;
-  powerUseThisRound: boolean;
-  powerUsedThisRound: boolean;
 }
 
 export interface PlayerInput
 {
   move: -1 | 0 | 1;
-  special: boolean;
 }
 
 export interface Player
@@ -157,6 +153,7 @@ export interface ServerPlayerAssignedMessage
   side: 1 | 2;
   instanceId?: string;
   opponentUsername?: string | null;
+  opponentSkinRac?: number | string | null;
 }
 
 export interface ServerErrorMessage
