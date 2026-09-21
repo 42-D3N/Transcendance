@@ -95,7 +95,8 @@ export async function load ({ cookies }) {
                     .select({
                         id: users.id,
                         username: users.username,
-                        icon: users.icon
+                        icon: users.icon,
+                        online: users.online_status,
                     })
                     .from(users)
                     .where(eq(users.id, toFetch));
@@ -183,7 +184,7 @@ export const actions = {
         // check if not already friends
         let requestExisting = (await db.select({ user1:friends.user1, user2:friends.user2, isaccepted:friends.isaccepted })
         .from(friends)
-        .where(and(
+        .where(or(
             eq(friends.user1, parseInt(infoTab[1])),
             eq(friends.user2, parseInt(infoTab[1]))
         )));

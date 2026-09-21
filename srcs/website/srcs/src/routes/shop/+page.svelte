@@ -19,7 +19,7 @@
         { id: 2, name: "Game dev's fav colors: ", price: 20, src: item2},
         { id: 3, name: "Dev's fav color: ", price: 30, src: item3},
         { id: 4, name: "Mariposa's creation: ", price: 40, src: item4},
-        { id: 5, name: "TV snow: ", price: 50, src: item5},
+        { id: 5, name: "MY LIFE FOR AIUR: ", price: 50, src: item5},
         { id: 6, name: "Light: ", price: 60, src: item6},
         { id: 7, name: "Perturabo's love: ", price: 70, src: item7},
         { id: 8, name: "WE ARE RICH: ", price: 670, src: item8},
@@ -35,6 +35,8 @@
         const result = await response.json();
         const data = JSON.parse(result.data);
         return_val = data[2];
+        if (return_val == 3 || return_val == 4)
+            window.location.reload();
     }
     
     async function save_code() {
@@ -120,18 +122,6 @@
 {/if}
 {#if return_val === 2}
 <Popup message="Already own the item" 
-    duration = {5000}
-    class="fixed top-5 left-1/2 z-[1000] block -translate-x-1/2 items-center gap-4 rounded-lg bg-[#C41E3A] px-[18px] py-3 text-[#000000] shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
-    onClose={() => return_val = 0}/>
-{/if}
-{#if return_val === 3}
-<Popup message="Thanks for your buy"
-    duration = {5000}
-    class="fixed top-5 left-1/2 z-[1000] block -translate-x-1/2 items-center gap-4 rounded-lg bg-[#C41E3A] px-[18px] py-3 text-[#000000] shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
-    onClose={() => return_val = 0}/>
-{/if}
-{#if return_val === 4}
-<Popup message="Code accepted. Please reload the page"
     duration = {5000}
     class="fixed top-5 left-1/2 z-[1000] block -translate-x-1/2 items-center gap-4 rounded-lg bg-[#C41E3A] px-[18px] py-3 text-[#000000] shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
     onClose={() => return_val = 0}/>

@@ -70,15 +70,16 @@
 			{/if}
 			{:else}
 			<span class="flex shrink-0 text-[2.5rem] relative text-center">
-				<img class="h-[30px] w-[30px]" src={openedChats[index].avatar != null?openedChats[index].avatar:usericon}>
+				<img class="h-[30px] w-[30px]" alt="{openedChats[index].name}'s avatar" src={openedChats[index].avatar != null?openedChats[index].avatar:usericon}>
+				<span class="status-indicator {openedChats[index].online?"bg-green-500":"bg-red-500"}"></span>
 			</span>
 			<span class="ml-[1rem] items-center flex text-[1.4rem]">
-				<a class="text-white">{openedChats[index].name}</a>
+				<a class="text-white" href="/user/member/{openedChats[index].name}_{openedChats[index].id}" data-sveltekit-reload>{openedChats[index].name}</a>
 			</span>
 			{/if}
 		</div>
 		<div class="flex g-[0.2rem] whitespace-nowrap">
-			<button class="ft-icon-button ft-icon-button-small" onclick={close}>
+			<button class="ft-icon-button ft-icon-button-small" aria-label="Close chat" onclick={close}>
 				<span class="h-[2rem] w-[2rem] place-content-center inline-grid">
 					<svg data-glyph="mark-cross" aria-hidden="true" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="h-[2rem] w-[2rem]">
 						<path fill="currentColor" d="m6.1 20.77c-1.13 1.13-1.6 1.13-2.73 0l-.13-.13c-1.13-1.13-1.13-1.6 0-2.73l5.97-5.9-5.97-6c-1.13-1.13-1.13-1.6 0-2.73l.13-.1c1.13-1.13 1.6-1.13 2.73 0l5.93 6 5.93-5.97c1.13-1.13 1.6-1.13 2.73 0l.13.13c1.13 1.13 1.13 1.6 0 2.73l-5.97 5.93 5.8 5.9c1.13 1.13 1.13 1.6 0 2.73l-.1.13c-1.13 1.13-1.6 1.13-2.73 0l-5.8-5.93zm0 0"></path>
