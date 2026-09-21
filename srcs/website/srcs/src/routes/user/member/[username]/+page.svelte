@@ -3,12 +3,39 @@
     import { redirect } from '@sveltejs/kit';
     import { enhance } from '$app/forms';
     import profileicon from '$lib/assets/profile_icon.svg';
+    import xp from '$lib/assets/test.webp';
+    import lock from '$lib/assets/locked.svg';
+    import item1 from "$lib/assets/item1.png";
+    import item2 from "$lib/assets/item2.png";
+    import item3 from "$lib/assets/item3.png";
+    import item4 from "$lib/assets/item4.png";
+    import item5 from "$lib/assets/item5.png";
+    import item6 from "$lib/assets/item6.png";
+    import item7 from "$lib/assets/item7.png";
+    import item8 from "$lib/assets/item8.png";
+
+    const products = [
+        { id: 1, name: "Old placeholder", src: item1},
+        { id: 2, name: "Game dev's fav colors", src: item2},
+        { id: 3, name: "Dev's fav color", src: item3},
+        { id: 4, name: "Mariposa's creation", src: item4},
+        { id: 5, name: "TV snow", src: item5},
+        { id: 6, name: "Light", src: item6},
+        { id: 7, name: "Perturabo's love", src: item7},
+        { id: 8, name: "WE ARE RICH", src: item8},
+    ];
+    import { afterNavigate } from '$app/navigation'
+    import { chatClient } from '$lib/chat-client.svelte.ts';
 
     import type { PageProps } from './$types';
     let { data, form }: PageProps = $props();
-    let friendNb = $state(0);
-    if (!data.accPrivate)
-        friendNb = data.friends.length;
+    // svelte-ignore state_referenced_locally
+    let friendNb = $state(data.friends.length);
+
+    afterNavigate ((navigation:any) => {
+        if (navigation.type === "goto" && navigation.from.route.id === "/user/profile/edit")
+            chatClient.execProfileChange(data.username, data.icon);
+    });
 
     function    Winrate()
     {
@@ -16,9 +43,10 @@
             return (0);
         return (parseInt(data.wins) / parseInt(data.matches));
     }
-    function    EditProfile()
+
+    function redirectToProfiles(username: string)
     {
-        redirect(308, "./edit");
+        redirect(308, "./user/member/"+username);
     }
 
     function formatTime(e:Date):string {
@@ -37,133 +65,195 @@
             return "Il y a "+Math.round(interval/3600)+" heures.";
         return e.toDateString();
     }
-
 </script>
 
-<div class="fixed inset-0 z-0 bg-[#333131FF] size-full"></div>
+<img class="fixed inset-0 z-0 bg-[#404040] size-full" src={xp} alt=""/>
 
-{#if data.accPrivate}
-    <div class="flex ml-[10%] h-[50%]">
-        <div class="pb-8 z-1 lg:mt-[2%] lg:p-16 pl-6 pr-6 w-[90%] h-[50%]">
-            <div class="pb-8 size-full bg-[#292626FF] border-solid rounded-lg z-10">
-                <div class="text-white font-bold mt-[10%] lg:mt-0 text-md lg:text-3xl p-12">This user made his account private</div>
-                <a class="block ml-12 mt-4 w-fit p-2 bg-[#7a2020] hover:bg-[#9e1e1e] shadow-[inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.35),0_1px_2px_rgba(0,0,0,0.4)] rounded-md" href="/user/profile">
-                    <span class="text-white font-bold lg:text-3xl p-4">Back to profile</span>
-                </a>
+<div class="flex ml-[10%]">
+    <div class="pb-8 z-1 lg:mt-[2%] lg:p-16 pl-6 pr-6 w-[90%] h-fit">
+    <div
+            class="w-full h-[80%] bg-[#C0C0C0] border-t-2 border-l-2 border-b-2 border-r-2 border-t-white border-l-white border-b-[#404040] border-r-[#404040] z-10"
+            style="font-family: Tahoma, 'MS Sans Serif', sans-serif;"
+        >
+            <div class="flex items-center gap-2 px-2 py-1 bg-[#000080] h-fit">
+                <span class="inline-block h-[6px] w-[6px] rounded-full bg-[#00ff00] shadow-[0_0_2px_#00ff00]"></span>
+                <span class="text-white text-sm md:text-base lg:text-xl xl:text-2xl font-bold">{data.username}#{data.id}</span>
             </div>
-        </div>
-    </div>
-{:else}
-    <div class="flex ml-[10%]">
-        <div class="pb-8 z-1 lg:mt-[2%] lg:p-16 pl-6 pr-6 w-[90%] h-fit">
-            <div class="pb-8 w-full h-[80%] bg-[#292626FF] border-solid rounded-lg z-10">
-                
-                <div class="flex p-4">
-                    {#if !data.icon}
-                        <img class="upload block lg:h-[16rem] lg:w-[16rem] h-[8rem] w-[8rem] border-solid rounded-md bg-amber-50" src={usericon} alt=""/>
-                    {:else}
-                        <img class="upload block lg:h-[16rem] lg:w-[16rem] h-[8rem] w-[8rem] border-solid rounded-md bg-amber-50" src={data.icon} alt=""/>
-                    {/if}
-                    <div>
-                        <span class="block pl-6 font-black text-white text-3xl md:text-6xl">{data.username}#{data.id}</span>
 
-                        <span class="pl-12 pt-6 font-semibold text-zinc-400 text-xl lg:text-2xl">Wallets:</span>
-                        <span class="pt-6 font-semibold text-white text-xl lg:text-2xl">{data.wallet}</span>
-                        <span class="block"></span>
-                        <span class="pl-12 text-zinc-400 text-lg lg:text-xl">Winrate:</span>
-                        <span class="text-white text-lg lg:text-xl">{Winrate()}</span>
+            <div class="p-4">
+                <div class="flex gap-4">
+                    <div class="p-[2px] bg-white border-t-2 border-l-2 border-b-2 border-r-2 border-t-[#404040] border-l-[#404040] border-b-white border-r-white h-fit">
+                        {#if !data.icon}
+                            <img class="block lg:h-[14rem] lg:w-[14rem] h-[7rem] w-[7rem] bg-amber-50" src={usericon} alt="" />
+                        {:else}
+                            <img class="block lg:h-[14rem] lg:w-[14rem] h-[7rem] w-[7rem] bg-amber-50" src={data.icon} alt="" />
+                        {/if}
+                    </div>
+
+                    <div class="flex flex-col gap-1 pt-1">
+                        <div class="flex gap-2 text-sm lg:text-base">
+                            <span class="text-[#404040]">Wallets:</span>
+                            <span class="text-black font-bold">{data.wallet}</span>
+                        </div>
+                        <div class="flex gap-2 text-sm lg:text-base">
+                            <span class="text-[#404040]">Winrate:</span>
+                            <span class="text-black font-bold">{Winrate()}</span>
+                        </div>
                     </div>
                 </div>
-                <span class="pl-12 text-white text-lg lg:text-3xl lg:font-light">Friends: {friendNb} | don't forget you can chat with your friends!</span>
-                <a class="block ml-4 mt-4 w-fit p-2 bg-[#7a2020] hover:bg-[#9e1e1e] shadow-[inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.35),0_1px_2px_rgba(0,0,0,0.4)] rounded-md" href="/user/profile">
-                    <span class="text-white font-bold lg:text-3xl p-4">Back to profile</span>
+
+                <span class="block mt-4 text-black text-sm lg:text-lg">
+                    Friends: {friendNb} | don't forget you can chat with your friends!
+                </span>
+
+                <a
+                    class="inline-block mt-3 px-3 py-1 bg-[#C0C0C0] border-t-2 border-l-2 border-b-2 border-r-2 border-t-white border-l-white border-b-[#404040] border-r-[#404040] active:border-t-[#404040] active:border-l-[#404040] active:border-b-white active:border-r-white"
+                    href="../profile"
+                >
+                    <span class="text-black font-bold text-sm lg:text-base">Back to Profile</span>
                 </a>
+
                 {#if data.friends.length > 0}
-                    <span class="block mt-4 pl-6 font-black text-white text-xl md:text-3xl">Friends:</span>
+                    <span class="block mt-4 text-black text-base md:text-xl font-bold">Friends:</span>
                 {/if}
-                <div class="grid grid-cols-4 gap-4 mt-4 ml-8 lg:ml-4 w-[60%] lg:w-[40%]">
-                    {#each data.friends as friend}
-                        <a href={"/user/member/"+friend.username+"_"+JSON.stringify(friend.id)}>
-                            <div class="bg-stone-700 size-fit p-2 rounded-md">
-                                {#if !friend.icon}
-                                    <img class="block ml-4 lg:m-4 2xl:h-[6rem] 2xl:w-[6rem] xl:h-[5rem] xl:w-[5rem] h-[3rem] w-[3rem] border-solid rounded-md bg-amber-50" src={usericon} alt=""/>
-                                {:else}
-                                    <img class="block ml-4 lg:m-4 2xl:h-[6rem] 2xl:w-[6rem] xl:h-[5rem] xl:w-[5rem] h-[3rem] w-[3rem] border-solid rounded-md bg-amber-50" src={friend.icon} alt=""/>
-                                {/if}
-                                {#if friend.username.length+JSON.stringify(friend.id).length+1 < 10}
-                                    <span class="ml-2 text-lg lg:pl-2 lg:ml-2 lg:mt-1 font-md lg:mt-5">{friend.username}#{friend.id}</span>
-                                {:else}
-                                    <span class="ml-2 text-lg lg:pl-2 lg:ml-2 lg:mt-1 font-md lg:mt-5">{friend.username.slice(0, 7)}...</span>
-                                {/if}
+
+                <div class="grid grid-cols-4 gap-4 mt-4 w-[60%] lg:w-[40%]">
+                {#each data.friends as friend}
+                    <form method="POST" enctype="multipart/form-data" class="flex size-fit" action="?/rmFriend" use:enhance={({ formData }) => {
+                            formData.append('friend', JSON.stringify(friend.id));
+                            formData.append('user', JSON.stringify(data.id));
+                        }}>
+                        <a class="relative z-0 block"
+                            href={"/user/member/" + friend.username + "_" + JSON.stringify(friend.id)}>
+                            <div
+                                class="flex items-center justify-between gap-2 px-1 py-0.5 bg-[#000080] text-white"
+                                style="font-family: Tahoma, 'MS Sans Serif', sans-serif; font-size: 11px;"
+                            >
+                                <span class="truncate flex items-center gap-1">
+                                    <span class="inline-block h-[6px] w-[6px] rounded-full bg-[#00ff00] shadow-[0_0_2px_#00ff00]"></span>
+                                    {#if friend.username.length + JSON.stringify(friend.id).length + 1 < 10}
+                                        {friend.username}#{friend.id}
+                                    {:else}
+                                        {friend.username.slice(0, 7)}...
+                                    {/if}
+                                </span>
+
+                                <button
+                                    class="h-[14px] w-[14px] shrink-0 leading-none text-[10px] font-bold text-black bg-[#C0C0C0] border-t border-l border-white border-b-2 border-r-2 border-b-[#404040] border-r-[#404040] active:border-t-2 active:border-l-2 active:border-b active:border-r active:border-t-[#404040] active:border-l-[#404040] active:border-b-white active:border-r-white"
+                                    onclick={(event) => { event.stopPropagation(); friendNb--; }}
+                                    type="submit"
+                                    title="endFriend"
+                                >
+                                    ×
+                                </button>
+                            </div>
+
+                            <div
+                                class="flex items-center gap-3 p-2 bg-[#C0C0C0] border-t-2 border-l-2 border-b-2 border-r-2 border-t-white border-l-white border-b-[#404040] border-r-[#404040]"
+                            >
+                                <div class="p-[2px] bg-white border-t-2 border-l-2 border-b-2 border-r-2 border-t-[#404040] border-l-[#404040] border-b-white border-r-white shrink-0">
+                                    <div class="h-[3rem] w-[3rem] lg:h-[4rem] lg:w-[4rem] 2xl:h-[5rem] 2xl:w-[5rem] aspect-square overflow-hidden bg-amber-50">
+                                        {#if !friend.icon}
+                                            <img
+                                                class="block h-full w-full aspect-square object-cover"
+                                                src={usericon}
+                                                alt=""
+                                            />
+                                        {:else}
+                                            <img
+                                                class="block h-full w-full aspect-square object-cover"
+                                                src={friend.icon}
+                                                alt=""
+                                            />
+                                        {/if}
+                                    </div>
+                                </div>
+
+                                <span
+                                    class="text-black text-sm lg:text-base"
+                                    style="font-family: Tahoma, 'MS Sans Serif', sans-serif;"
+                                >
+                                    {#if friend.username.length + JSON.stringify(friend.id).length + 1 < 10}
+                                        {friend.username}#{friend.id}
+                                    {:else}
+                                        {friend.username.slice(0, 7)}...
+                                    {/if}
+                                </span>
                             </div>
                         </a>
-                    {/each}
+                    </form>
+                {/each}
                 </div>
             </div>
-
-            <div class="mt-[4%] w-fit h-[20%] bg-[#292626FF] border-solid rounded-lg z-10 p-4">
-                <span class="text-white text-xl lg:text-4xl font-bold">Match History:</span>
-                <span class="text-zinc-400 text-xl lg:text-4xl font-bold">({data.matches})</span>
-            </div>
-
-            {#each data.matchHistory as match}
-                <div class="block mt-[1%] w-full h-[20%] bg-[#292626FF] border-solid rounded-lg z-10 p-4">
-                    <div class="flex">
-
-                        {#if match.winner === data.id}
-                            <span class="text-green-600 text-lg lg:text-2xl font-bold">Win</span>
-                        {:else}
-                            <span class="text-red-600 text-lg lg:text-2xl font-bold">Lose</span>
-                        {/if}
-                        <div class="mx-[1%] self-stretch pb-1 w-px shrink-0 bg-black"></div>
-                        
-                        <span class="ml-auto text-white text-lg lg:text-xl">{formatTime(new Date(match.date))}</span>
-                    </div>
-                    <hr class="w-[20%] lg:w-[8%]">
-                    <div class="h-[20%] p-4">
-
-                        <div class="flex">
-        
-                            <div class="flex-1 flex items-center">
-                                <a class="w-fit" href={"/user/member/"+match.user1Pseudo+"_"+JSON.stringify(match.user1)}>
-                                    <span class="text-lg lg:text-3xl text-white font-semibold">{match.user1Pseudo}#{match.user1}</span>
-                                </a>
-                            </div>
-                            
-                            {#if match.user1Score > match.user2Score}
-                                <span class="ml-auto text-lg lg:text-2xl not-lg:mt-2 font-bold text-green-800">{match.user1Score}</span>
-                            {:else}
-                                <span class="ml-auto text-lg lg:text-2xl not-lg:mt-2 font-bold text-red-800">{match.user1Score}</span>
-                            {/if}
-        
-                            <div class="not-lg:hidden mx-[2%] self-stretch items-center w-px shrink-0 bg-black"></div>
-                            <div class="lg:hidden ml-1 mr-1">-</div>
-                            
-                            {#if match.user1Score > match.user2Score}
-                                <span class="ml-auto text-lg lg:text-2xl not-lg:mt-2 font-bold text-red-800">{match.user2Score}</span>
-                            {:else}
-                                <span class="ml-auto text-lg lg:text-2xl not-lg:mt-2 font-bold text-green-800">{match.user2Score}</span>
-                            {/if}
-        
-                            <div class="flex-1 flex items-center justify-end">
-                                <a class="w-fit" href={"/user/member/"+match.user2Pseudo+"_"+JSON.stringify(match.user2)}>
-                                    <span class="text-lg lg:text-3xl text-white font-semibold">{match.user2Pseudo}#{match.user2}</span>
-                                </a>
-                            </div>
-                            
-                        </div>
-                        <div class="flex w-full">
-                            {#if match.user1EloChange > 0}
-                                <span class="flex-1 flex items-center text-lg lg:text-2xl text-green-600 font-bold">+{match.user1EloChange}</span>
-                                <span class="flex-1 flex items-center text-lg lg:text-2xl justify-end text-red-600 font-bold">{match.user2EloChange}</span>
-                            {:else}
-                                <span class="flex-1 flex items-center text-lg lg:text-2xl text-red-600 font-bold">{match.user1EloChange}</span>
-                                <span class="flex-1 flex items-center text-lg lg:text-2xl justify-end text-green-600 font-bold">+{match.user2EloChange}</span>
-                            {/if}
-                        </div>
-                    </div>
-                </div>
-            {/each}
         </div>
+
+        {#if parseInt(data.matches) > 0}
+            <div
+                class="mt-[4%] w-fit bg-[#C0C0C0] border-t-2 border-l-2 border-b-2 border-r-2 border-t-white border-l-white border-b-[#404040] border-r-[#404040] z-10 px-3 py-2"
+                style="font-family: Tahoma, 'MS Sans Serif', sans-serif;"
+            >
+                <span class="text-black text-sm lg:text-lg font-bold">Match History:</span>
+                <span class="text-[#404040] text-sm lg:text-lg font-bold">({data.matches})</span>
+            </div>
+        {/if}
+
+        {#each data.matchHistory as match}
+            <div
+                class="block mt-[1%] w-full bg-[#C0C0C0] border-t-2 border-l-2 border-b-2 border-r-2 border-t-white border-l-white border-b-[#404040] border-r-[#404040] z-10"
+                style="font-family: Tahoma, 'MS Sans Serif', sans-serif;"
+            >
+                <div class="flex items-center px-3 py-1 bg-[#000080]">
+                    {#if match.winner === data.id}
+                        <span class="text-[#00ff00] text-sm lg:text-lg font-bold">Win</span>
+                    {:else}
+                        <span class="text-[#ff5555] text-sm lg:text-lg font-bold">Lose</span>
+                    {/if}
+
+                    <span class="ml-auto text-white text-xs lg:text-sm">{formatTime(new Date(match.date))}</span>
+                </div>
+
+                <div class="mx-3 mt-2 border-t border-[#808080]">
+                    <div class="border-t border-white w-[20%] lg:w-[8%]"></div>
+                </div>
+
+                <div class="p-3">
+                    <div class="flex items-center">
+                        <div class="flex-1 flex items-center">
+                            <a class="w-fit" href={"/user/member/" + match.user1Pseudo + "_" + JSON.stringify(match.user1)}>
+                                <span class="text-sm lg:text-xl text-black font-semibold hover:underline" style="color: #0000EE;">{match.user1Pseudo}#{match.user1}</span>
+                            </a>
+                        </div>
+
+                        <div class="flex items-center gap-2 bg-white px-3 py-1 border-t-2 border-l-2 border-b-2 border-r-2 border-t-[#404040] border-l-[#404040] border-b-white border-r-white">
+                            {#if match.user1Score > match.user2Score}
+                                <span class="text-sm lg:text-xl font-bold text-[#008000]">{match.user1Score}</span>
+                                <span class="text-[#808080]">|</span>
+                                <span class="text-sm lg:text-xl font-bold text-[#800000]">{match.user2Score}</span>
+                            {:else}
+                                <span class="text-sm lg:text-xl font-bold text-[#800000]">{match.user1Score}</span>
+                                <span class="text-[#808080]">|</span>
+                                <span class="text-sm lg:text-xl font-bold text-[#008000]">{match.user2Score}</span>
+                            {/if}
+                        </div>
+
+                        <div class="flex-1 flex items-center justify-end">
+                            <a class="w-fit" href={"/user/member/" + match.user2Pseudo + "_" + JSON.stringify(match.user2)}>
+                                <span class="text-sm lg:text-xl text-black font-semibold hover:underline" style="color: #0000EE;">{match.user2Pseudo}#{match.user2}</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="flex w-full mt-1">
+                        {#if match.user1EloChange > 0}
+                            <span class="flex-1 text-xs lg:text-base text-[#008000] font-bold">+{match.user1EloChange}</span>
+                            <span class="flex-1 text-right text-xs lg:text-base text-[#800000] font-bold">{match.user2EloChange}</span>
+                        {:else}
+                            <span class="flex-1 text-xs lg:text-base text-[#800000] font-bold">{match.user1EloChange}</span>
+                            <span class="flex-1 text-right text-xs lg:text-base text-[#008000] font-bold">+{match.user2EloChange}</span>
+                        {/if}
+                    </div>
+                </div>
+            </div>
+        {/each}
     </div>
-{/if}
+</div>
