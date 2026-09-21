@@ -64,7 +64,6 @@ export async function load ({ cookies, params, fetch }) {
             .from(friends)
             .where(and(or(eq(friends.user2, TakenInfos.id), eq(friends.user1, TakenInfos.id)), eq(friends.isaccepted, true)))
         );
-        console.log("copinous:",copinous)
 
         actualFriends = await Promise.all(
             copinous.map(async (request) => {
@@ -88,12 +87,12 @@ export async function load ({ cookies, params, fetch }) {
         );
         console.log(actualFriends);
 
-        if (userInfos.matches > 0)
+        if (TakenInfos.matches > 0)
             userHistory = await db.select()
             .from(matches)
-            .where(or(eq(matches.user1, userInfos.id), eq(matches.user2, userInfos.id)))
+            .where(or(eq(matches.user1, TakenInfos.id), eq(matches.user2, TakenInfos.id)))
             .limit(5);
-
+        
         id = TakenInfos.id;
         username = TakenInfos.username;
         email = TakenInfos.email;
