@@ -29,9 +29,10 @@ services:
       timeout: 3s
       retries: 3
   api:
-    command: npm run dev
     image: transcendance-api
-    build: ./srcs/api
+    build: 
+      context: ./srcs/api
+      target: dev
     pull_policy: never
     env_file:
       - ./srcs/api/srcs/.env
