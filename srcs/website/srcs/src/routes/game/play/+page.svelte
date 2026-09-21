@@ -137,35 +137,35 @@
     return null;
   }
 
-  function getSkinStyle(skin: unknown, is_ball: boolean): string {
+  function getSkinClass(skin: unknown, isBall: boolean): string {
     const skinId = normalizeSkinId(skin);
 
     if (skinId === 1)
-      return ('background:#123c52;');
+      return ('bg-[#123c52]');
     else if (skinId === 2)
-      return ('background:#ba0bf3;');
+      return ('bg-[#ba0bf3]');
     else if (skinId === 3)
-      return ('background:#c41e3a;');
+      return ('bg-[#c41e3a]');
     else if (skinId === 4)
-      return ('background:#1bff00;');
+      return ('bg-[#1bff00]');
     else if (skinId === 5)
-      return ('background:#fff59d;');
+      return ('bg-[#fff59d]');
     else if (skinId === 6)
-      return ('background:linear-gradient(to right,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#8000ff,#f00);');
+      return ('bg-[linear-gradient(to_right,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#8000ff,#f00)]');
     else if (skinId === 7)
-      return ('background:repeating-linear-gradient(135deg,#ffff00 0px,#ffff00 5px,#000000 5px,#000000 10px);');
+      return ('bg-[repeating-linear-gradient(135deg,#ffff00_0px,#ffff00_5px,#000000_5px,#000000_10px)]');
     else if (skinId === 8)
-      return ('background:#efbf04;');
-    if (is_ball)
-      return ('background:#ff0000;');
-    return ('background:#f4f4f4;');
+      return ('bg-[#efbf04]');
+    if (isBall)
+      return ('bg-[#ff0000]');
+    return ('bg-[#f4f4f4]');
   }
 
-  const localRacketSkinStyle = $derived(getSkinStyle((data as GameUserData).skin_rac, false));
-  const localBallSkinStyle = $derived(getSkinStyle((data as GameUserData).skin_ball, true));
-  const opponentRacketSkinStyle = $derived(getSkinStyle(opponentSkinRac, false));
-  const topRacketStyle = $derived(localSide === 2 ? localRacketSkinStyle : opponentRacketSkinStyle);
-  const bottomRacketStyle = $derived(localSide === 1 ? localRacketSkinStyle : opponentRacketSkinStyle);
+  const localRacketSkinClass = $derived(getSkinClass((data as GameUserData).skin_rac, false));
+  const localBallSkinClass = $derived(getSkinClass((data as GameUserData).skin_ball, true));
+  const opponentRacketSkinClass = $derived(getSkinClass(opponentSkinRac, false));
+  const topRacketClass = $derived(localSide === 2 ? localRacketSkinClass : opponentRacketSkinClass);
+  const bottomRacketClass = $derived(localSide === 1 ? localRacketSkinClass : opponentRacketSkinClass);
 
   function sendMobileInput(nextMove: -1 | 0 | 1)
   {
@@ -311,9 +311,9 @@
             <div id="terrain" class="relative h-full w-full overflow-hidden border-[3px] border-[#111111] bg-[#2d2d2d]" style="aspect-ratio: 65 / 73;">
               <div class="absolute left-[3%] right-[3%] top-1/2 border-t-[3px] border-dashed border-[#f4f4f4]/80"></div>
               <div class="absolute left-1/2 top-1/2 h-20 w-20 -translate-x-1/2 -translate-y-1/2 rounded-full border-[2px] border-[#f4f4f4]/80"></div>
-              <div id="racketUp" class="absolute z-20 top-[1.7%] h-[1.35%] min-h-[6px] w-[12.3%] rounded-sm border-[2px] border-[#111111] shadow-[2px_2px_0_#111111]" style={topRacketStyle}></div>
-              <div id="racketDown" class="absolute z-20 bottom-[1.7%] h-[1.35%] min-h-[6px] w-[12.3%] rounded-sm border-[2px] border-[#111111] shadow-[2px_2px_0_#111111]" style={bottomRacketStyle}></div>
-              <div id="ball" class="absolute z-20 aspect-square w-[2.3%] rounded-sm border-[2px] border-[#111111] shadow-[2px_2px_0_#111111]" style={localBallSkinStyle}></div>
+              <div id="racketUp" class={`absolute z-20 top-[1.7%] h-[1.35%] min-h-[6px] w-[12.3%] rounded-sm border-[2px] border-[#111111] shadow-[2px_2px_0_#111111] ${topRacketClass}`}></div>
+              <div id="racketDown" class={`absolute z-20 bottom-[1.7%] h-[1.35%] min-h-[6px] w-[12.3%] rounded-sm border-[2px] border-[#111111] shadow-[2px_2px_0_#111111] ${bottomRacketClass}`}></div>
+              <div id="ball" class={`absolute z-20 aspect-square w-[2.3%] rounded-sm border-[2px] border-[#111111] shadow-[2px_2px_0_#111111] ${localBallSkinClass}`}></div>
               <div id="where" class="absolute z-10 h-[3px] origin-left rounded-none bg-[#ff0000] shadow-[0_0_0.8rem_#ff0000]" style="display:none;"></div>
 
               {#if showReadyOverlay}
