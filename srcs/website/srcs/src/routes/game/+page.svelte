@@ -1,116 +1,56 @@
-<div class="menu-container">
-	<div class="overlay">
-		<h1 class="game-title">Pong</h1>
-		<div class="menu-buttons">
-			<div class="pvp-group">
-				<p class="pvp-group-title">PVP</p>
-				<a class="menu-button" href="/game/play?mode=pvp">Matchmaking</a>
-			</div>
-			<div class="ai-group">
-				<p class="ai-group-title">Affrontements IA</p>
-				<div class="ai-grid">
-					<a class="menu-button ai-button" href="/game/play?mode=pve&aiDifficulty=easy">IA Easy</a>
-					<a class="menu-button ai-button" href="/game/play?mode=pve&aiDifficulty=normal">IA Normal</a>
-					<a class="menu-button ai-button" href="/game/play?mode=pve&aiDifficulty=hard">IA Hard</a>
-					<a class="menu-button ai-button" href="/game/play?mode=pve&aiDifficulty=impossible">IA Impossible</a>
+<script lang="ts">
+</script>
+<div class="min-h-dvh w-full flex items-center justify-center bg-[#000000FF] bg-[url('/src/lib/assets/pong.svg')] bg-contain bg-center bg-no-repeat" style="font-family: Arial, Helvetica, sans-serif;">
+	<div class="w-[340px]">
+
+		<div class="bg-white border border-[#c5d9e8] rounded-[4px] shadow-[0_1px_2px_rgba(0,0,0,0.1)] overflow-hidden">
+
+			<div class="border-b border-dotted border-[#c5d9e8]">
+				<div class="bg-[#e1ecf7] px-3 py-1.5 border-b border-[#c5d9e8]">
+					<span class="text-[13px] font-bold text-[#3b5998]">PVP</span>
+				</div>
+				<div class="p-3 flex justify-center">
+					<a
+						class="inline-flex items-center justify-center px-6 py-2 text-[13px] font-bold text-black no-underline bg-gradient-to-b from-[#f8f8f8] to-[#e0e0e0] border border-[#999999] rounded-[3px] hover:from-[#eeeeee] hover:to-[#d0d0d0] active:from-[#d0d0d0] active:to-[#e0e0e0]"
+						href="/game/play?mode=pvp"
+					>
+						Matchmaking
+					</a>
 				</div>
 			</div>
-			<a class="menu-button" href="/game/loadingScreen">Preview du Loading screen</a>
+
+			<div class="border-b border-dotted border-[#c5d9e8]">
+				<div class="bg-[#e1ecf7] px-3 py-1.5 border-b border-[#c5d9e8]">
+					<span class="text-[13px] font-bold text-[#3b5998]">Affrontements IA</span>
+				</div>
+				<div class="p-3 grid grid-cols-2 gap-2">
+					<a class="flex items-center justify-center px-2 py-2 text-[12px] font-bold text-black no-underline bg-gradient-to-b from-[#f8f8f8] to-[#e0e0e0] border border-[#999999] rounded-[3px] hover:from-[#eeeeee] hover:to-[#d0d0d0] active:from-[#d0d0d0] active:to-[#e0e0e0]" href="/game/play?mode=pve&aiDifficulty=easy">
+						IA Easy
+					</a>
+					<a class="flex items-center justify-center px-2 py-2 text-[12px] font-bold text-black no-underline bg-gradient-to-b from-[#f8f8f8] to-[#e0e0e0] border border-[#999999] rounded-[3px] hover:from-[#eeeeee] hover:to-[#d0d0d0] active:from-[#d0d0d0] active:to-[#e0e0e0]" href="/game/play?mode=pve&aiDifficulty=normal">
+						IA Normal
+					</a>
+					<a class="flex items-center justify-center px-2 py-2 text-[12px] font-bold text-black no-underline bg-gradient-to-b from-[#f8f8f8] to-[#e0e0e0] border border-[#999999] rounded-[3px] hover:from-[#eeeeee] hover:to-[#d0d0d0] active:from-[#d0d0d0] active:to-[#e0e0e0]" href="/game/play?mode=pve&aiDifficulty=hard">
+						IA Hard
+					</a>
+					<a class="flex items-center justify-center px-2 py-2 text-[12px] font-bold text-black no-underline bg-gradient-to-b from-[#f8f8f8] to-[#e0e0e0] border border-[#999999] rounded-[3px] hover:from-[#eeeeee] hover:to-[#d0d0d0] active:from-[#d0d0d0] active:to-[#e0e0e0]" href="/game/play?mode=pve&aiDifficulty=impossible">
+						IA Impossible
+					</a>
+				</div>
+			</div>
+
+			<!-- preview -->
+			<div class="p-3 flex justify-center bg-[#fafafa]">
+				<a
+					class="text-[13px] font-bold no-underline hover:underline"
+					style="color: #3366CC;"
+					href="/game/loadingScreen"
+				>
+					Preview du Loading screen
+				</a>
+			</div>
 		</div>
-		<p class="version">Version 0.6.7.?</p>
+
+		<p class="mt-3 text-center text-[11px] text-[#666666]">Version 0.6.7.?</p>
 	</div>
 </div>
-
-<style>
-	.menu-container
-	{
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		background: rgb(143, 28, 28);
-		background-image: url('Placeholder.svg');
-		background-size: cover;
-		background-position: center;
-		background-repeat: no-repeat;
-		height: 100vh;
-	}
-
-	.overlay
-	{
-		text-align: center;
-		color: rgb(255, 251, 0);
-	}
-
-	.game-title
-	{
-		font-size: 5rem;
-		font-weight: 900;
-		margin-bottom: 3rem;
-		letter-spacing: 0.2em;
-		text-shadow: 0 0 20px rgba(59, 130, 246, 0.6);
-	}
-
-	.menu-buttons
-	{
-		display: flex;
-		flex-direction: column;
-		gap: 1rem;
-		width: 280px;
-		margin: 0;
-	}
-
-	.menu-button
-	{
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		padding: 1rem;
-		font-size: 1.2rem;
-		font-weight: bold;
-		border: none;
-		border-radius: 12px;
-		background: rgb(0, 89, 253, 0.7);
-		color: white;
-		text-decoration: none;
-	}
-
-	.pvp-group,
-	.ai-group
-	{
-		padding: 0.8rem;
-		border: 2px solid rgba(255, 251, 0, 0.6);
-		border-radius: 12px;
-		background: rgba(6, 15, 44, 0.35);
-	}
-
-	.pvp-group-title,
-	.ai-group-title
-	{
-		margin: 0 0 0.7rem;
-		font-size: 0.95rem;
-		font-weight: 700;
-		letter-spacing: 0.08em;
-		text-transform: uppercase;
-		color: rgba(255, 251, 0, 0.9);
-	}
-
-	.ai-grid
-	{
-		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		gap: 0.6rem;
-	}
-
-	.ai-button
-	{
-		padding: 0.8rem 0.5rem;
-		font-size: 1rem;
-	}
-
-	.version
-	{
-		margin-top: 3rem;
-		font-size: 0.9rem;
-		opacity: 0.6;
-	}
-</style>

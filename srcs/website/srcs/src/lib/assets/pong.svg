@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+  <title>Retro Pong</title>
+  <desc>Vector recreation of a minimalist Pong graphic.</desc>
+  <rect width="1920" height="1080" fill="#000"/>
+  <rect x="328.421" y="166.419" width="48.23" height="50.499" fill="#fff"/>
+  <rect x="384.689" y="166.419" width="50.526" height="50.499" fill="#fff"/>
+  <rect x="444.402" y="166.419" width="49.378" height="50.499" fill="#fff"/>
+  <rect x="500.67" y="166.419" width="51.675" height="50.499" fill="#fff"/>
+  <rect x="709.665" y="166.419" width="51.675" height="50.499" fill="#fff"/>
+  <rect x="769.378" y="166.419" width="50.526" height="50.499" fill="#fff"/>
+  <rect x="826.794" y="166.419" width="50.526" height="50.499" fill="#fff"/>
+  <rect x="986.411" y="166.419" width="51.675" height="50.499" fill="#fff"/>
+  <rect x="1225.263" y="166.419" width="50.526" height="50.499" fill="#fff"/>
+  <rect x="1374.545" y="166.419" width="50.526" height="50.499" fill="#fff"/>
+  <rect x="1430.813" y="166.419" width="51.675" height="50.499" fill="#fff"/>
+  <rect x="1489.378" y="166.419" width="50.526" height="50.499" fill="#fff"/>
+  <rect x="326.124" y="223.804" width="50.526" height="50.499" fill="#fff"/>
+  <rect x="559.234" y="223.804" width="50.526" height="50.499" fill="#fff"/>
+  <rect x="653.397" y="223.804" width="51.675" height="50.499" fill="#fff"/>
+  <rect x="886.507" y="223.804" width="50.526" height="50.499" fill="#fff"/>
+  <rect x="986.411" y="223.804" width="51.675" height="50.499" fill="#fff"/>
+  <rect x="1224.115" y="223.804" width="51.675" height="50.499" fill="#fff"/>
+  <rect x="1319.426" y="223.804" width="50.526" height="50.499" fill="#fff"/>
+  <rect x="1549.091" y="223.804" width="50.526" height="50.499" fill="#fff"/>
+  <rect x="326.124" y="281.19" width="50.526" height="50.499" fill="#fff"/>
+  <rect x="559.234" y="281.19" width="50.526" height="50.499" fill="#fff"/>
+  <rect x="653.397" y="281.19" width="51.675" height="50.499" fill="#fff"/>
+  <rect x="886.507" y="281.19" width="50.526" height="50.499" fill="#fff"/>
+  <rect x="986.411" y="281.19" width="51.675" height="50.499" fill="#fff"/>
+  <rect x="1046.124" y="281.19" width="50.526" height="50.499" fill="#fff"/>
+  <rect x="1224.115" y="281.19" width="51.675" height="50.499" fill="#fff"/>
+  <rect x="1319.426" y="281.19" width="50.526" height="50.499" fill="#fff"/>
+  <rect x="326.124" y="337.428" width="50.526" height="50.499" fill="#fff"/>
+  <rect x="384.689" y="337.428" width="50.526" height="50.499" fill="#fff"/>
+  <rect x="442.105" y="337.428" width="51.675" height="50.499" fill="#fff"/>
+  <rect x="500.67" y="337.428" width="51.675" height="50.499" fill="#fff"/>
+  <rect x="653.397" y="337.428" width="51.675" height="50.499" fill="#fff"/>
+  <rect x="886.507" y="337.428" width="50.526" height="50.499" fill="#fff"/>
+  <rect x="986.411" y="337.428" width="50.526" height="50.499" fill="#fff"/>
+  <rect x="1105.837" y="337.428" width="50.526" height="50.499" fill="#fff"/>
+  <rect x="1224.115" y="337.428" width="51.675" height="50.499" fill="#fff"/>
+  <rect x="1319.426" y="337.428" width="50.526" height="50.499" fill="#fff"/>
+  <rect x="1430.813" y="337.428" width="51.675" height="50.499" fill="#fff"/>
+  <rect x="1488.23" y="337.428" width="51.675" height="50.499" fill="#fff"/>
+  <rect x="1547.943" y="337.428" width="51.675" height="50.499" fill="#fff"/>
+  <rect x="326.124" y="394.814" width="50.526" height="50.499" fill="#fff"/>
+  <rect x="653.397" y="394.814" width="51.675" height="50.499" fill="#fff"/>
+  <rect x="886.507" y="394.814" width="51.675" height="50.499" fill="#fff"/>
+  <rect x="986.411" y="394.814" width="51.675" height="50.499" fill="#fff"/>
+  <rect x="1165.55" y="394.814" width="51.675" height="50.499" fill="#fff"/>
+  <rect x="1224.115" y="394.814" width="51.675" height="50.499" fill="#fff"/>
+  <rect x="1319.426" y="394.814" width="50.526" height="50.499" fill="#fff"/>
+  <rect x="1549.091" y="394.814" width="49.378" height="50.499" fill="#fff"/>
+  <rect x="326.124" y="452.2" width="50.526" height="50.499" fill="#fff"/>
+  <rect x="653.397" y="452.2" width="51.675" height="50.499" fill="#fff"/>
+  <rect x="886.507" y="452.2" width="50.526" height="50.499" fill="#fff"/>
+  <rect x="986.411" y="452.2" width="51.675" height="50.499" fill="#fff"/>
+  <rect x="1224.115" y="452.2" width="51.675" height="50.499" fill="#fff"/>
+  <rect x="1319.426" y="452.2" width="50.526" height="50.499" fill="#fff"/>
+  <rect x="1549.091" y="452.2" width="50.526" height="50.499" fill="#fff"/>
+  <rect x="326.124" y="509.586" width="50.526" height="49.352" fill="#fff"/>
+  <rect x="709.665" y="509.586" width="51.675" height="49.352" fill="#fff"/>
+  <rect x="769.378" y="509.586" width="50.526" height="49.352" fill="#fff"/>
+  <rect x="826.794" y="509.586" width="50.526" height="49.352" fill="#fff"/>
+  <rect x="986.411" y="509.586" width="50.526" height="49.352" fill="#fff"/>
+  <rect x="1224.115" y="509.586" width="51.675" height="49.352" fill="#fff"/>
+  <rect x="1373.397" y="509.586" width="51.675" height="49.352" fill="#fff"/>
+  <rect x="1430.813" y="509.586" width="51.675" height="49.352" fill="#fff"/>
+  <rect x="1489.378" y="509.586" width="50.526" height="49.352" fill="#fff"/>
+  <rect x="1547.943" y="509.586" width="50.526" height="49.352" fill="#fff"/>
+  <rect x="577.608" y="878.002" width="764.785" height="87.226" fill="#fff"/>
+  <circle cx="1205.742" cy="695.515" r="55.105" fill="#555"/>
+  <circle cx="1172.44" cy="728.799" r="55.105" fill="#777"/>
+  <circle cx="1140.287" cy="759.787" r="55.105" fill="#aaa"/>
+  <circle cx="1116.746" cy="789.054" r="54.531" fill="#fff"/>
+</svg>

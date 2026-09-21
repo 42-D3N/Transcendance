@@ -275,3 +275,7 @@ body:not(.keyboard-navigation-in-use) *:focus {
     @apply text-sm text-red-700 italic;
     @apply text-sm text-red-700 italic;
 }
+
+.status-indicator {
+	@apply absolute bottom-0 right-0 h-[1rem] w-[1rem] rounded-full;
+}

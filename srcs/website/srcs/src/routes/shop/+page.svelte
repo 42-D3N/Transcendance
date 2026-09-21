@@ -35,6 +35,7 @@
         const result = await response.json();
         const data = JSON.parse(result.data);
         return_val = data[2];
+        window.location.reload();
     }
     
     async function save_code() {

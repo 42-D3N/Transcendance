@@ -24,7 +24,7 @@
         { id: 7, name: "Perturabo's love", src: item7},
         { id: 8, name: "WE ARE RICH", src: item8},
     ];
-    import { afterNavigate } from '$app/navigation'
+    import { afterNavigate } from '$app/navigation';
     import { chatClient } from '$lib/chat-client.svelte.ts';
 
     import type { PageProps } from './$types';
@@ -130,7 +130,8 @@
                                 style="font-family: Tahoma, 'MS Sans Serif', sans-serif; font-size: 11px;"
                             >
                                 <span class="truncate flex items-center gap-1">
-                                    <span class="inline-block h-[6px] w-[6px] rounded-full bg-[#00ff00] shadow-[0_0_2px_#00ff00]"></span>
+                                    <span class="inline-block h-[6px] w-[6px] rounded-full {friend.online?"bg-green-500":"bg-red-500"} shadow-[0_0_2px_#00ff00]"></span>
+
                                     {#if friend.username.length + JSON.stringify(friend.id).length + 1 < 10}
                                         {friend.username}#{friend.id}
                                     {:else}
