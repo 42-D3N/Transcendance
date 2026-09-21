@@ -69,9 +69,9 @@ body:not(.keyboard-navigation-in-use) *:focus {
 }
 
 .sidebar-footer-icons {
-	@apply grid place-items-center px-[0.4rem] grid-cols-[repeat(4,3.2rem)] grid-rows-[3.2rem] justify-between mt-[0.8rem];
+	@apply grid place-items-center px-[0.4rem] grid-cols-[repeat(3,3.2rem)] grid-rows-[3.2rem] justify-between mt-[0.8rem];
 	@variant lg:max-xl {
-		@apply grid-cols-[3.2rem] grid-rows-[repeat(4,3.2rem)] justify-around gap-[0.4rem];
+		@apply grid-cols-[3.2rem] grid-rows-[repeat(3,3.2rem)] justify-around gap-[0.4rem];
 		margin: unset;
 		padding: unset;
 	}
