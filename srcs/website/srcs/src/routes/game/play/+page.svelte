@@ -2,10 +2,33 @@
   import { onMount, onDestroy } from 'svelte';
   import type { ClientGameState } from '$lib/game/both/interfaces';
   import { initGameClient } from '$lib/game/frontend/pongVariables'
-  import { connection, sendInput, sendReady } from '$lib/game/backend/network'
-  import { handleKeyDown, handleKeyUp, updateScale, updateInput, renderGameState } from '$lib/game/frontend/front';
+  import { sendInput } from '$lib/game/backend/network'
+  import { handleKeyDown, handleKeyUp, updateScale, updateInput } from '$lib/game/frontend/front';
   import type { AIDifficulty, MatchMode } from '$lib/game/both/interfaces';
   import { afterNavigate, goto } from '$app/navigation'
+  import chatData from './chat-data.json';
+
+  type ChatMessage = string;
+
+  let chatMessages = $state<ChatMessage[]>([]);
+  let chatInterval: ReturnType<typeof setInterval> | undefined;
+  let chatPanelElement: HTMLElement | undefined;
+  let chatCapacity = $state(8);
+  let chatResizeObserver: ResizeObserver | undefined;
+  import {
+    bindSocketHandlers,
+    clickReady,
+    createPointerHandlers,
+    sendDirectionalInput,
+  } from './game-controller';
+  import {
+    buildGameUrl,
+    getPlayerLabels,
+    getRequestedDifficulty,
+    getRequestedMode,
+    isReadyOverlayVisible,
+    type GameUserData,
+  } from './play-page';
 
   let resolveNavReady: (() => void) | undefined;
   const navReady = new Promise<void>((resolve) => {
@@ -32,51 +55,36 @@
   let aiDifficulty		= $state<AIDifficulty>('easy');
   let reconnecting		= $state(false);
   let activeMove		= $state<-1 | 0 | 1>(0);
-  let activeSpecial		= $state(false);
   let currentInstanceId	= $state<string | null>(null);
   let opponentUsername	= $state<string | null>(null);
+  let opponentSkinRac	= $state<number | string | null>(null);
   let { data }			= $props();
 
-  const leftPlayerLabel = $derived(localSide === 1 ? data.username : (opponentUsername ?? 'PLAYER 1'));
-  const rightPlayerLabel = $derived(localSide === 1 ? (opponentUsername ?? 'PLAYER 2') : data.username);
+  const playerLabels = $derived(getPlayerLabels({
+    localSide,
+    username: data.username,
+    opponentUsername,
+  }));
+  const leftPlayerLabel = $derived(playerLabels.left);
+  const rightPlayerLabel = $derived(playerLabels.right);
+  const topPlayerLabel = $derived(playerLabels.top);
+  const bottomPlayerLabel = $derived(playerLabels.bottom);
 
-  function updateLocalReadyFromState(state: ClientGameState)
+  function handleClickReady()
   {
-    if (localSide === 1)
-      localReady = state.ready.p1;
-    else if (localSide === 2)
-      localReady = state.ready.p2;
+    clickReady(socket, localReady);
+    localReady = true;
   }
 
-  function clickReady()
+  function createGameSocketUrl()
   {
-    if (!socket || socket.readyState !== WebSocket.OPEN || localReady)
-      return;
-    sendReady(socket);
-  }
-
-  function buildGameUrl()
-  {
-    const userPayload = {
-      id: data.id,
-      username: data.username,
-      wins: data.wins,
-      losses: data.losses,
-      matches: data.matches,
-      wallet: data.wallet,
-      icon: data.icon,
-      skin_rac: data.skin_rac,
-      skin_ball: data.skin_ball
-    };
-    const url = new URL('wss://'+window.location.host+'/api/game_server');
-    url.searchParams.set('mode', matchMode);
-    url.searchParams.set('userId', String(data.id));
-    url.searchParams.set('user', JSON.stringify(userPayload));
-    if (matchMode === 'pve')
-      url.searchParams.set('aiDifficulty', aiDifficulty);
-    if (currentInstanceId)
-      url.searchParams.set('instanceId', currentInstanceId);
-    return url.toString();
+    return buildGameUrl({
+      host: window.location.host,
+      mode: matchMode,
+      aiDifficulty,
+      currentInstanceId,
+      data: data as GameUserData,
+    });
   }
 
   function disconnectSocket()
@@ -96,96 +104,137 @@
     localReady = false;
     gameState = null;
     activeMove = 0;
-    activeSpecial = false;
-    socket = new WebSocket(buildGameUrl());
+    opponentSkinRac = null;
+    socket = new WebSocket(createGameSocketUrl());
     socket.onopen  = () => { connected = true;  reconnecting = false; };
     socket.onclose = () => { connected = false; reconnecting = false; };
-    bindSocketHandlers(game);
-  }
-
-  function bindSocketHandlers(game: ReturnType<typeof initGameClient>)
-  {
-    connection(
+    bindSocketHandlers({
       socket,
-      state =>
-      {
-        gameState = state;
-        updateLocalReadyFromState(state);
-        renderGameState(game, state);
-      },
-      (side, instanceId, nextOpponentUsername) =>
-      {
-        localSide = side;
-        opponentUsername = nextOpponentUsername ?? null;
-        if (instanceId)
-          currentInstanceId = instanceId;
-      }
-    );
+      game,
+      getLocalSide: () => localSide,
+      setGameState: (state) => { gameState = state; },
+      setLocalReady: (value) => { localReady = value; },
+      setLocalSide: (side) => { localSide = side; },
+      setOpponentUsername: (value) => { opponentUsername = value; },
+      setOpponentSkinRac: (value) => { opponentSkinRac = value; },
+      setCurrentInstanceId: (value) => { currentInstanceId = value; },
+    });
   }
 
-  const showReadyOverlay = $derived(!gameState || gameState.status === "waiting" || gameState.status === "ready_check");
-  const isReadyPhase = $derived(!gameState || gameState.status === "waiting" || gameState.status === "ready_check");
+  const showReadyOverlay = $derived(isReadyOverlayVisible(gameState?.status ?? null));
+  const isReadyPhase = $derived(isReadyOverlayVisible(gameState?.status ?? null));
   const modeLabel = $derived(matchMode === 'pvp' ? 'PvP' : 'PvE');
 
-  function sendMobileInput(nextMove: -1 | 0 | 1, nextSpecial: boolean)
+  function normalizeSkinId(skin: unknown): number | null {
+    if (typeof skin === 'number' && Number.isInteger(skin))
+      return skin;
+    if (typeof skin === 'string')
+    {
+      const parsedSkin = Number.parseInt(skin, 10);
+      if (Number.isInteger(parsedSkin))
+        return parsedSkin;
+    }
+    return null;
+  }
+
+  function getSkinStyle(skin: unknown, is_ball: boolean): string {
+    const skinId = normalizeSkinId(skin);
+
+    if (skinId === 1)
+      return ('background:#123c52;');
+    else if (skinId === 2)
+      return ('background:#ba0bf3;');
+    else if (skinId === 3)
+      return ('background:#c41e3a;');
+    else if (skinId === 4)
+      return ('background:#1bff00;');
+    else if (skinId === 5)
+      return ('background:#fff59d;');
+    else if (skinId === 6)
+      return ('background:linear-gradient(to right,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#8000ff,#f00);');
+    else if (skinId === 7)
+      return ('background:repeating-linear-gradient(135deg,#ffff00 0px,#ffff00 5px,#000000 5px,#000000 10px);');
+    else if (skinId === 8)
+      return ('background:#efbf04;');
+    if (is_ball)
+      return ('background:#ff0000;');
+    return ('background:#f4f4f4;');
+  }
+
+  const localRacketSkinStyle = $derived(getSkinStyle((data as GameUserData).skin_rac, false));
+  const localBallSkinStyle = $derived(getSkinStyle((data as GameUserData).skin_ball, true));
+  const opponentRacketSkinStyle = $derived(getSkinStyle(opponentSkinRac, false));
+  const topRacketStyle = $derived(localSide === 2 ? localRacketSkinStyle : opponentRacketSkinStyle);
+  const bottomRacketStyle = $derived(localSide === 1 ? localRacketSkinStyle : opponentRacketSkinStyle);
+
+  function sendMobileInput(nextMove: -1 | 0 | 1)
   {
-    if (socket?.readyState !== WebSocket.OPEN)
-      return;
     activeMove = nextMove;
-    activeSpecial = nextSpecial;
-    sendInput(socket, { move: nextMove, special: nextSpecial });
+    sendDirectionalInput(socket, nextMove);
   }
 
   function setMove(move: -1 | 0 | 1)
   {
-    sendMobileInput(move, activeSpecial);
+    sendMobileInput(move);
   }
 
-  function setSpecial(special: boolean)
-  {
-    sendMobileInput(activeMove, special);
-  }
-
-  function onTouchMoveStart(event: PointerEvent, move: -1 | 1)
-  {
-    if (!event.isPrimary)
-      return;
-    setMove(move);
-  }
-
-  function onTouchMoveStop(event: PointerEvent)
-  {
-    if (!event.isPrimary)
-      return;
-    setMove(0);
-  }
-
-  function onPowerDown(event: PointerEvent)
-  {
-    if (!event.isPrimary)
-      return;
-    setSpecial(true);
-  }
-
-  function onPowerUp(event: PointerEvent)
-  {
-    if (!event.isPrimary)
-      return;
-    setSpecial(false);
-  }
+  const pointerHandlers = createPointerHandlers((move) => setMove(move));
+  const onTouchMoveStart = pointerHandlers.start;
+  const onTouchMoveStop = pointerHandlers.stop;
 
   onMount(async () =>
   {
     const game = initGameClient();
-    let keyboardState = { left: false, right: false, special: false };
+    let keyboardState = { left: false, right: false };
     const query = new URLSearchParams(window.location.search);
     const requestedDifficulty = query.get('aiDifficulty');
 
-    matchMode = query.get('mode') === 'pve' ? 'pve' : 'pvp';
-    if (requestedDifficulty === 'easy' || requestedDifficulty === 'normal' || requestedDifficulty === 'hard' || requestedDifficulty === 'impossible')
-      aiDifficulty = requestedDifficulty;
-    else
-      aiDifficulty = 'easy';
+    matchMode = getRequestedMode(query.get('mode'));
+    aiDifficulty = getRequestedDifficulty(requestedDifficulty);
+
+    const users = Array.isArray(chatData?.users) ? chatData.users : [];
+    const messages = Array.isArray(chatData?.messages) ? chatData.messages : [];
+
+    const makeChatLine = () => {
+      if (!users.length || !messages.length) {
+        return 'gg ez';
+      }
+      const user = users[Math.floor(Math.random() * users.length)];
+      const message = messages[Math.floor(Math.random() * messages.length)];
+      return `${user}: ${message}`;
+    };
+
+    const updateChatCapacity = () => {
+      if (!chatPanelElement) {
+        chatCapacity = 5;
+        return;
+      }
+
+      const panelHeight = chatPanelElement.clientHeight;
+      const messageHeight = 28;
+      const gap = 8;
+      const nextCapacity = Math.max(4, Math.floor((panelHeight - 36) / (messageHeight + gap)));
+      chatCapacity = nextCapacity;
+
+      if (chatMessages.length < chatCapacity) {
+        const missing = chatCapacity - chatMessages.length;
+        chatMessages = [...chatMessages, ...Array.from({ length: missing }, () => makeChatLine())];
+      } else if (chatMessages.length > chatCapacity) {
+        chatMessages = chatMessages.slice(-chatCapacity);
+      }
+    };
+
+    updateChatCapacity();
+    chatMessages = Array.from({ length: chatCapacity }, () => makeChatLine());
+
+    chatInterval = setInterval(() => {
+      const next = makeChatLine();
+      chatMessages = [...chatMessages.slice(-Math.max(0, chatCapacity - 1)), next];
+      chatMessages = chatMessages.slice(-chatCapacity);
+    }, 4000);
+
+    chatResizeObserver = new ResizeObserver(() => updateChatCapacity());
+    if (chatPanelElement) chatResizeObserver.observe(chatPanelElement);
 
     const cleanup = () => { disconnectSocket(); };
     const KeyDown = (event: KeyboardEvent) =>
@@ -218,12 +267,14 @@
     Resize();
     return () =>
     {
+      if (chatInterval) clearInterval(chatInterval);
       window.removeEventListener('keydown', KeyDown);
       window.removeEventListener('keyup', KeyUp);
       window.removeEventListener('resize', Resize);
       window.removeEventListener('beforeunload', cleanup);
       window.removeEventListener('pagehide', cleanup);
       document.removeEventListener('visibilitychange', cleanup as EventListener);
+      chatResizeObserver?.disconnect();
       cleanup();
     };
   })
@@ -236,344 +287,141 @@
 
 </script>
 
-<main class="pong-page">
-  <section class="portal" aria-label="Partie de Pong">
-    <div class="portal-topline">ARMORED ARCADE // ONLINE GAME ROOM // PLAYER 01</div>
-    <header class="portal-header">
-      <div class="brand-lockup">
-        <div class="brand-mark">P</div>
-        <div>
-          <p class="eyebrow">THE CLASSIC BATTLE</p>
-          <h1>PONG <span>ARENA</span></h1>
+<main class="flex min-h-screen w-full bg-[#d9d9d9] text-[#111111] antialiased">
+
+  <section class="flex min-h-screen flex-1 items-center justify-center" aria-label="Partie de Pong">
+    <div class="flex w-full max-w-[1700px] flex-col items-center justify-center gap-4 px-2 py-4 md:flex-row lg:gap-8 xl:gap-10">
+      <div class="min-w-0 w-full max-w-[420px] shrink-0 md:mr-[10px] md:max-w-[500px] lg:max-w-[560px] xl:max-w-[700px] lg:mr-[80px]">
+        <div class="mb-2 flex items-center justify-center gap-3 border-[3px] border-[#111111] bg-[#ffffff] px-3 py-1.5 shadow-[3px_3px_0_#111111]" aria-label="Score">
+          <span class="font-mono text-[0.68rem] font-bold uppercase tracking-[0.08em] text-[#444444] sm:text-[0.8rem]">{leftPlayerLabel}</span>
+          <strong id="score" class="min-w-[4.5rem] text-center font-mono text-sm font-extrabold text-[#111111] sm:text-base">0  -  0</strong>
+          <span class="font-mono text-[0.68rem] font-bold uppercase tracking-[0.08em] text-[#444444] sm:text-[0.8rem]">{rightPlayerLabel}</span>
         </div>
-      </div>
-      <div class="scoreboard" aria-label="Score">
-        <span class="player-label">{leftPlayerLabel}</span>
-        <strong id="score">0  -  0</strong>
-        <span class="player-label">{rightPlayerLabel}</span>
-      </div>
-    </header>
-
-    <div class="portal-body">
-      <aside class="side-panel left-panel">
-        <span class="panel-title">GAME INFO</span>
-        <div class="info-row"><span>MODE</span><b>{modeLabel}</b></div>
-        {#if matchMode === 'pve'}
-          <div class="info-row"><span>IA</span><b>{aiDifficulty}</b></div>
-        {/if}
-        <div class="info-row"><span>ROUND</span><b>01</b></div>
-        <div class="pixel-divider"></div>
-        <p class="tip">READY PLAYER ONE?</p>
-        <p class="small-copy">Use the arrow keys to move your paddle and Shift to arm your power-up.</p>
-      </aside>
-
-      <div class="game-column">
-        <div class="status-line" aria-live="polite">
-          <span class="status-dot"></span>
-          <span id="game-status">Connexion...</span>
+        <div class="mb-2 flex items-center justify-center gap-2 font-mono text-base font-bold uppercase tracking-[0.08em] text-[#111111]" aria-live="polite">
+          <span class="h-[0.5rem] w-[0.5rem] rounded-full bg-[#2ecc71] shadow-[0_0_0_2px_#1f7d4d]"></span>
+          <span id="game-status" class="text-center text-[clamp(1.2rem,3vw,2.1rem)] font-black leading-none tracking-[0.08em]">Connexion...</span>
         </div>
 
-        <div id="realbackground" class="board-frame">
-          <div id="terrain" class="terrain">
-            <div class="center-line"></div>
-            <div class="center-mark"></div>
-            <div id="racketUp" class="racket racket-up"></div>
-            <div id="racketDown" class="racket racket-down"></div>
-            <div id="ball" class="ball"></div>
-            <div id="where" class="trajectory"></div>
+        <div id="realbackground" class="relative mx-auto w-full max-w-[420px] rounded-none border-[3px] border-[#111111] bg-[#d9d9d9] p-2 shadow-[4px_4px_0_#111111] sm:p-3 lg:max-w-[520px] xl:max-w-[620px]">
+          <div class="relative w-full">
+            <div class="pointer-events-none mb-2 flex justify-center">
+              <div class="border border-[#111111] bg-[#f4f4f4] px-2 py-1 font-mono text-[0.6rem] font-bold uppercase tracking-[0.08em] text-[#111111] sm:text-[0.7rem]">{topPlayerLabel}</div>
+            </div>
 
-            {#if showReadyOverlay}
-              <div class="ready-overlay" aria-live="polite">
-                <p class="ready-title">READY CHECK</p>
-                <p class="ready-subtitle">
-                  {#if !connected}
-                    Connexion au serveur...
-                  {:else if localReady}
-                    En attente de l'autre joueur...
-                  {:else}
-                    Clique sur Ready pour signaler que tu es pret.
-                  {/if}
-                </p>
-                {#if isReadyPhase}
-                  <button
-                    type="button"
-                    class="ready-button"
-                    on:click={clickReady}
-                    disabled={!connected || localReady}
-                  >
-                    {localReady ? 'My body is ready!' : 'Let\'s Get Ready To Rumble!'}
-                  </button>
-                {/if}
-                {#if gameState}
-                  <p class="ready-progress">
-                    J1: {gameState.ready.p1 ? 'pret' : 'attente'} • J2: {gameState.ready.p2 ? 'pret' : 'attente'}
+            <div id="terrain" class="relative h-full w-full overflow-hidden border-[3px] border-[#111111] bg-[#2d2d2d]" style="aspect-ratio: 65 / 73;">
+              <div class="absolute left-[3%] right-[3%] top-1/2 border-t-[3px] border-dashed border-[#f4f4f4]/80"></div>
+              <div class="absolute left-1/2 top-1/2 h-20 w-20 -translate-x-1/2 -translate-y-1/2 rounded-full border-[2px] border-[#f4f4f4]/80"></div>
+              <div id="racketUp" class="absolute z-20 top-[1.7%] h-[1.35%] min-h-[6px] w-[12.3%] rounded-sm border-[2px] border-[#111111] shadow-[2px_2px_0_#111111]" style={topRacketStyle}></div>
+              <div id="racketDown" class="absolute z-20 bottom-[1.7%] h-[1.35%] min-h-[6px] w-[12.3%] rounded-sm border-[2px] border-[#111111] shadow-[2px_2px_0_#111111]" style={bottomRacketStyle}></div>
+              <div id="ball" class="absolute z-20 aspect-square w-[2.3%] rounded-sm border-[2px] border-[#111111] shadow-[2px_2px_0_#111111]" style={localBallSkinStyle}></div>
+              <div id="where" class="absolute z-10 h-[3px] origin-left rounded-none bg-[#ff0000] shadow-[0_0_0.8rem_#ff0000]" style="display:none;"></div>
+
+              {#if showReadyOverlay}
+                <div class="absolute inset-0 z-30 grid place-items-center gap-3 bg-[linear-gradient(180deg,rgba(17,17,17,0.84),rgba(0,0,0,0.9))] p-4 text-center" aria-live="polite">
+                  <p class="m-0 text-center font-mono text-xl font-black uppercase tracking-[0.08em] text-[#ffffff] sm:text-2xl">Ready check</p>
+                  <p class="m-0 text-center font-mono text-sm text-[#f3f3f3] sm:text-base">
+                    {#if !connected}
+                      Connexion au serveur...
+                    {:else if localReady}
+                      En attente de l'autre joueur...
+                    {:else}
+                      Clique sur Ready pour signaler que tu es pret.
+                    {/if}
                   </p>
-                {/if}
-              </div>
-            {/if}
+                  {#if isReadyPhase}
+                    <button
+                      type="button"
+                      class="min-h-[3rem] min-w-[9rem] border-[3px] border-[#111111] bg-[#ff0000] px-5 py-3 font-mono text-sm font-black uppercase text-[#ffffff] shadow-[3px_3px_0_#111111] transition hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0_#111111] disabled:cursor-not-allowed disabled:opacity-70"
+                      onclick={handleClickReady}
+                      disabled={!connected || localReady}
+                    >
+                      {localReady ? 'My body is ready!' : 'Let\'s Get Ready To Rumble!'}
+                    </button>
+                  {/if}
+                  {#if gameState}
+                    <p class="m-0 font-mono text-[0.7rem] font-bold uppercase text-[#aaa8ef] sm:text-xs">
+                      J1: {gameState.ready.p1 ? 'pret' : 'attente'} • J2: {gameState.ready.p2 ? 'pret' : 'attente'}
+                    </p>
+                  {/if}
+                </div>
+              {/if}
+            </div>
+
+            <div class="pointer-events-none mt-2 flex justify-center">
+              <div class="border border-[#111111] bg-[#f4f4f4] px-2 py-1 font-mono text-[0.6rem] font-bold uppercase tracking-[0.08em] text-[#111111] sm:text-[0.7rem]">{bottomPlayerLabel}</div>
+            </div>
           </div>
         </div>
 
-        <div class="touch-controls" aria-label="Commandes tactiles">
+        <div class="mt-2 flex w-full max-w-[420px] items-center justify-center gap-3 lg:max-w-[520px] xl:max-w-[620px]" aria-label="Commandes tactiles">
           <button
             type="button"
             aria-label="Deplacer a gauche"
-            on:pointerdown|preventDefault={(event) => onTouchMoveStart(event, -1)}
-            on:pointerup|preventDefault={onTouchMoveStop}
-            on:pointercancel|preventDefault={onTouchMoveStop}
-            on:pointerleave|preventDefault={onTouchMoveStop}
+            class="min-h-[2.9rem] flex-1 border-[3px] border-[#111111] bg-[#ff0000] px-3 py-2 font-mono text-sm font-black uppercase text-[#ffffff] shadow-[3px_3px_0_#111111] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0_#111111] lg:min-h-[3.4rem] lg:text-base xl:min-h-[3.8rem] xl:text-lg"
+            onpointerdown={(event) => {
+              event.preventDefault();
+              onTouchMoveStart(event, -1);
+            }}
+            onpointerup={(event) => {
+              event.preventDefault();
+              onTouchMoveStop(event);
+            }}
+            onpointercancel={(event) => {
+              event.preventDefault();
+              onTouchMoveStop(event);
+            }}
+            onpointerleave={(event) => {
+              event.preventDefault();
+              onTouchMoveStop(event);
+            }}
           >&lt; LEFT</button>
           <button
             type="button"
-            class="power-button"
-            aria-label="Activer le power-up"
-            on:pointerdown|preventDefault={onPowerDown}
-            on:pointerup|preventDefault={onPowerUp}
-            on:pointercancel|preventDefault={onPowerUp}
-            on:pointerleave|preventDefault={onPowerUp}
-          >POWER-UP</button>
-          <button
-            type="button"
             aria-label="Deplacer a droite"
-            on:pointerdown|preventDefault={(event) => onTouchMoveStart(event, 1)}
-            on:pointerup|preventDefault={onTouchMoveStop}
-            on:pointercancel|preventDefault={onTouchMoveStop}
-            on:pointerleave|preventDefault={onTouchMoveStop}
+            class="min-h-[2.9rem] flex-1 border-[3px] border-[#111111] bg-[#ff0000] px-3 py-2 font-mono text-sm font-black uppercase text-[#ffffff] shadow-[3px_3px_0_#111111] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0_#111111] lg:min-h-[3.4rem] lg:text-base xl:min-h-[3.8rem] xl:text-lg"
+            onpointerdown={(event) => {
+              event.preventDefault();
+              onTouchMoveStart(event, 1);
+            }}
+            onpointerup={(event) => {
+              event.preventDefault();
+              onTouchMoveStop(event);
+            }}
+            onpointercancel={(event) => {
+              event.preventDefault();
+              onTouchMoveStop(event);
+            }}
+            onpointerleave={(event) => {
+              event.preventDefault();
+              onTouchMoveStop(event);
+            }}
           >RIGHT &gt;</button>
         </div>
       </div>
 
-      <aside class="side-panel right-panel">
-        <span class="panel-title">STATUS</span>
-        <div class="signal"><i></i><span>SERVER ONLINE</span></div>
-        <div class="signal"><i></i><span>60 FPS LINK</span></div>
-        <div class="pixel-divider"></div>
-        <p class="tip">HIGH SCORE</p>
-        <strong class="high-score">15 POINTS</strong>
+      <aside bind:this={chatPanelElement} class="flex h-[220px] w-full max-w-[420px] shrink-0 flex-col border-[3px] border-[#111111] bg-[#f5f5f5] p-2 shadow-[4px_4px_0_#111111] md:h-[420px] md:max-w-[270px] md:w-[270px] lg:h-[62vh] lg:min-h-[500px] lg:w-[32vw] lg:max-w-[520px] xl:h-[72vh] xl:min-h-[620px] xl:w-[34vw] xl:max-w-[620px]">
+        <div class="mb-2 flex items-center justify-between border-b-[2px] border-[#111111] bg-[#e1e1e1] px-2 py-1 text-[0.55rem] font-black uppercase tracking-[0.14em] text-[#111111] lg:text-[0.75rem] xl:text-[0.9rem]">
+          <span>Chat</span>
+          <span class="text-[#ff0000]">LIVE ?</span>
+        </div>
+
+        <div class="flex-1 overflow-y-auto border-[2px] border-[#111111] bg-[#f7f7f7] p-2 lg:p-3 xl:p-4">
+          <div class="flex h-full min-h-[150px] flex-col gap-2 xl:gap-3">
+            {#if chatMessages.length}
+              {#each chatMessages as message}
+                <div class="border-[2px] border-[#111111] bg-[#ffffff] p-1.5 text-[0.56rem] font-bold uppercase tracking-[0.05em] text-[#111111] lg:text-[0.72rem] xl:text-[0.9rem]">
+                  {message}
+                </div>
+              {/each}
+            {:else}
+              <div class="border-[2px] border-[#111111] bg-[#ffffff] p-2 text-[0.6rem] font-bold uppercase tracking-[0.08em] text-[#111111] lg:text-[0.7rem] xl:text-[0.9rem]">
+                Waiting for chat...
+              </div>
+            {/if}
+          </div>
+        </div>
       </aside>
     </div>
-    <footer class="portal-footer">[ PONG ARENA ] &nbsp; BEST VIEWED IN FULL SCREEN &nbsp; // &nbsp; INSERT COIN: FREE PLAY</footer>
   </section>
 </main>
 
-<style>
-  .pong-page {
-    min-height: 100vh;
-    width: 100%;
-    box-sizing: border-box;
-    display: grid;
-    place-items: start center;
-    padding: 0;
-    background: #302e78;
-    color: #fff8da;
-    font-family: Verdana, Geneva, sans-serif;
-  }
-
-  .portal {
-    width: 100%;
-    min-height: 100vh;
-    display: grid;
-    grid-template-rows: auto 1fr;
-    gap: 0;
-    background: #302e78;
-    border: 0;
-    box-shadow: none;
-  }
-
-  .portal-topline, .portal-footer {
-    display: none;
-    background: #08081d;
-    color: #aaa8ef;
-    font: 700 1.2rem/1.2 monospace;
-    letter-spacing: .08em;
-    text-align: center;
-  }
-
-  .portal-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    padding: .35rem clamp(.8rem, 3vw, 2rem);
-    background: linear-gradient(180deg, #45419e, #2c2a72);
-    border-bottom: 3px solid #0b0b24;
-  }
-
-  .brand-lockup { display: flex; align-items: center; gap: .6rem; }
-  .brand-mark {
-    display: grid;
-    place-items: center;
-    width: 2.7rem;
-    height: 2.7rem;
-    color: #20204f;
-    background: #f8dd45;
-    border: 3px solid #10102e;
-    box-shadow: 3px 3px 0 #10102e;
-    font: 900 2rem/1 Georgia, serif;
-    transform: rotate(-5deg);
-  }
-
-  .eyebrow {
-    margin: 0 0 .25rem;
-    color: #ffdf4b;
-    font: 700 1.4rem/1 monospace;
-    letter-spacing: .14em;
-  }
-
-  h1 {
-    margin: 0;
-    color: #fff8da;
-    text-shadow: 3px 3px 0 #191846;
-    font: 900 clamp(1.6rem, 5vw, 3.2rem)/.9 Georgia, serif;
-    letter-spacing: 0;
-  }
-
-  h1 span { color: #ff668d; }
-
-  .scoreboard {
-    display: flex;
-    align-items: center;
-    gap: .7rem;
-    padding: .45rem .7rem;
-    border: 3px solid #111131;
-    background: #171744;
-    box-shadow: 3px 3px 0 #111131;
-  }
-
-  .scoreboard strong {
-    min-width: 5rem;
-    color: #ffdf4b;
-    font: 800 1.2rem/1 monospace;
-    text-align: center;
-  }
-
-  .player-label { color: #aaa8ef; font: 700 1.4rem/1 monospace; }
-  .portal-body { display: grid; grid-template-columns: 20rem minmax(0, 1fr) 20rem; gap: clamp(.75rem, 1.5vw, 1.5rem); align-items: center; padding: clamp(.8rem, 2vw, 1.5rem) clamp(1rem, 2vw, 2rem); background: #302e78; }
-  .game-column { min-width: 0; display: flex; flex-direction: column; align-items: center; }
-  .side-panel { width: 100%; box-sizing: border-box; align-self: stretch; padding: .8rem .65rem; background: #211f5a; border: 2px solid #6b63bb; box-shadow: 3px 3px 0 #171642; }
-  .panel-title { display: block; padding-bottom: .5rem; color: #ffdf4b; font: 900 1.6rem/1 monospace; border-bottom: 2px solid #ff668d; }
-  .info-row { display: flex; justify-content: space-between; gap: .4rem; padding: .55rem 0; color: #aaa8ef; font: 1.4rem/1 monospace; }
-  .info-row b, .high-score { color: #fff8da; }
-  .pixel-divider { height: 5px; margin: .7rem 0; background: repeating-linear-gradient(90deg, #ff668d 0 5px, transparent 5px 9px); }
-  .tip { color: #ff668d; font: 900 1.4rem/1.3 monospace; }
-  .small-copy { color: #aaa8ef; font: 1.4rem/1.5 Verdana, sans-serif; }
-  .signal { display: flex; gap: .4rem; align-items: center; padding: .55rem 0; color: #aaa8ef; font: 1.3rem/1 monospace; }
-  .signal i, .status-dot { width: .55rem; height: .55rem; flex: 0 0 auto; border-radius: 50%; background: #62e6a8; box-shadow: 0 0 0 2px #235f55; }
-  .high-score { display: block; font: 900 1.5rem/1 monospace; }
-  .status-line { display: flex; align-items: center; gap: .5rem; margin-bottom: .6rem; color: #fff8da; font: 700 1.4rem/1 monospace; }
-  #game-status { font-size: clamp(2.2rem, 4vw, 3.2rem); line-height: 1; letter-spacing: .08em; font-weight: 900; }
-
-  .board-frame {
-    width: min(100%, calc((100vh - 10rem) * .84));
-    aspect-ratio: 65 / 73;
-    padding: clamp(.45rem, 1.5vw, .8rem);
-    background: #0b1722;
-    border: 2px solid #111131;
-    box-shadow: 3px 3px 0 #111131;
-  }
-
-  .terrain {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    background: #123c52;
-    border: 1px solid #5a9a9c;
-  }
-
-  .terrain::before, .terrain::after { content: ''; position: absolute; inset: 0; pointer-events: none; }
-  .terrain::before { background: none; }
-  .terrain::after { box-shadow: inset 0 0 2rem #06192388; }
-  .center-line { position: absolute; top: 50%; left: 3%; right: 3%; border-top: 3px dashed #d2ffe777; }
-  .center-mark { position: absolute; width: 5rem; height: 5rem; top: calc(50% - 2.5rem); left: calc(50% - 2.5rem); border: 2px solid #d2ffe755; border-radius: 50%; }
-  .racket, .ball, .trajectory { position: absolute; z-index: 2; }
-  .racket { width: 12.3%; height: 1.35%; min-height: 6px; background: #ffdf4b; border: 2px solid #9b641d; border-radius: 2px; box-shadow: 3px 3px 0 #172b36; }
-  .racket-up { top: 1.7%; }
-  .racket-down { bottom: 1.7%; }
-  .ball { width: 2.3%; aspect-ratio: 1; background: #ff668d; border: 2px solid #8d3156; border-radius: 2px; box-shadow: 3px 3px 0 #172b36; }
-  .trajectory { height: 3px; transform-origin: left center; background: #ffdf4b; box-shadow: 0 0 .8rem #ffdf4b; border-radius: 0; }
-  .touch-controls {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 1rem;
-    margin-top: .9rem;
-    color: #aaa8ef;
-    font: 1.3rem/1 monospace;
-    user-select: none;
-    -webkit-user-select: none;
-  }
-
-  .touch-controls button {
-    min-height: 3.2rem;
-    padding: 0 1rem;
-    border: 3px solid #111131;
-    background: #ff668d;
-    color: #211f5a;
-    box-shadow: 3px 3px 0 #111131;
-    font: 900 1.4rem/1 monospace;
-    touch-action: manipulation;
-    user-select: none;
-    -webkit-user-select: none;
-    -webkit-touch-callout: none;
-  }
-
-  .power-button {
-    background: #62e6a8;
-    color: #111131;
-  }
-  .touch-controls button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 #111131; }
-
-  .ready-overlay {
-    position: absolute;
-    inset: 0;
-    z-index: 6;
-    display: grid;
-    place-items: center;
-    align-content: center;
-    gap: .8rem;
-    background: linear-gradient(180deg, #08131dd9 0%, #111131e6 100%);
-    text-align: center;
-    padding: 1rem;
-  }
-
-  .ready-title {
-    margin: 0;
-    color: #ffdf4b;
-    font: 900 clamp(1.3rem, 3vw, 2rem)/1 monospace;
-    letter-spacing: .08em;
-  }
-
-  .ready-subtitle {
-    margin: 0;
-    color: #fff8da;
-    font: 700 1rem/1.4 monospace;
-  }
-
-  .ready-button {
-    min-width: 9rem;
-    min-height: 3rem;
-    padding: 0 1.2rem;
-    border: 3px solid #111131;
-    background: #62e6a8;
-    color: #111131;
-    box-shadow: 3px 3px 0 #111131;
-    font: 900 1.2rem/1 monospace;
-    cursor: pointer;
-  }
-
-  .ready-button:disabled {
-    opacity: .65;
-    cursor: not-allowed;
-  }
-
-  .ready-progress {
-    margin: 0;
-    color: #aaa8ef;
-    font: 700 .9rem/1.2 monospace;
-  }
-
-  @media (min-width: 700px) { .touch-controls { display: none; } }
-  @media (max-width: 760px) { .portal-body { grid-template-columns: 1fr; } .side-panel { display: none; } .board-frame { width: 100%; } }
-  @media (max-width: 480px) { .pong-page { padding: .5rem; } .portal-header { align-items: flex-start; flex-direction: column; } .scoreboard { align-self: stretch; justify-content: center; } .portal-footer { font-size: .52rem; } }
-</style>

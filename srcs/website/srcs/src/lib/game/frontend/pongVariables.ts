@@ -16,7 +16,7 @@ export function initGameClient()
 
   const scale = { x: 1, y: 1 };
   const network = { connected: false, gameState: null as ClientGameState | null };
-  const input: PlayerInput = { move: 0, special: false };
+  const input: PlayerInput = { move: 0 };
 
   return {
     terrainElem,

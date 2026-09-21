@@ -1,9 +1,17 @@
 import type { ClientGameState, PlayerInput, ServerMessage } from "../both/interfaces";
 
+function sendIfOpen(socket: WebSocket | null | undefined, payload: unknown)
+{
+  if (!socket || socket.readyState !== WebSocket.OPEN)
+    return;
+
+  socket.send(JSON.stringify(payload));
+}
+
 export function connection(
   socket: WebSocket,
   onGameState: (state: ClientGameState) => void,
-  onPlayerAssigned?: (side: 1 | 2, instanceId?: string, opponentUsername?: string | null) => void
+  onPlayerAssigned?: (side: 1 | 2, instanceId?: string, opponentUsername?: string | null, opponentSkinRac?: number | string | null) => void
 )
 {
   socket.addEventListener("open", () => { console.log("Connected"); });
@@ -13,29 +21,29 @@ export function connection(
     switch (message.type)
     {
       case "pong":
-        socket.send(JSON.stringify({ type: "pang" }));
+        sendIfOpen(socket, { type: "pang" });
         break;
       case "gameState":
         onGameState(message.state);
         break;
       case "playerAssigned":
-        onPlayerAssigned?.(message.side, message.instanceId, message.opponentUsername ?? null);
+        onPlayerAssigned?.(message.side, message.instanceId, message.opponentUsername ?? null, message.opponentSkinRac ?? null);
         break;
     }
   });
 }
 
-export function ping(socket: WebSocket)
+export function ping(socket: WebSocket | null | undefined)
 {
-  socket.send(JSON.stringify({ type: "ping" }));
+  sendIfOpen(socket, { type: "ping" });
 }
 
-export function sendInput(socket: WebSocket, input: PlayerInput)
+export function sendInput(socket: WebSocket | null | undefined, input: PlayerInput)
 {
-  socket.send(JSON.stringify({ type: "input", input }));
+  sendIfOpen(socket, { type: "input", input });
 }
 
-export function sendReady(socket: WebSocket)
+export function sendReady(socket: WebSocket | null | undefined)
 {
-  socket.send(JSON.stringify({ type: "ready" }));
+  sendIfOpen(socket, { type: "ready" });
 }
