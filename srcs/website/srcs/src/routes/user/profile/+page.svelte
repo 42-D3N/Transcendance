@@ -119,9 +119,9 @@
                     <span class="block mt-4 text-black text-base md:text-xl font-bold">Friends:</span>
                 {/if}
 
-                <div class="grid grid-cols-4 gap-4 mt-4 w-[60%] lg:w-[40%]">
+                <div class="grid grid-cols-2 xl:grid-cols-180 sm:grid-cols-4 gap-4 sm:gap-16 mt-4 w-[80%] xl:w-[40%]">
                 {#each data.friends as friend}
-                    <form method="POST" enctype="multipart/form-data" class="flex size-fit" action="?/rmFriend" use:enhance={({ formData }) => {
+                    <form method="POST" enctype="multipart/form-data" class="size-fit" action="?/rmFriend" use:enhance={({ formData }) => {
                             formData.append('friend', JSON.stringify(friend.id));
                             formData.append('user', JSON.stringify(data.id));
                         }}>
@@ -155,7 +155,7 @@
                                 class="flex items-center gap-3 p-2 bg-[#C0C0C0] border-t-2 border-l-2 border-b-2 border-r-2 border-t-white border-l-white border-b-[#404040] border-r-[#404040]"
                             >
                                 <div class="p-[2px] bg-white border-t-2 border-l-2 border-b-2 border-r-2 border-t-[#404040] border-l-[#404040] border-b-white border-r-white shrink-0">
-                                    <div class="h-[3rem] w-[3rem] lg:h-[4rem] lg:w-[4rem] 2xl:h-[5rem] 2xl:w-[5rem] aspect-square overflow-hidden bg-amber-50">
+                                    <div class="not-sm:h-[2rem] not-sm:w-[2rem] h-[3rem] w-[3rem] lg:h-[4rem] lg:w-[4rem] 2xl:h-[5rem] 2xl:w-[5rem] aspect-square overflow-hidden bg-amber-50">
                                         {#if !friend.icon}
                                             <img
                                                 class="block h-full w-full aspect-square object-cover"

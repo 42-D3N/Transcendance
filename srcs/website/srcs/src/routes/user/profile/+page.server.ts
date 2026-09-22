@@ -185,8 +185,14 @@ export const actions = {
         let requestExisting = (await db.select({ user1:friends.user1, user2:friends.user2, isaccepted:friends.isaccepted })
         .from(friends)
         .where(or(
-            eq(friends.user1, parseInt(infoTab[1])),
-            eq(friends.user2, parseInt(infoTab[1]))
+            and(
+                eq(friends.user1, parseInt(infoTab[1])),
+                eq(friends.user2, parseInt(myUsername.id))
+            ),
+            and(
+                eq(friends.user1, parseInt(myUsername.id)),
+                eq(friends.user2, parseInt(infoTab[1]))
+            )
         )));
 
         if (requestExisting[0])
