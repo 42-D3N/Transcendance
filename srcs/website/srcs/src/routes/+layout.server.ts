@@ -22,13 +22,6 @@ export async function load ({ cookies }) {
     {
         let userInfos = await validateJWT(JWTtoken);
 
-        if (userInfos["JWT"] != undefined)
-        {
-            JWTtoken = userInfos["JWT"];
-            cookies.set('JWTtoken', JWTtoken, { path: '/' });
-            userInfos = await validateJWT(JWTtoken);
-        }
-
         if (!userInfos || userInfos["empty"] == 0)
         {
             cookies.set('JWTtoken', '-1', { path: '/' });

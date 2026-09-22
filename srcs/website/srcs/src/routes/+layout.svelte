@@ -134,7 +134,7 @@
 		<a class="ft-user-profile-button" href="/user/profile">
 			<img class="ft-user-avatar" src={!data.icon?usericon:data.icon} alt="your avatar"/>
 			<div id="user-info-container">	
-				<span class="lg:max-xl:hidden text-white">{data.username < 10?data.username:data.username.slice(0, 7)}</span><br/>
+				<span class="lg:max-xl:hidden text-white">{data.username.length < 10?data.username:(data.username.slice(0, 7)+"...")}</span><br/>
 				<span class="content-center w-5 text-lg hidden xl:block text-white">W: {data.wallet <= 9999?data.wallet:JSON.stringify(data.wallet).slice(0,4) + ".."}$</span>
 			</div>
 		</a>

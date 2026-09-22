@@ -2,11 +2,11 @@
 	let { data } = $props();
 </script>
 
-<div class="w-full max-w-[200rem] z-1 content-start grow shrink-0 p-[1.6rem] font-['Verdana','Geneva','Arial',sans-serif] text-[11px] leading-[1.5]">
-	<div class="max-w-[780px] mx-auto lg:mt-[9.9%] lg:scale-150">
+<div class="w-full z-1 content-start grow shrink-0 p-[1.6rem] font-['Verdana','Geneva','Arial',sans-serif] text-[11px]">
+	<div class="mx-auto lg:mt-[9.9%] w-[80%] lg:w-[80%] not-sm:scale-75 not-sm:w-full lg:scale-120">
 
 		<div class="bg-gradient-to-b from-[#1b4b8f] to-[#00214d] border border-[#001233] px-3.5 py-2.5 flex items-baseline justify-between flex-wrap gap-1">
-			<div class="font-['Georgia','Times_New_Roman',serif] text-[26px] sm:text-xl font-bold text-white tracking-wide">
+			<div class="font-['Georgia','Times_New_Roman',serif] not-sm:text-[22px] sm:text-4xl font-bold text-white tracking-wide">
 				Transcendance<span class="text-[#8fb4ea]">.forum</span>
 			</div>
 			<div class="text-[#b9cdea] text-[10px] italic">pong &middot; shop &middot; friends &middot; chat &mdash; est. 2024</div>
@@ -32,7 +32,7 @@
 				<span>4 members currently building this thread</span>
 			</div>
 
-			<div class="grid grid-cols-[150px_1fr] sm:grid-cols-1">
+			<div class="grid grid-cols-[150px_1fr] not-sm:grid-cols-[110px_1fr] sm:grid-cols-1">
 
 	
 				<div class="bg-[#eef2f8] border-r border-[#8ba3c7] sm:border-r-0 sm:border-b sm:border-[#8ba3c7] px-2 py-2.5 text-[10px] text-[#4a5c78] sm:flex sm:items-center sm:gap-2.5">
