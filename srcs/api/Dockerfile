@@ -1,8 +1,7 @@
 FROM node:26-trixie AS dev
 WORKDIR /app
 
-RUN --mount=type=cache,target=/root/.npm \
-    --mount=type=bind,source=./srcs/package.json,target=package.json \
+RUN --mount=type=bind,source=./srcs/package.json,target=package.json \
     --mount=type=bind,source=./srcs/package-lock.json,target=package-lock.json \
     npm ci
 COPY ./srcs /app
@@ -15,8 +14,7 @@ CMD ["npm", "run", "dev"]
 FROM node:26-trixie AS deps
 WORKDIR /app
 
-RUN --mount=type=cache,target=/root/.npm \
-    --mount=type=bind,source=srcs/package.json,target=package.json \
+RUN --mount=type=bind,source=srcs/package.json,target=package.json \
     --mount=type=bind,source=srcs/package-lock.json,target=package-lock.json \
     npm ci --omit=dev
 

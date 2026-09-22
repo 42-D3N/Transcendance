@@ -1,0 +1,107 @@
+services:
+  reverse-proxy:
+    image: transcendance-reverse-proxy
+    build: ./srcs/reverse-proxy
+    pull_policy: never
+    restart: always
+    networks:
+      - transcendance
+    ports:
+      - "5000:5000"
+    depends_on:
+      - website
+      - game_server
+      - chat-server
+  database:
+    image: transcendance-db
+    build: ./srcs/database
+    pull_policy: never
+    restart: always
+    networks:
+      - transcendance
+    env_file:
+      - ./srcs/database/.env
+    volumes:
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "psql -U $${POSTGRES_USER} -d $${POSTGRES_DB} -c 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+  api:
+    image: transcendance-api
+    build: 
+      context: ./srcs/api
+      target: runner
+    pull_policy: never
+    env_file:
+      - ./srcs/api/srcs/.env
+    restart: always
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - transcendance
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9090/healthcheck || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+      start_interval: 5s
+  website:
+    command: npm run dev -- --host
+    image: transcendance-front-end
+    build: ./srcs/website
+    pull_policy: never
+    env_file:
+      - ./srcs/website/srcs/.env
+    networks:
+      - transcendance
+    restart: always
+    depends_on:
+      api:
+        condition: service_healthy
+  game_server:
+    command: npm run dev
+    image: game_serv
+    build: ./srcs/game-server
+    pull_policy: never
+    env_file:
+      - ./srcs/game-server/srcs/.env
+    networks:
+      - transcendance
+    restart: always
+    depends_on:
+      api:
+        condition: service_healthy
+  chat-server:
+    command: npm run dev
+    image: transcendance-chat-server
+    build: ./srcs/chat-server
+    pull_policy: never
+    env_file:
+      - ./srcs/chat-server/srcs/.env
+    networks:
+      - transcendance
+    restart: always
+    depends_on:
+      api:
+        condition: service_healthy
+  adminer:
+    image: adminer
+    restart: always
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - transcendance
+    ports:
+      - 4040:8080
+
+volumes:
+  pgdata:
+
+networks:
+  transcendance:
+    name: transcendance
