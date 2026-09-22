@@ -50,9 +50,10 @@ services:
       start_period: 30s
       start_interval: 5s
   website:
-    command: npm run dev -- --host
     image: transcendance-front-end
-    build: ./srcs/website
+    build:
+      context: ./srcs/website
+      target: runner
     pull_policy: never
     env_file:
       - ./srcs/website/srcs/.env

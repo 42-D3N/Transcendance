@@ -29,4 +29,4 @@ COPY --from=dev --chown=node:node /app/build ./build
 
 EXPOSE 5173
 
-CMD ["PORT=5173", "node", "build/index.js"]
+CMD ["node", "build/index.js"]
