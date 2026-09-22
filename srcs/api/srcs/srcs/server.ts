@@ -20,7 +20,7 @@ const publicLimiter = rateLimit({
 const apiLimiter = rateLimit({
     windowMs: 60 * 1000,
     max: 120,
-    skip: (req) => req.user?.role === "admin",
+    skip: (req:any) => req.user?.role === "admin",
     handler: (req, res, next) => next(new CustomError("Too many requests. Please try again later.",429)),
 });
 
