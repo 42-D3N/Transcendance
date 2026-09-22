@@ -50,12 +50,16 @@ const start = async () => {
         const opponentUser = side === 1
           ? gameInstances.getOpponentUsername(joinResult.instanceId, 1)
           : gameInstances.getOpponentUsername(joinResult.instanceId, 2);
+        const opponentSkinRac = side === 1
+          ? gameInstances.getOpponentSkinRac(joinResult.instanceId, 1)
+          : gameInstances.getOpponentSkinRac(joinResult.instanceId, 2);
 
         socket.send(JSON.stringify({
           type: 'playerAssigned',
           side,
           instanceId: joinResult.instanceId,
-          opponentUsername: opponentUser ?? null
+          opponentUsername: opponentUser ?? null,
+          opponentSkinRac: opponentSkinRac ?? null
         }));
       }
 

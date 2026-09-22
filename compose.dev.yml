@@ -80,6 +80,9 @@ services:
             - node_modules/
         - action: rebuild
           path: ./srcs/website/srcs/package.json
+    depends_on:
+      api:
+        condition: service_started
   game_server:
     image: game_serv
     build:
@@ -126,6 +129,9 @@ services:
             - node_modules/
         - action: rebuild
           path: ./srcs/chat-server/srcs/package.json
+    depends_on:
+      api:
+        condition: service_started
   adminer:
     image: adminer
     restart: always
