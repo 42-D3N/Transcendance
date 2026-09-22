@@ -63,8 +63,8 @@ services:
         - action: rebuild
           path: ./srcs/website/srcs/package.json
     depends_on:
-      database:
-        condition: service_healthy
+      api:
+        condition: service_started
   game_server:
     command: npm run dev
     image: game_serv
@@ -76,8 +76,8 @@ services:
       - transcendance
     restart: always
     depends_on:
-      database:
-        condition: service_healthy
+      api:
+        condition: service_started
   chat-server:
     command: npm run dev
     image: transcendance-chat-server
@@ -98,8 +98,8 @@ services:
         - action: rebuild
           path: ./srcs/chat-server/srcs/package.json
     depends_on:
-      database:
-        condition: service_healthy
+      api:
+        condition: service_started
   adminer:
     image: adminer
     restart: always

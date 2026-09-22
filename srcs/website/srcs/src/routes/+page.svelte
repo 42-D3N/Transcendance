@@ -20,11 +20,6 @@
 				<span class="text-[#d6e2f2] mx-[3px]">&raquo;</span>
 				Welcome, visitor!
 			</div>
-			<div>
-				<a href="/login" class="font-bold text-white hover:underline">Log in</a>
-				<span class="mx-1">|</span>
-				<a href="/sign_in" class="font-bold text-white hover:underline">Register</a>
-			</div>
 		</div>
 
 		<div class="bg-white border border-[#8ba3c7] border-t-0 mb-3">
