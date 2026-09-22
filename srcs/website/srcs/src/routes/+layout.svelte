@@ -114,6 +114,7 @@
 			</a>
 		</div>
 		<hr class="mt-auto border-none">
+		<!-- FULL SCREEN -->
 		{#if data.Token === '-1'}
 		<div id="sidebar-login-buttons" class="sidebar-buttons-box gap-[1.2rem] mt-[1.2rem]">
 			<a id="signup-button" class="ft-button ft-button-medium sidebar-link sidebar-collapse-icon bg-[#1A8A35FF] hover:bg-[#27B849FF]" href="/sign_in">
@@ -134,7 +135,7 @@
 			<img class="ft-user-avatar" src={!data.icon?usericon:data.icon} alt="your avatar"/>
 			<div id="user-info-container">	
 				<span class="lg:max-xl:hidden text-white">{data.username < 10?data.username:data.username.slice(0, 7)}</span><br/>
-				<span class="content-center w-5 text-lg hidden xl:block text-white">wallet: {data.wallet}$</span>
+				<span class="content-center w-5 text-lg hidden xl:block text-white">W: {data.wallet <= 9999?data.wallet:JSON.stringify(data.wallet).slice(0,4) + ".."}$</span>
 			</div>
 		</a>
 		<div class="sidebar-footer-icons mobile-hidden">
@@ -154,9 +155,11 @@
 				</a>
 			</div>
 		</div>
+		<footer class="px-2 py-2"> <div class="mx-auto flex w-fit flex-col items-center gap-1 rounded-lg border border-white bg-black/20 px-3 py-2 text-xs xl:flex-row xl:gap-3" > <a href="/ToS" class="text-white/70 transition-colors duration-200 hover:text-white" > ToS </a> <span class="h-px w-5 bg-white/40 xl:h-3 xl:w-px" aria-hidden="true" ></span> <a href="/pp" class="text-white/70 transition-colors duration-200 hover:text-white" > PP </a> </div> </footer>
 		{/if}
 	</nav>
 </div>
+<!-- MOBILE -->
 <div class="flex flex-col min-h-dvh">
 	<header id="mobile-header" class="bg-[#333131FF] lg:hidden left-0 right-0 top-0 sticky z-100" bind:this={header} data-sveltekit-reload>
 		<div class="flex flex-row items-center justify-between py-[0.8rem] px-[0.4rem]">
