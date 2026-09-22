@@ -2,7 +2,7 @@
 	let { data } = $props();
 </script>
 
-<main class="w-full max-w-[200rem] z-1 content-start grow shrink-0 p-[1.6rem] font-['Verdana','Geneva','Arial',sans-serif] text-[11px] leading-[1.5]">
+<div class="w-full max-w-[200rem] z-1 content-start grow shrink-0 p-[1.6rem] font-['Verdana','Geneva','Arial',sans-serif] text-[11px] leading-[1.5]">
 	<div class="max-w-[780px] mx-auto lg:mt-[9.9%] lg:scale-150">
 
 		<div class="bg-gradient-to-b from-[#1b4b8f] to-[#00214d] border border-[#001233] px-3.5 py-2.5 flex items-baseline justify-between flex-wrap gap-1">
@@ -132,4 +132,4 @@
 			</table>
 		</div>
 	</div>
-</main>
+</div>

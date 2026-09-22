@@ -1,4 +1,4 @@
-import { eq, and } from "drizzle-orm";
+import { eq, and, or } from "drizzle-orm";
 import { db } from "../db/db.ts";
 import { users, shop, inventory } from "../db/schema.ts";
 import bcrypt, { hashSync } from "bcryptjs";
@@ -14,7 +14,7 @@ export async function adduser(req: Request, res: Response, next: NextFunction) {
   }
   try {
     const { username, email, password } = req.body;
-    const already = await db.select({username: users.username}).from(users).where(and(eq(users.email, email), eq(users.username, username)));
+    const already = await db.select({username: users.username}).from(users).where(or(eq(users.email, email), eq(users.username, username)));
     if (already.length !== 0) {
       return next(new CustomError("Error: user already in database", 400));
     }
@@ -25,6 +25,8 @@ export async function adduser(req: Request, res: Response, next: NextFunction) {
       password: hashedPassword
     }).returning();
     const product = await db.select().from(shop);
+    if (product.length === 0)
+      return next(new CustomError("Error: shop table not found in the database", 412));
     await db.insert(inventory).values(
       product.map((product) => ({
         user: Data[0].id,
