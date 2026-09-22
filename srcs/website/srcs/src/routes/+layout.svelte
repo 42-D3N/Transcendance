@@ -155,8 +155,14 @@
 				</a>
 			</div>
 		</div>
-		<footer class="px-2 py-2"> <div class="mx-auto flex w-fit flex-col items-center gap-1 rounded-lg border border-white bg-black/20 px-3 py-2 text-xs xl:flex-row xl:gap-3" > <a href="/ToS" class="text-white/70 transition-colors duration-200 hover:text-white" > ToS </a> <span class="h-px w-5 bg-white/40 xl:h-3 xl:w-px" aria-hidden="true" ></span> <a href="/pp" class="text-white/70 transition-colors duration-200 hover:text-white" > PP </a> </div> </footer>
 		{/if}
+		<footer class="px-2 py-2">
+			<div class="mx-auto flex w-fit flex-col items-center gap-1 rounded-lg border border-white bg-black/20 px-3 py-2 text-xs xl:flex-row xl:gap-3" >
+				<a href="/ToS" class="text-white/70 transition-colors duration-200 hover:text-white" > ToS </a>
+				<span class="h-px w-5 bg-white/40 xl:h-3 xl:w-px" aria-hidden="true" ></span>
+				<a href="/pp" class="text-white/70 transition-colors duration-200 hover:text-white" > PP </a>
+			</div>
+		</footer>
 	</nav>
 </div>
 <!-- MOBILE -->
