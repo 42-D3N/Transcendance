@@ -60,7 +60,7 @@ class ChatClient {
 
 		this.ws.onmessage = event => {
 			let data = JSON.parse(event.data);
-			// console.log(data);
+			console.log(data);
 			switch (data.type) {
 				case "contacts":
 					activeChats.splice(0);

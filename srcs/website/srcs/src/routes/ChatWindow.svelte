@@ -1,10 +1,10 @@
 <script lang="ts">
-    import { chatClient, openedChats } from "$lib/chat-client.svelte.ts";
+    import { chatClient, openedChats, activeChats } from "$lib/chat-client.svelte.ts";
 	import usericon from '$lib/assets/user/default.svg';
 
 	let { index, userId } = $props();
 	let chatMessage:string = $state("");
-	let userNewChat:string = $state();
+	let userNewChat:string = $state("");
 	let messagesBox:HTMLElement;
 
 	const scrollToBottom = async (node) => {
@@ -34,8 +34,22 @@
 				userNewChat = "";
 				close();
 			}
-			else
-				chatClient.checkUserExists(userNewChat, index);
+			else {
+				let targetId = -1;
+				activeChats.forEach((user, i) => {
+					if (user.name === userNewChat)
+						targetId = i;
+				});
+				if (targetId === -1)
+					chatClient.checkUserExists(userNewChat, index);
+				else {
+					openedChats[index].id = activeChats[targetId].id;
+					openedChats[index].name = activeChats[targetId].name;
+					openedChats[index].avatar = activeChats[targetId].avatar;
+					openedChats[index].online = activeChats[targetId].online;
+					chatClient.sendRequest(activeChats[targetId].id);
+				}
+			}
 		}
 	}
 	function handleChatInput(event: any) {
