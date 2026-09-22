@@ -20,7 +20,7 @@
         {#if form?.username_exists}<p class="error text-sm text-red-700 italic">Username already used</p>{/if}
         <label class="text-white">
             Email:<br>
-            <input name="email" value={form?.email} class="border border-solid border-zinc-400 bg-[#333131FF] focus:bg-black/20 max-w-full">
+            <input name="email" value={form?.email} minlength="8" maxlength="128" class="border border-solid border-zinc-400 bg-[#333131FF] focus:bg-black/20 max-w-full">
         </label><br>
         {#if form?.empty}<p class="error text-sm text-red-700 italic">The email field is required</p>{/if}
         {#if form?.wrong}<p class="error text-sm text-red-700 italic">Invalid Email!</p>{/if}
