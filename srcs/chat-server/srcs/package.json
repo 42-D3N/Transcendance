@@ -1,29 +1,31 @@
 {
   "name": "chat-server",
-
-
+  "type": "module",
   "version": "1.0.0",
-  "main": "src/index.ts",
+  "main": "index.js",
   "scripts": {
-    "dev": "tsx watch src/index.ts"
+    "dev": "tsx watch src/index.ts",
+    "build": "npx tsc",
+    "start": "node --env-file=.env dist/index.js"
   },
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
     "@fastify/websocket": "^11.3.0",
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.3",
     "dotenv": "^17.4.2",
     "drizzle-orm": "^0.45.2",
-	"bcrypt": "^6.0.0",
-	"bcryptjs": "^3.0.3",
     "fastify": "^5.11.2",
     "fastify-cli": "^8.0.0",
-    "ts-node": "^10.9.2",
-    "typescript": "^6.0.3",
     "postgres": "^3.4.9"
   },
   "devDependencies": {
+    "@types/ws": "^8.18.1",
     "drizzle-kit": "^0.31.10",
-    "tsx": "^4.23.5"
+    "ts-node": "^10.9.2",
+    "tsx": "^4.23.5",
+    "typescript": "^6.0.3"
   }
 }
