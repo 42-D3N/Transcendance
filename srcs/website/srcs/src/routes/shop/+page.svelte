@@ -35,7 +35,7 @@
         const result = await response.json();
         const data = JSON.parse(result.data);
         return_val = data[2];
-        if (return_val == 3 || return_val == 4)
+        if (return_val == 3)
             window.location.reload();
     }
     
@@ -52,6 +52,8 @@
             return_val = 4;
         showmodal = false;
         code = "";
+        if (return_val)
+            window.location.reload();
     }
     function secret() {
         showmodal = true;
