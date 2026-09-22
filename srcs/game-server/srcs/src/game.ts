@@ -18,8 +18,8 @@ export interface GameUserData
   matches: number;
   wallet: number;
   icon?: string | null;
-  skin_rac?: number | string | null;
-  skin_ball?: number | string | null;
+  skin_rac?: number | null;
+  skin_ball?: number | null;
 }
 
 export interface GameSessionConfig
