@@ -101,7 +101,6 @@ export async function load ({ cookies, params, fetch }) {
             icon = TakenInfos.icon
     }
 
-
     return ({
         Token: JWTtoken,
         id: id,
