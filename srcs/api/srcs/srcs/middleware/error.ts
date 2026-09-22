@@ -9,7 +9,7 @@ export function error(
   next: NextFunction
 )
   {
-  let debug:number = 1;
+  let debug:number = 0;
   console.error(err?.message);
   if (debug === 1)
     {
