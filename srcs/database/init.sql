@@ -87,3 +87,5 @@ ALTER TABLE "matches" ADD CONSTRAINT "matches_skinRac2_shop_id_fk" FOREIGN KEY (
 ALTER TABLE "matches" ADD CONSTRAINT "matches_winner_users_id_fk" FOREIGN KEY ("winner") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "users" ADD CONSTRAINT "users_skin_rac_shop_id_fk" FOREIGN KEY ("skin_rac") REFERENCES "public"."shop"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "users" ADD CONSTRAINT "users_skin_ball_shop_id_fk" FOREIGN KEY ("skin_ball") REFERENCES "public"."shop"("id") ON DELETE no action ON UPDATE no action;
+--> statement-breakpoint
+INSERT INTO shop (name, price) VALUES ('Product 1', 10), ('Product 2', 20), ('Product 3', 30), ('Product 4', 40), ('Product 5', 50), ('Product 6', 60), ('Product 7', 70), ('Product 8', 670);

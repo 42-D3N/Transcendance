@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import app from "./server.ts";
 import { db } from "./db/db.ts";
-import { api_users, users, shop } from "./db/schema.ts";
+import { api_users, users, shop, inventory } from "./db/schema.ts";
 import bcrypt, { hashSync } from "bcryptjs";
 import { generateHexString } from "./lib/custom-key.ts";
 const port = process.env.PORT || 9090;
@@ -17,6 +17,13 @@ async function addadmin():Promise<number> {
       email: process.env.ADMIN_EMAIL,
       password: hashedPassword
     }).returning();
+	const products = await db.select().from(shop);
+	await db.insert(inventory).values(
+	products.map((product:any) => ({
+		user: 1,
+		product: product.id,
+		own: false,
+	})));
     console.log("Successfully added admin user.");
     const id = await db.select({id: users.id}).from(users).where(eq(users.email, process.env.ADMIN_EMAIL));
 	const secret_key = generateHexString();
@@ -27,7 +34,7 @@ async function addadmin():Promise<number> {
     }).returning();
     console.log("Successfully added admin user to api.");
 	} catch (error) {
-	console.log("Failed to add user ", error.cause.code);
+	console.log("Failed to add admin user because ", error.cause.code);
 	return (1);
   }
   return (0);

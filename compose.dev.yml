@@ -29,17 +29,18 @@ services:
       timeout: 3s
       retries: 3
   api:
+    command: npm run dev
     image: transcendance-api
     build: 
       context: ./srcs/api
-      target: dev
+      dockerfile: Dockerfile.dev
     pull_policy: never
     env_file:
       - ./srcs/api/srcs/.env
     restart: always
     depends_on:
       database:
-        condition: service_healthy
+        condition: service_started
     networks:
       - transcendance
     healthcheck:
@@ -83,10 +84,11 @@ services:
         - action: rebuild
           path: ./srcs/website/srcs/package.json
   game_server:
+    command: npm run dev
     image: game_serv
     build:
       context: ./srcs/game-server
-      target: dev
+      dockerfile: Dockerfile.dev
     pull_policy: never
     env_file:
       - ./srcs/game-server/srcs/.env
@@ -95,7 +97,7 @@ services:
     restart: always
     depends_on:
       api:
-        condition: service_healthy
+        condition: service_started
     develop:
       watch:
         - path: ./srcs/game-server/srcs/src
@@ -106,10 +108,11 @@ services:
         - action: rebuild
           path: ./srcs/game-server/srcs/package.json
   chat-server:
+    command: npm run dev
     image: transcendance-chat-server
     build:
       context: ./srcs/chat-server
-      target: dev
+      dockerfile: Dockerfile.dev
     pull_policy: never
     env_file:
       - ./srcs/chat-server/srcs/.env
@@ -118,7 +121,7 @@ services:
     restart: always
     depends_on:
       api:
-        condition: service_healthy
+        condition: service_started
     develop:
       watch:
         - path: ./srcs/chat-server/srcs/src
@@ -133,7 +136,7 @@ services:
     restart: always
     depends_on:
       database:
-        condition: service_healthy
+        condition: service_started
     networks:
       - transcendance
     ports:

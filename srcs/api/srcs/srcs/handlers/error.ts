@@ -30,6 +30,10 @@ export function HandleParsingError(result, next: NextFunction)
 export function handleErrorCode(error, next: NextFunction, used)
 {
   if (!used) {
+    if (error.cause.code == "42601") {
+      next(new CustomError("Error: No valid field in request", 400));
+      return 1;
+    }
     next(new CustomError("Error: user not existing in database", 400));
     return 1;
   }

@@ -1,6 +1,6 @@
-import { eq, and } from "drizzle-orm";
+import { eq, and, or } from "drizzle-orm";
 import { db } from "../db/db.ts";
-import { friends } from "../db/schema.ts";
+import { friends, users } from "../db/schema.ts";
 import type { Response, Request, NextFunction } from "express";
 import { CustomError } from "../lib/custom-error.ts";
 import { HandleParsingError, handleErrorCode } from "./error.ts";
@@ -16,13 +16,13 @@ export async function deletefriends(req: Request, res: Response, next: NextFunct
     try {
         const Data = await db
         .delete(friends)
-        .where(and(eq(friends.user1, + req.body.user1), (eq(friends.user2, + req.body.user2))))
+        .where(or(and(eq(friends.user1, req.body.user1), eq(friends.user2, req.body.user2)),and(eq(friends.user1, req.body.user2), eq(friends.user2, req.body.user1))))
         .returning({
             User1: friends.user1, 
             User2: friends.user2
         });
         if (Data.length == 0) {
-            return next (new CustomError("Error: Users not found or not in friends list", 404));
+            return next (new CustomError("Error: Users not found or not in friends list", 400));
         }
         console.log("Deleted friends ", Data);
         res.status(200).json({ Data });
@@ -60,16 +60,18 @@ export async function getfriends(req: Request, res: Response, next: NextFunction
         return next(new CustomError(JSON.stringify(result.array()), 400));
     }
     try {
+        const isUser = await db.select().from(users).where(eq(users.id, Number(req.params.id)));
+        if (isUser.length == 0)
+            return next (new CustomError("Error: User does not exist", 400));
         const Data = await db
             .select()
             .from(friends)
-            .where(eq(friends.user1, + req.params.id));
-        if (Data.length == 0) {
-            return next (new CustomError("Error: user not found", 400));
-        }
+            .where(or(eq(friends.user1, Number(req.params.id)), eq(friends.user2, Number(req.params.id))));
         console.log(`get friends list`,Data);
         res.status(200).json({ Data });
     } catch (error) {
+        if (handleErrorCode(error, next, null))
+            return;
         next (new CustomError("Error: Failed to fetch friends", 500));
     }
 }

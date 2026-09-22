@@ -27,8 +27,8 @@ DataRouter.delete("/user/:id", v.validateIdParam(), authMiddleware, roleMiddlewa
 //fiends
 
 DataRouter.get("/friends/:id", v.validateIdParam(), authMiddleware, roleMiddleware("admin"), getfriends);
-DataRouter.post("/friends/", ...v.validateIdFriends(), authMiddleware, roleMiddleware("admin"), addfriends);
-DataRouter.delete("/friends/", ...v.validateDeleteFriends(), authMiddleware, roleMiddleware("admin"), deletefriends);
+DataRouter.post("/friends", ...v.validateIdFriends(), authMiddleware, roleMiddleware("admin"), addfriends);
+DataRouter.delete("/friends", ...v.validateDeleteFriends(), authMiddleware, roleMiddleware("admin"), deletefriends);
 
 //inventory
 

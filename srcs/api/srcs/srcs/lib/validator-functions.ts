@@ -11,15 +11,15 @@ export function validateDataBody() {
 }
 
 function validateUpdateEmail() {
-  return body("email").optional({ checkFalsy: true }).isString().trim().isEmail().normalizeEmail().custom((email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email));
+  return body("email").optional({ values: "undefined" }).isString().trim().isEmail().normalizeEmail().custom((email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email));
 }
 
 function validateUpdateUsername() {
-  return body("username").optional({ checkFalsy: true }).isString().trim().escape().custom((username: string) => /^[a-zA-Z0-9_-]{4,128}$/.test(username));;
+  return body("username").optional({ values: "undefined" }).isString().trim().escape().custom((username: string) => /^[a-zA-Z0-9_-]{4,128}$/.test(username));;
 }
 
 function validateUpdatePassword() {
-  return body("password").optional({ checkFalsy: true }).isString().trim().custom((password: string) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])[^\s]{12,67}$/.test(password));;
+  return body("password").optional({ values: "undefined" }).isString().trim().custom((password: string) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])[^\s]{12,67}$/.test(password));;
 }
 
 export function validateUpdateUser() {

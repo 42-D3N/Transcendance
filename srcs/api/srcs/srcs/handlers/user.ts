@@ -147,7 +147,25 @@ export async function updateuser(req: Request, res: Response, next: NextFunction
     return (HandleParsingError(result, next));
   }
   try {
+    let already_username = null;
+    let already_email = null;
     const update_data = { ...req.body };
+    if (update_data.icon)
+      return next (new CustomError("Error: cannot change icon witth the api", 400));
+    if (update_data.username || update_data.email) {
+      if (update_data.username) {
+        already_username = await db.select({username: users.username}).from(users).where(eq(update_data.username, users.username));
+        if (already_username.length !== 0) {
+          return next(new CustomError("Error: username already in database", 400));
+        }
+      }
+      if (update_data.email) {
+        already_email = await db.select({email: users.email}).from(users).where(eq(update_data.email, users.email));
+        if (already_email.length !== 0) {
+          return next(new CustomError("Error: email already in database", 400));
+        }
+      }
+    }
     if (update_data.password) {
       update_data.password = await bcrypt.hash(update_data.password, 10);
     }
@@ -157,7 +175,7 @@ export async function updateuser(req: Request, res: Response, next: NextFunction
       .where(eq(users.id, Number(req.params.id)))
       .returning();
     if (Data.length == 0) {
-      return next (new CustomError("Error: User not found", 404));
+      return next (new CustomError("Error: User does not exist", 400));
     }
     delete Data[0].password;
     console.log("user updated",Data);
@@ -181,7 +199,25 @@ export async function P_updateuser(req: Request, res: Response,next: NextFunctio
     return (HandleParsingError(result, next));
   }
   try {
+    let already_username = null;
+    let already_email = null;
     const update_data = { ...req.body };
+    if (update_data.icon)
+      return next (new CustomError("Error: cannot change icon witth the api", 400));
+    if (update_data.username || update_data.email) {
+      if (update_data.username) {
+        already_username = await db.select({username: users.username}).from(users).where(eq(update_data.username, users.username));
+        if (already_username.length !== 0) {
+          return next(new CustomError("Error: username already in database", 400));
+        }
+      }
+      if (update_data.email) {
+        already_email = await db.select({email: users.email}).from(users).where(eq(update_data.email, users.email));
+        if (already_email.length !== 0) {
+          return next(new CustomError("Error: email already in database", 400));
+        }
+      }
+    }
     update_data.password = await bcrypt.hash(update_data.password, 10);
     const Data = await db
       .update(users)
