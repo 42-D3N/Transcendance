@@ -38,14 +38,14 @@
                 <div class="relative bg-blue-200 min-height-1/50 min-lenght-10 h-4 bottom-4"></div>
                 <label>
                     Username or Email:
-                    <br><input name="username" type="username" class="border border-solid border-zinc-400 bg-white focus:bg-black/20 max-w-full">
+                    <br><input name="username" type="username" minlength="4" maxlength="128" class="border border-solid border-zinc-400 bg-white focus:bg-black/20 max-w-full">
                 </label><br>
                 {#if form?.accNotFound}<p class="error text-sm text-red-700 italic">Account not found</p>{/if}
                 {#if form?.emptyName}<p class="error text-sm text-red-700 italic">Usename or email cannot be empty</p>{/if}
                 {#if form?.wrong}<p class="error text-sm text-red-700 italic">You must enter your email or username</p>{/if}
                 <label>
                     Password:
-                    <br><input name="password" type="password" class="border border-solid border-zinc-400 bg-white focus:bg-black/20 max-w-full">
+                    <br><input name="password" type="password" minlength="12" maxlength="67" class="border border-solid border-zinc-400 bg-white focus:bg-black/20 max-w-full">
                 </label><br>
                 {#if form?.emptyPass}<p class="error text-sm text-red-700 italic">Password cannot be empty</p>{/if}
                 {#if form?.invalidPass}<p class="error text-sm text-red-700 italic">Incorrect password</p>{/if}
