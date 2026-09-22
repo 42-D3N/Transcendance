@@ -140,14 +140,6 @@
                                     {/if}
                                 </span>
 
-                                <button
-                                    class="h-[14px] w-[14px] shrink-0 leading-none text-[10px] font-bold text-black bg-[#C0C0C0] border-t border-l border-white border-b-2 border-r-2 border-b-[#404040] border-r-[#404040] active:border-t-2 active:border-l-2 active:border-b active:border-r active:border-t-[#404040] active:border-l-[#404040] active:border-b-white active:border-r-white"
-                                    onclick={(event) => { event.stopPropagation(); friendNb--; }}
-                                    type="submit"
-                                    title="endFriend"
-                                >
-                                    ×
-                                </button>
                             </div>
 
                             <div
