@@ -10,8 +10,9 @@ import { users, friends } from '$lib/server/db/schema';
 export const GET: RequestHandler = async ({ params }) => {
 
     let username = params.username.split('_');
+
     if (username.length != 2 || isNaN(parseInt(username[1])))
-        return (json({}));
+        return (json({empty: 1}));
     let user = await db.select({
             id:users.id,
             username:users.username,
@@ -25,8 +26,8 @@ export const GET: RequestHandler = async ({ params }) => {
         })
         .from(users)
         .where(eq(users.id, parseInt(username[1])))
-    if (user.length == 0)
-        return (json({}));
+    if (user.length == 0 || username[0] !== user[0].username)
+        return (json({empty: 1}));
 
     return (json(user[0]));
 };

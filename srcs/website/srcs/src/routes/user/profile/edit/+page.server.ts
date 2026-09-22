@@ -38,6 +38,7 @@ export async function load ({ cookies }) {
         if (userInfos["JWT"] != undefined)
         {
             cookies.set('JWTtoken', userInfos["JWT"], { path: '/' });
+            console.log(userInfos["JWT"]);
             throw redirect(303, "./edit");
         }
 

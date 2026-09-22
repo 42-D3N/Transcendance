@@ -46,19 +46,18 @@ export async function load ({ cookies, params, fetch }) {
 		}
 
         let checkName = params.username.split("_");
-        if (checkName[0] == userInfos.username || checkName[1] == userInfos.id)
+        if (checkName[0] == userInfos.username || checkName[1] == userInfos.id || isNaN(parseInt(checkName[1])))
             throw redirect(308, "/user/profile");
 
         let fetchedUser = await fetch(`/user/member/${params.username}`);
         let TakenInfos = await fetchedUser.json()
 
-        if (TakenInfos.length == 0)
+        if (TakenInfos.empty)
             throw redirect(308, "/user/profile");
         if (TakenInfos.privateAcc)
             return ({
                 accPrivate: true
         });
-
         copinous = (await db.select({ user1: friends.user1, user2: friends.user2, isaccepted: friends.isaccepted })
             .from(friends)
             .where(and(or(eq(friends.user2, TakenInfos.id), eq(friends.user1, TakenInfos.id)), eq(friends.isaccepted, true)))
