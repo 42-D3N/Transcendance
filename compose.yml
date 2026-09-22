@@ -63,9 +63,10 @@ services:
       api:
         condition: service_healthy
   game_server:
-    command: npm run dev
     image: game_serv
-    build: ./srcs/game-server
+    build:
+      context: ./srcs/game-server
+      target: runner
     pull_policy: never
     env_file:
       - ./srcs/game-server/srcs/.env

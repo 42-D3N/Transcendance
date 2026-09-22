@@ -81,9 +81,10 @@ services:
         - action: rebuild
           path: ./srcs/website/srcs/package.json
   game_server:
-    command: npm run dev
     image: game_serv
-    build: ./srcs/game-server
+    build:
+      context: ./srcs/game-server
+      target: dev
     pull_policy: never
     env_file:
       - ./srcs/game-server/srcs/.env
@@ -93,6 +94,15 @@ services:
     depends_on:
       api:
         condition: service_healthy
+    develop:
+      watch:
+        - path: ./srcs/game-server/srcs/src
+          action: sync
+          target: /app/src
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: ./srcs/game-server/srcs/package.json
   chat-server:
     image: transcendance-chat-server
     build:
