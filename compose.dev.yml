@@ -94,9 +94,10 @@ services:
       api:
         condition: service_healthy
   chat-server:
-    command: npm run dev
     image: transcendance-chat-server
-    build: ./srcs/chat-server
+    build:
+      context: ./srcs/chat-server
+      target: dev
     pull_policy: never
     env_file:
       - ./srcs/chat-server/srcs/.env
