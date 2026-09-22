@@ -59,10 +59,11 @@ services:
         - action: rebuild
           path: ./srcs/api/srcs/package.json
   website:
+    command: "npm run dev -- --host"
     image: transcendance-front-end
     build:
       context: ./srcs/website
-      target: dev
+      dockerfile: Dockerfile.dev
     pull_policy: never
     env_file:
       - ./srcs/website/srcs/.env
