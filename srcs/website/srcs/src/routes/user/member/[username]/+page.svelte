@@ -147,7 +147,7 @@
                         <span class="block mt-4 text-black text-base md:text-xl font-bold">Friends:</span>
                     {/if}
 
-                    <div class="grid grid-cols-4 gap-4 mt-4 w-[60%] lg:w-[40%]">
+                    <div class="grid grid-cols-2 xl:grid-cols-180 sm:grid-cols-4 gap-4 sm:gap-16 mt-4 w-[80%] xl:w-[40%]">
                     {#each data.friends as friend}
                         <form method="POST" enctype="multipart/form-data" class="flex size-fit" action="?/rmFriend" use:enhance={({ formData }) => {
                                 formData.append('friend', JSON.stringify(friend.id));
