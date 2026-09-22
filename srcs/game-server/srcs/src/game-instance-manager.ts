@@ -1,6 +1,6 @@
-import { createGameSession } from './game';
-import type { GameSession, GameSessionConfig } from './game';
-import type { AIDifficulty, MatchMode } from './pongVariables';
+import { createGameSession } from './game.ts';
+import type { GameSession, GameSessionConfig } from './game.ts';
+import type { AIDifficulty, MatchMode } from './pongVariables.ts';
 
 export interface GameUserData
 {

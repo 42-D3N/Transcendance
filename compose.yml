@@ -32,7 +32,7 @@ services:
     image: transcendance-api
     build: 
       context: ./srcs/api
-      target: dev
+      target: runner
     pull_policy: never
     env_file:
       - ./srcs/api/srcs/.env
@@ -49,20 +49,11 @@ services:
       retries: 5
       start_period: 30s
       start_interval: 5s
-    develop:
-      watch:
-        - path: ./srcs/api/srcs/srcs
-          action: sync
-          target: /app/srcs
-          ignore:
-            - node_modules/
-        - action: rebuild
-          path: ./srcs/api/srcs/package.json
   website:
     image: transcendance-front-end
     build:
       context: ./srcs/website
-      target: dev
+      target: runner
     pull_policy: never
     env_file:
       - ./srcs/website/srcs/.env
@@ -72,20 +63,11 @@ services:
     depends_on:
       api:
         condition: service_healthy
-    develop:
-      watch:
-        - path: ./srcs/website/srcs/src
-          action: sync
-          target: /app/src
-          ignore:
-            - node_modules/
-        - action: rebuild
-          path: ./srcs/website/srcs/package.json
   game_server:
     image: game_serv
     build:
       context: ./srcs/game-server
-      target: dev
+      target: runner
     pull_policy: never
     env_file:
       - ./srcs/game-server/srcs/.env
@@ -95,20 +77,11 @@ services:
     depends_on:
       api:
         condition: service_healthy
-    develop:
-      watch:
-        - path: ./srcs/game-server/srcs/src
-          action: sync
-          target: /app/src
-          ignore:
-            - node_modules/
-        - action: rebuild
-          path: ./srcs/game-server/srcs/package.json
   chat-server:
     image: transcendance-chat-server
     build:
       context: ./srcs/chat-server
-      target: dev
+      target: runner
     pull_policy: never
     env_file:
       - ./srcs/chat-server/srcs/.env
@@ -118,15 +91,6 @@ services:
     depends_on:
       api:
         condition: service_healthy
-    develop:
-      watch:
-        - path: ./srcs/chat-server/srcs/src
-          action: sync
-          target: /app/src
-          ignore:
-            - node_modules/
-        - action: rebuild
-          path: ./srcs/chat-server/srcs/package.json
   adminer:
     image: adminer
     restart: always

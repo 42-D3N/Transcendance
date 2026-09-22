@@ -131,11 +131,5 @@
                 </tbody>
 			</table>
 		</div>
-
-		<footer class="text-center text-[10px] text-[#4a5c78] pt-2.5 pb-1">
-			a 42 project realised by
-			<div class="mt-1">tle-pape &middot; rdestruh &middot; macolomi &middot; aeherve</div>
-		</footer>
-
 	</div>
 </main>

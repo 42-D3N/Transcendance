@@ -19,21 +19,29 @@ export const nodes = [
 	() => import('./nodes/7'),
 	() => import('./nodes/8'),
 	() => import('./nodes/9'),
-	() => import('./nodes/10')
+	() => import('./nodes/10'),
+	() => import('./nodes/11'),
+	() => import('./nodes/12'),
+	() => import('./nodes/13'),
+	() => import('./nodes/14')
 ];
 
 export const server_loads = [0];
 
 export const dictionary = {
 		"/": [~2],
-		"/game": [5],
+		"/game": [~5],
 		"/game/gameItself": [6],
 		"/game/loadingScreen": [7],
-		"/game/matchmaking": [8],
+		"/game/matchmaking": [~8],
+		"/game/play": [~9],
 		"/(login)/login": [~3],
+		"/shop": [~10],
 		"/(login)/sign_in": [~4],
-		"/user/logout": [~9],
-		"/user/profile": [~10]
+		"/user/logout": [~11],
+		"/user/member/[username]": [~12],
+		"/user/profile": [~13],
+		"/user/profile/edit": [~14]
 	};
 
 export const hooks = {

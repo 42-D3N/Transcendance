@@ -1,11 +1,32 @@
-FROM node:26-trixie
+FROM node:26-trixie AS dev
+RUN mkdir -p /user/profile/userIcons
+WORKDIR /app
+
+RUN --mount=type=bind,source=./srcs/package.json,target=package.json \
+    --mount=type=bind,source=./srcs/package-lock.json,target=package-lock.json \
+    npm ci
+COPY ./srcs /app
+RUN npm run build
+
+EXPOSE 5173
+
+CMD ["npm", "run", "dev"]
+
+FROM node:26-trixie AS deps
+WORKDIR /app
+
+RUN --mount=type=bind,source=./srcs/package.json,target=package.json \
+    --mount=type=bind,source=./srcs/package-lock.json,target=package-lock.json \
+    npm ci --omit=dev
+
+FROM node:26-trixie AS runner
 RUN mkdir -p /user/profile/userIcons
 RUN chmod 777 /user/profile/userIcons
-RUN useradd -ms /bin/sh -u 1001 app
-USER app
-
 WORKDIR /app
-COPY --chown=app:app ./srcs/package.json ./srcs/package-lock.json ./
-RUN npm install
-COPY --chown=app:app ./srcs /app
+
+COPY --from=deps --chown=node:node /app/node_modules ./node_modules
+COPY --from=dev --chown=node:node /app/build ./build
+
 EXPOSE 5173
+
+CMD ["node", "build/index.js"]

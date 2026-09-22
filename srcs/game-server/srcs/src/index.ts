@@ -1,8 +1,8 @@
 import Fastify from 'fastify';
 import fastifyWebsocket from '@fastify/websocket';
-import { GameInstanceManager } from './game-instance-manager';
-import type { ClientMessage } from '../../../website/srcs/src/lib/game/both/interfaces';
-import type { AIDifficulty, MatchMode } from './pongVariables';
+import { GameInstanceManager } from './game-instance-manager.ts';
+import type { ClientMessage } from './interfaces.ts';
+import type { AIDifficulty, MatchMode } from './pongVariables.ts';
 
 const server = Fastify({logger: true});
 const gameInstances = new GameInstanceManager();

@@ -26,7 +26,7 @@ export const options = {
 		app: ({ head, body, assets, nonce, env }) => "<!doctype html>\n<html lang=\"en\" class=\"text-[62.5%] box-border\">\n\t<head>\n\t\t<meta charset=\"utf-8\" />\n\t\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n\t\t<meta name=\"text-scale\" content=\"scale\" />\n\t\t" + head + "\n\t</head>\n\t<body data-sveltekit-preload-data=\"hover\" class=\"text-[1.5rem]\">\n\t\t<div class=\"xl:pl-68 lg:pl-[5.6rem]\">" + body + "</div>\n\t</body>\n</html>\n",
 		error
 	},
-	version_hash: "1esbnf5"
+	version_hash: "3lsjiv"
 };
 
 export async function get_hooks() {
@@ -35,7 +35,7 @@ export async function get_hooks() {
 	let handleError;
 	let handleValidationError;
 	let init;
-	
+	({ handle, handleFetch, handleError, handleValidationError, init } = await import("../../../src/hooks.server.ts"));
 
 	let reroute;
 	let transport;

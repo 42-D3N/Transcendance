@@ -9,7 +9,7 @@ const port = process.env.PORT || 9090;
 async function addadmin():Promise<number> {
   try {
     const hashedPassword = await bcrypt.hash(process.env.ADMIN_PASSWORD, 10);
-    const is_first = await db.select().from(users).where(eq(process.env.ADMIN_USERNAME, users.username));
+    const is_first = await db.select().from(users).where(eq(users.username, process.env.ADMIN_USERNAME));
     if (is_first[0])
       return (0);
     const admin = await db.insert(users).values({
@@ -18,7 +18,7 @@ async function addadmin():Promise<number> {
       password: hashedPassword
     }).returning();
     console.log("Successfully added admin user.");
-    const id = await db.select({id: users.id}).from(users).where(eq(process.env.ADMIN_EMAIL, users.email));
+    const id = await db.select({id: users.id}).from(users).where(eq(users.email, process.env.ADMIN_EMAIL));
 	const secret_key = generateHexString();
     const admin_api = await db.insert(api_users).values({
       user: id[0].id,

@@ -1,10 +1,10 @@
-import { serverVariable } from './pongVariables';
+import { serverVariable } from './pongVariables.ts';
 import { eq, lt, gte, ne, and } from 'drizzle-orm';
 import { db } from './db/db.ts';
 import { users, matches} from './db/schema.ts';
 
-import type { ClientInputMessage, ConnectedPlayer, ClientGameState, Player } from '../../../website/srcs/src/lib/game/both/interfaces';
-import type { AIDifficulty, MatchConfig, MatchMode } from './pongVariables';
+import type { ClientInputMessage, ConnectedPlayer, ClientGameState, Player } from './interfaces.ts';
+import type { AIDifficulty, MatchConfig, MatchMode } from './pongVariables.ts';
 
 type Game = ReturnType<typeof serverVariable>;
 export type PlayerSide = 1 | 2;
@@ -18,8 +18,8 @@ export interface GameUserData
   matches: number;
   wallet: number;
   icon?: string | null;
-  skin_rac?: number | string | null;
-  skin_ball?: number | string | null;
+  skin_rac?: number | null;
+  skin_ball?: number | null;
 }
 
 export interface GameSessionConfig

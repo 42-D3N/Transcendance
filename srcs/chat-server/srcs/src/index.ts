@@ -1,14 +1,13 @@
-import fastify, { FastifyRequest } from 'fastify'
-import fastifyWebsocket from '@fastify/websocket'
+import fastify from 'fastify';
+import fastifyWebsocket from '@fastify/websocket';
 import { db } from './db/db.ts';
 import { users, chat } from './db/schema.ts';
-import { eq, lt, gte, ne, or, and } from 'drizzle-orm';
-import http from "http";
-import { validateJWT } from './jwt';
+import { eq, or, and } from 'drizzle-orm';
+import { validateJWT } from './jwt.ts';
 
 const server = fastify({ logger: true })
 
-const connections = new Map<WebSocket, { id: number, isAlive: boolean }>();
+const connections = new Map<fastifyWebsocket.WebSocket, { id: number, isAlive: boolean }>();
 
 interface ChatContact {
 	id: number,
@@ -27,7 +26,7 @@ function timeSort(a: ChatContact, b: ChatContact): number {
 	return a.time.getTime() - b.time.getTime();
 }
 
-async function newConn(sock: WebSocket, token: string): Promise<boolean> {
+async function newConn(sock: fastifyWebsocket.WebSocket, token: string): Promise<boolean> {
 	let userInfos = await validateJWT(token);
 	if (userInfos.empty === 0) {
 		sock.close(3000 , "Invalid token.");
@@ -49,7 +48,7 @@ async function newConn(sock: WebSocket, token: string): Promise<boolean> {
 	return true;
 }
 
-async function sendContacts(sock: WebSocket) {
+async function sendContacts(sock: fastifyWebsocket.WebSocket) {
 	let thisUser = connections.get(sock);
 	if (!thisUser) return ;
 
@@ -65,15 +64,15 @@ async function sendContacts(sock: WebSocket) {
 }
 
 async function broadcast(authorId: number | undefined, dest: number, packet: any, stamp: any) {
-	connections.forEach((userId, sock) => {
-		if (userId === authorId || userId === dest)
+	connections.forEach((userInfos, sock) => {
+		if (userInfos.id === authorId || userInfos.id === dest)
 			sock.send(JSON.stringify({type: "message", valid:true, body:{author: authorId, target: dest, message: packet.message, timestamp: stamp}}));
 	});
 }
 
 server.register(fastifyWebsocket);
 server.register(async function (server) {
-	server.get('/api/chat', { websocket: true }, async (socket: WebSocket, req: FastifyRequest) => {
+	server.get('/api/chat', { websocket: true }, async (socket: fastifyWebsocket.WebSocket, req: any) => {
 		let authRes:boolean = await newConn(socket, req.query.token);
 		if (!authRes)
 			return ;
@@ -221,7 +220,7 @@ server.register(async function (server) {
 
 server.listen({ host: '0.0.0.0', port: 5786 }, err => {
 	if (err) {
-		fastify.log.error(err);
+		server.log.error(err);
 		process.exit(1);
 	}
 });

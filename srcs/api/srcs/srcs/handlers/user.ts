@@ -14,7 +14,7 @@ export async function adduser(req: Request, res: Response, next: NextFunction) {
   }
   try {
     const { username, email, password } = req.body;
-    const already = await db.select({username: users.username}).from(users).where(eq(users.email, email)).where(eq(users.username, username));
+    const already = await db.select({username: users.username}).from(users).where(and(eq(users.email, email), eq(users.username, username)));
     if (already.length !== 0) {
       return next(new CustomError("Error: user already in database", 400));
     }
@@ -91,7 +91,7 @@ export async function admingetuserid(req: Request, res: Response, next: NextFunc
     const Data = await db
       .select()
       .from(users)
-      .where(eq(users.username, +req.body.username));
+      .where(eq(users.username, req.body.username));
     if (Data.length === 0) {
       return next (new CustomError("Error: User not found", 404));
     }

@@ -1,4 +1,4 @@
-import type { Ball, GameRules, GameState, Player, AILevel } from "../../../website/srcs/src/lib/game/both/interfaces";
+import type { Ball, GameRules, GameState, Player, AILevel } from "./interfaces.ts";
 
 export type MatchMode = "pvp" | "pve";
 export type AIDifficulty = "easy" | "normal" | "hard" | "impossible";

@@ -8,7 +8,7 @@ import { handleErrorCode, HandleParsingError } from "./error.ts";
 import { eq } from "drizzle-orm";
 import { generateHexString } from "../lib/custom-key.ts";
 import jwt from "jsonwebtoken";
-var expire_time = '1h';
+const expire_time = '1h';
 
 export async function register(req: Request, res: Response, next: NextFunction) {
     const result = validationResult(req);
