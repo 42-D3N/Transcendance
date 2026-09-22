@@ -71,7 +71,8 @@ export const actions = {
                 {
                     await recreatejtw(cookies, userInfos);
                     return {
-                        success: true
+                        success: true,
+						code: 4
                     };
                 }
                 return {

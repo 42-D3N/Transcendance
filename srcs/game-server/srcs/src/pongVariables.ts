@@ -18,11 +18,6 @@ export function serverVariable(config: MatchConfig)
   const DT = 1 / TICK_RATE;
   const ROUND_PAUSE_TICKS = TICK_RATE * 2;
   const MATCH_START_COUNTDOWN_TICKS = TICK_RATE * 3;
-  const POWER_PAUSE_TICKS = Math.round(TICK_RATE / 4);
-  const POWER_TRIGGER_LINE_Y = GAME_HEIGHT / 2;
-  const POWER_MAX_USES = 3;
-  const POWER_SPEED_MULTIPLIER = 2;
-  const POWER_DIRECTION_VARIATION = 0.35;
   const BALL_SIZE = { w: 15, h: 15 } as const;
   const BALL_BASE_POSITION = {
     x: (GAME_WIDTH - BALL_SIZE.w) / 2,
@@ -84,7 +79,7 @@ export function serverVariable(config: MatchConfig)
 
   const player1: Player =
   {
-    input: { move: 0, special: false },
+    input: { move: 0 },
     racket:
     {
       pos:	{ x: (GAME_WIDTH / 2), y: GAME_HEIGHT - 12.5 - 10 },
@@ -95,7 +90,7 @@ export function serverVariable(config: MatchConfig)
 
   const player2: Player =
   {
-    input: { move: 0, special: false },
+    input: { move: 0 },
     racket:
     {
       pos:	{ x: (GAME_WIDTH / 2), y: 12.5 },
@@ -105,20 +100,8 @@ export function serverVariable(config: MatchConfig)
     ai: {
       level: aiLevels[config.aiDifficulty ?? "easy"],
       lastDecisionTime: 0,
-      targetX: null,
-      powerUseThisRound: false,
-      powerUsedThisRound: false
+      targetX: null
     }
-  };
-
-  const power =
-  {
-    pendingOwner: null as 1 | 2 | null,
-    pauseUntilTick: 0,
-    boostedTarget: null as 1 | 2 | null,
-    baseSpeedBeforeBoost: null as number | null,
-    remainingUses: { p1: POWER_MAX_USES, p2: POWER_MAX_USES },
-    specialLatch: { p1: false, p2: false }
   };
 
   const ready =
@@ -148,10 +131,6 @@ export function serverVariable(config: MatchConfig)
     DT,
     ROUND_PAUSE_TICKS,
     MATCH_START_COUNTDOWN_TICKS,
-    POWER_PAUSE_TICKS,
-    POWER_TRIGGER_LINE_Y,
-    POWER_SPEED_MULTIPLIER,
-    POWER_DIRECTION_VARIATION,
     roundEndTick: 0,
     countdownEndTick: 0,
     countdownLaunchVelocity: null as { x: number; y: number } | null,
@@ -163,7 +142,6 @@ export function serverVariable(config: MatchConfig)
     player2,
     state,
     rules,
-    power,
     ready,
     playerUserIds,
     playerUserData,

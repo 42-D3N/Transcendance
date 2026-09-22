@@ -146,4 +146,13 @@ export class GameInstanceManager
 
     return session.getOpponentUsername(side);
   }
+
+  public getOpponentSkinRac(instanceId: string, side: 1 | 2): number | string | null
+  {
+    const session = this.sessions.get(instanceId);
+    if (!session)
+      return null;
+
+    return session.getOpponentSkinRac(side);
+  }
 }
