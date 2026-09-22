@@ -41,7 +41,7 @@
 											<p class="message-row-message-content text-small p-0 m-0 overscroll-contain">{formatTime(contact.time)}</p>
 										</div>
 										<div class="message-row-row overscroll-contain">
-											<p class="message-row-message-content text-small p-0 m-0 overscroll-contain">{contact.message}</p>
+											<p class="text-left message-row-message-content text-small p-0 m-0 overscroll-contain">{contact.message}</p>
 										</div>
 									</div>
 								</button>
