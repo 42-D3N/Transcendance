@@ -57,6 +57,10 @@ services:
     pull_policy: never
     env_file:
       - ./srcs/website/srcs/.env
+    environment:
+      - PORT=5173
+      - PROTOCOL_HEADER=x-forwarded-proto
+      - HOST_HEADER=x-forwarded-host
     networks:
       - transcendance
     restart: always
@@ -91,16 +95,6 @@ services:
     depends_on:
       api:
         condition: service_healthy
-  adminer:
-    image: adminer
-    restart: always
-    depends_on:
-      database:
-        condition: service_healthy
-    networks:
-      - transcendance
-    ports:
-      - 4040:8080
 
 volumes:
   pgdata:

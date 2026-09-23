@@ -38,7 +38,6 @@ export async function load ({ cookies }) {
         if (userInfos["JWT"] != undefined)
         {
             cookies.set('JWTtoken', userInfos["JWT"], { path: '/' });
-            console.log(userInfos["JWT"]);
             throw redirect(303, "./edit");
         }
 
@@ -95,6 +94,7 @@ export const actions = {
         const isPrivate = form.get('agree') as string;
 
         let userInfos = await validateJWT(event.cookies.get('JWTtoken'));
+		let alreadyExists = false;
         if (!newName || !isUsername.test(newName))
             return (fail(400, {newName, invalidName: true }));
         if (!newMail || !isEmail.test(newMail))
@@ -102,10 +102,13 @@ export const actions = {
 
         let bdInfos = (await db.select({ username: users.username, email: users.email, id: users.id }).from(users).where(or(eq(newName, users.username), eq(newMail, users.email))));
         bdInfos.forEach((entry) => {
-            if (entry.id != userInfos.id)
-                return (fail(400, {bdInfos, somethingExists: true }));
-        });
+            if (entry.id !== userInfos.id)
+				alreadyExists = true;
+			});
 
+		if (alreadyExists)
+			return (fail(400, {bdInfos, somethingExists: true }));
+		
         if (newName != userInfos.username)
         {
             await db.update(users).set({username: newName}).where(eq(users.id, userInfos.id));

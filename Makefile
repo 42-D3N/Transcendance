@@ -2,17 +2,19 @@ up:
 	docker compose -f compose.yml up --build
 
 down:
-	docker compose -f compose.yml down --volumes
+	docker compose -f compose.yml down
 
 devup:
 	docker compose -f compose.dev.yml up --watch
 
 devdown:
+	docker compose -f compose.dev.yml down
+
+clean:
+	docker compose -f compose.yml down --volumes
+
+devclean:
 	docker compose -f compose.dev.yml down --volumes
-
-clean: down
-
-devclean: devdown
 
 fclean: clean
 	docker compose -f compose.yml down --volumes --remove-orphans --rmi all

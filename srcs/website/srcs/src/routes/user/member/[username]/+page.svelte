@@ -26,10 +26,10 @@
     ];
     import { afterNavigate } from '$app/navigation'
     import { chatClient } from '$lib/chat-client.svelte.ts';
+	import { formatTime } from "$lib/common";
 
     import type { PageProps } from './$types';
     let { data, form }: PageProps = $props();
-    console.log(data.accPrivate);
     let friendNb = $state(0);
 
     // svelte-ignore state_referenced_locally
@@ -51,23 +51,6 @@
     function redirectToProfiles(username: string)
     {
         redirect(308, "./user/member/"+username);
-    }
-
-    function formatTime(e:Date):string {
-        const interval = (Date.now() - e.getTime()) / 1000;
-        if (interval < 5)
-            return ("À l'instant.");
-        if (interval < 60)
-            return "Il y a "+interval+" secondes.";
-        if (interval < 90)
-            return "Il y a 1 minute.";
-        if (interval < 3600)
-            return "Il y a "+Math.round(interval/60)+" minutes.";
-        if (interval < 5400)
-            return "Il y a 1 heure.";
-        if (interval < 86400)
-            return "Il y a "+Math.round(interval/3600)+" heures.";
-        return e.toDateString();
     }
 </script>
 
@@ -106,7 +89,8 @@
                 style="font-family: Tahoma, 'MS Sans Serif', sans-serif;"
             >
                 <div class="flex items-center gap-2 px-2 py-1 bg-[#000080] h-fit">
-                    <span class="inline-block h-[6px] w-[6px] rounded-full bg-[#00ff00] shadow-[0_0_2px_#00ff00]"></span>
+					<span class="inline-block h-[6px] w-[6px] rounded-full {data.online?"bg-green-500":"bg-red-500"}"></span>
+                    <!-- <span class="inline-block h-[6px] w-[6px] rounded-full bg-[#00ff00] shadow-[0_0_2px_#00ff00]"></span> -->
                     <span class="text-white text-sm md:text-base lg:text-xl xl:text-2xl font-bold">{data.username}#{data.id}</span>
                 </div>
 

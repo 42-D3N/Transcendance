@@ -83,11 +83,11 @@ server.register(async function (server) {
 			
 			let numLog = 0;
 			let thisId = thisUser.id;
-			console.log("User "+thisId+" disconnected.");
 			connections.forEach((userId) => {
 				if (userId.id === thisId)
 					numLog++;
 			});
+			console.log("User "+thisId+" disconnected, "+(numLog - 1)+" connections remain.");
 			if (numLog <= 1) {
 				await db.update(users).set({online_status: false}).where(eq(users.id, thisId));
 				connections.forEach((userId, sock) => {

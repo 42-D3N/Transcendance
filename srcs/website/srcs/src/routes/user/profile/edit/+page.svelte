@@ -5,6 +5,7 @@
     import { redirect } from '@sveltejs/kit';
     import xp from '$lib/assets/test.webp';
     import usericon from '$lib/assets/user/default.svg';
+	import { formatTime } from "$lib/common";
     
     let fileinput: HTMLInputElement;
     let avatar: string | undefined = $state();
@@ -27,7 +28,7 @@
             fileError = 1;        
             return;
         }
-        if (image.size > 1048576)
+        if (image.size >= 524000)
         {
             target.value = "";
             fileError = 2;
@@ -53,26 +54,9 @@
     };
     
     function NoNoYourPreviewSuckPlsDeleteItDaddy() {
+		avatar = undefined;
         window.location.reload()
     }
-
-    function formatTime(e:Date):string {
-        const interval = (Date.now() - e.getTime()) / 1000;
-        if (interval < 5)
-            return ("À l'instant.");
-        if (interval < 60)
-            return "Il y a "+interval+" secondes.";
-        if (interval < 90)
-            return "Il y a 1 minute.";
-        if (interval < 3600)
-            return "Il y a "+Math.round(interval/60)+" minutes.";
-        if (interval < 5400)
-            return "Il y a 1 heure.";
-        if (interval < 86400)
-            return "Il y a "+Math.round(interval/3600)+" heures.";
-        return e.toDateString();
-    }
-
 </script>
 
 <img class="fixed inset-0 z-0 bg-[#404040] size-full" src={xp} alt=""/>
@@ -280,7 +264,7 @@
     <Popup message="No images uploaded" duration = {5000} onClose={() => fileError = 0}/>
 {/if}
 {#if fileError === 2}
-    <Popup message="Image too big, needs a size < 1mo" duration = {5000} onClose={() => fileError = 0}/>
+    <Popup message="Image too big, needs a size < 500ko" duration = {5000} onClose={() => fileError = 0}/>
 {/if}
 {#if fileError === 3}
     <Popup message="wrong extension detected: try using jpg, jpeg, png or webp" duration = {5000} onClose={() => fileError = 0}/>

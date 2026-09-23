@@ -1,5 +1,5 @@
 export function formatTime(e:Date):string {
-    const interval = (Date.now() - e.getTime()) / 1000;
+    const interval = Math.round((Date.now() - e.getTime()) / 1000);
     if (interval < 5)
         return ("À l'instant.");
     if (interval < 60)

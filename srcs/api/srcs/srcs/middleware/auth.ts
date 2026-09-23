@@ -20,7 +20,6 @@ export const authMiddleware = async (req, res, next) => {
     try {
         const decoded = jwt.decode(token);
         if (!decoded || typeof decoded !== "object" || !decoded.id) {
-            console.log(decoded);
             console.log("invalid token");
             return next(new CustomError("Invalid token", 401));
         }

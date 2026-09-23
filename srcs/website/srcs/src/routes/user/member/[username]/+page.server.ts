@@ -18,6 +18,7 @@ export async function load ({ cookies, params, fetch }) {
     let copinous = [];
     let actualFriends: {id: number; username: string; icon: string | null}[] = [];
     let userHistory: [];
+	let online = false;
 
     if (!JWTtoken || JWTtoken === '-1')
     {
@@ -96,6 +97,7 @@ export async function load ({ cookies, params, fetch }) {
         losses = TakenInfos.losses;
         matchesP = TakenInfos.matches;
         wallet = TakenInfos.wallet;
+		online = TakenInfos.online;
         if (TakenInfos.icon != '')
             icon = TakenInfos.icon
     }
@@ -112,6 +114,7 @@ export async function load ({ cookies, params, fetch }) {
         icon: icon,
         friends: actualFriends,
         accPrivate: false,
-        matchHistory: userHistory
+        matchHistory: userHistory,
+		online: online
     });
 };

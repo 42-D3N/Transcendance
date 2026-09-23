@@ -21,4 +21,3 @@ export const init: ServerInit = async () => {
         console.log('Products inserted!');
     }
 }
-

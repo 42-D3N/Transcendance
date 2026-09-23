@@ -55,19 +55,19 @@ export function serverVariable(config: MatchConfig)
     easy:
     {
       reactionTime:	780,
-      errorMargin:	230
+      errorMargin:	750
     },
 
     normal:
     {
       reactionTime:	780,
-      errorMargin:	200
+      errorMargin:	350
     },
 
     hard:
     {
       reactionTime:	300,
-      errorMargin:	150
+      errorMargin:	180
     },
 
     impossible:
